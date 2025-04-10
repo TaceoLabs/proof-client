@@ -1,0 +1,27 @@
+[package]
+name = "ppd-client"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+authors = ["TACEO GmbH <hello@taceo.io>"]
+homepage = "https://www.taceo.io"
+repository = "https:://github.com/TaceoLabs/ppd-network"
+license = "MIT OR Apache-2.0"
+publish = false
+readme = "./README.md"
+
+[dependencies]
+ark-bn254 = "0.5.0"
+ark-bls12-381 = "0.5.0"
+ark-bls12-377 = "0.5.0"
+ark-ec = "0.5.0"
+bincode = "1.3.3"
+crypto_box = { version = "0.9.1", features = ["std", "seal"] }
+co-circom-types = { git = "https://github.com/TaceoLabs/co-snarks", rev = "81a4fca" }
+circom-types = { git = "https://github.com/TaceoLabs/co-snarks", rev = "81a4fca", features = ["ark-bls12-377", "ark-bls12-381"] }
+ppd-api-client = { path = "../ppd-api-client" }
+base64ct = { version = "1.7.3", features = ["alloc"] }
+rand = "0.8.5"
+eyre = "0.6.12"
+uuid = "1.16.0"
+

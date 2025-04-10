@@ -1,0 +1,752 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Private Proof Delegation-CCL",
+    "description": "",
+    "contact": {
+      "name": "TACEO GmbH",
+      "email": "hello@taceo.io"
+    },
+    "license": {
+      "name": "MIT",
+      "identifier": "MIT"
+    },
+    "version": "1.0"
+  },
+  "paths": {
+    "/api/v1/blueprint/create": {
+      "put": {
+        "tags": [
+          "CoSnarkBlueprint"
+        ],
+        "summary": "create a new coSNARK blueprint",
+        "operationId": "create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBlueprintRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Scheduled the new job",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateBlueprintResponse"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/blueprint/{id}/circuit": {
+      "put": {
+        "tags": [
+          "CoSnarkBlueprint"
+        ],
+        "summary": "add proving key to blueprint",
+        "operationId": "upload_circuit",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The id of the blueprint",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Sucessfully added circuit"
+          },
+          "5XX": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/blueprint/{id}/pk": {
+      "put": {
+        "tags": [
+          "CoSnarkBlueprint"
+        ],
+        "summary": "add proving key to blueprint",
+        "operationId": "upload_pk",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The id of the blueprint",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Sucessfully added proving key"
+          },
+          "5XX": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/code": {
+      "get": {
+        "tags": [
+          "Job"
+        ],
+        "summary": "create a new job",
+        "operationId": "issue_cosnark_code",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IssueCoSnarkCodeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The code that enables issuing a coSNARK job",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/schedule": {
+      "post": {
+        "tags": [
+          "Job"
+        ],
+        "summary": "create a new job",
+        "operationId": "schedule_job",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScheduleJobRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Scheduled the new job",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScheduleJobResponse"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/{id}/input": {
+      "put": {
+        "tags": [
+          "Job"
+        ],
+        "summary": "add input data to a job",
+        "operationId": "add_input",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The uuid of the job",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "input_party0",
+                  "input_party1",
+                  "input_party2"
+                ],
+                "properties": {
+                  "input_party0": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "input_party1": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "input_party2": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Sucessfully added input for job"
+          },
+          "5XX": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/nps/register": {
+      "post": {
+        "tags": [
+          "NPS"
+        ],
+        "summary": "register a new node provider",
+        "operationId": "register",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterNpsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "NPS successfully registered",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterNpsResponse"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/users/login": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "get_login",
+        "parameters": [
+          {
+            "name": "next",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The login form"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "post_login",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Credentials"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The code that enables issuing a coSNARK job",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/users/logout": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "logout",
+        "responses": {
+          "200": {
+            "description": "Successful logout"
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "description": "The manager is healthy"
+          },
+          "5XX": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health/live": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "operationId": "live",
+        "responses": {
+          "200": {
+            "description": "The manager is healthy"
+          },
+          "5XX": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "operationId": "ready",
+        "responses": {
+          "200": {
+            "description": "The manager is healthy"
+          },
+          "5XX": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiError": {
+        "type": "object",
+        "required": [
+          "code"
+        ],
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "message": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "BlueprintCurve": {
+        "type": "string",
+        "enum": [
+          "Bn254",
+          "Bls381",
+          "Bls377"
+        ]
+      },
+      "BlueprintType": {
+        "type": "string",
+        "enum": [
+          "CircomGroth16",
+          "LibsnarkGroth16",
+          "NoirUltrahonk"
+        ]
+      },
+      "CreateBlueprintRequest": {
+        "type": "object",
+        "required": [
+          "typ",
+          "curve",
+          "node_provider0",
+          "node_provider1",
+          "node_provider2",
+          "vk"
+        ],
+        "properties": {
+          "curve": {
+            "$ref": "#/components/schemas/BlueprintCurve"
+          },
+          "node_provider0": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "node_provider1": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "node_provider2": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "typ": {
+            "$ref": "#/components/schemas/BlueprintType"
+          },
+          "vk": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateBlueprintResponse": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "Credentials": {
+        "type": "object",
+        "required": [
+          "username",
+          "password"
+        ],
+        "properties": {
+          "next": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "password": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        }
+      },
+      "IssueCoSnarkCodeRequest": {
+        "type": "object",
+        "required": [
+          "amount",
+          "validity_in_seconds"
+        ],
+        "properties": {
+          "amount": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "validity_in_seconds": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          }
+        }
+      },
+      "JobType": {
+        "type": "string",
+        "enum": [
+          "Rep3Full",
+          "Rep3Prove",
+          "ShamirProve"
+        ]
+      },
+      "NpsKeyMaterial": {
+        "type": "object",
+        "required": [
+          "enc_key",
+          "verify_key"
+        ],
+        "properties": {
+          "enc_key": {
+            "type": "string"
+          },
+          "verify_key": {
+            "type": "string"
+          }
+        }
+      },
+      "RegisterNpsRequest": {
+        "type": "object",
+        "required": [
+          "name",
+          "enc_key",
+          "verifying_key"
+        ],
+        "properties": {
+          "enc_key": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "verifying_key": {
+            "type": "string"
+          }
+        }
+      },
+      "RegisterNpsResponse": {
+        "type": "object",
+        "required": [
+          "nps_id",
+          "sqs_queue",
+          "sns_topic"
+        ],
+        "properties": {
+          "nps_id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sns_topic": {
+            "type": "string"
+          },
+          "sqs_queue": {
+            "type": "string"
+          }
+        }
+      },
+      "ScheduleJobRequest": {
+        "type": "object",
+        "required": [
+          "blueprint_id",
+          "job_type",
+          "code"
+        ],
+        "properties": {
+          "blueprint_id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "code": {
+            "type": "string"
+          },
+          "job_type": {
+            "$ref": "#/components/schemas/JobType"
+          }
+        }
+      },
+      "ScheduleJobResponse": {
+        "type": "object",
+        "required": [
+          "job_id",
+          "remaining_permits",
+          "key_material"
+        ],
+        "properties": {
+          "job_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "key_material": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NpsKeyMaterial"
+            }
+          },
+          "remaining_permits": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearer": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "ppd-ccl",
+      "description": "Private Proof Delegation - Cryptographic Coordination Layer"
+    }
+  ]
+}
