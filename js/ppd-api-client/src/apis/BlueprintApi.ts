@@ -16,20 +16,34 @@
 import * as runtime from '../runtime';
 import type {
   ApiError,
+  BlueprintReadyProbe,
   CreateBlueprintRequest,
   CreateBlueprintResponse,
+  IssueCoSnarkCodeRequest,
 } from '../models/index';
 import {
     ApiErrorFromJSON,
     ApiErrorToJSON,
+    BlueprintReadyProbeFromJSON,
+    BlueprintReadyProbeToJSON,
     CreateBlueprintRequestFromJSON,
     CreateBlueprintRequestToJSON,
     CreateBlueprintResponseFromJSON,
     CreateBlueprintResponseToJSON,
+    IssueCoSnarkCodeRequestFromJSON,
+    IssueCoSnarkCodeRequestToJSON,
 } from '../models/index';
+
+export interface BlueprintReadyRequest {
+    id: number;
+}
 
 export interface CreateRequest {
     createBlueprintRequest: CreateBlueprintRequest;
+}
+
+export interface IssueCosnarkCodeRequest {
+    issueCoSnarkCodeRequest: IssueCoSnarkCodeRequest;
 }
 
 export interface UploadCircuitRequest {
@@ -42,10 +56,56 @@ export interface UploadPkRequest {
     file: Blob;
 }
 
+export interface UploadVkRequest {
+    id: number;
+    file: Blob;
+}
+
 /**
  * 
  */
-export class CoSnarkBlueprintApi extends runtime.BaseAPI {
+export class BlueprintApi extends runtime.BaseAPI {
+
+    /**
+     * checks whether a blueprint is already ready
+     */
+    async blueprintReadyRaw(requestParameters: BlueprintReadyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BlueprintReadyProbe>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling blueprintReady().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/v1/blueprint/{id}/ready`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => BlueprintReadyProbeFromJSON(jsonValue));
+    }
+
+    /**
+     * checks whether a blueprint is already ready
+     */
+    async blueprintReady(requestParameters: BlueprintReadyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BlueprintReadyProbe> {
+        const response = await this.blueprintReadyRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * create a new coSNARK blueprint
@@ -92,7 +152,55 @@ export class CoSnarkBlueprintApi extends runtime.BaseAPI {
     }
 
     /**
-     * add proving key to blueprint
+     * create a new job
+     */
+    async issueCosnarkCodeRaw(requestParameters: IssueCosnarkCodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
+        if (requestParameters['issueCoSnarkCodeRequest'] == null) {
+            throw new runtime.RequiredError(
+                'issueCoSnarkCodeRequest',
+                'Required parameter "issueCoSnarkCodeRequest" was null or undefined when calling issueCosnarkCode().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/v1/blueprint/code`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+            body: IssueCoSnarkCodeRequestToJSON(requestParameters['issueCoSnarkCodeRequest']),
+        }, initOverrides);
+
+        if (this.isJsonMime(response.headers.get('content-type'))) {
+            return new runtime.JSONApiResponse<string>(response);
+        } else {
+            return new runtime.TextApiResponse(response) as any;
+        }
+    }
+
+    /**
+     * create a new job
+     */
+    async issueCosnarkCode(requestParameters: IssueCosnarkCodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
+        const response = await this.issueCosnarkCodeRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * add circuit to blueprint
      */
     async uploadCircuitRaw(requestParameters: UploadCircuitRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['id'] == null) {
@@ -153,7 +261,7 @@ export class CoSnarkBlueprintApi extends runtime.BaseAPI {
     }
 
     /**
-     * add proving key to blueprint
+     * add circuit to blueprint
      */
     async uploadCircuit(requestParameters: UploadCircuitRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.uploadCircuitRaw(requestParameters, initOverrides);
@@ -225,6 +333,74 @@ export class CoSnarkBlueprintApi extends runtime.BaseAPI {
      */
     async uploadPk(requestParameters: UploadPkRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.uploadPkRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * add verification key to blueprint
+     */
+    async uploadVkRaw(requestParameters: UploadVkRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling uploadVk().'
+            );
+        }
+
+        if (requestParameters['file'] == null) {
+            throw new runtime.RequiredError(
+                'file',
+                'Required parameter "file" was null or undefined when calling uploadVk().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const consumes: runtime.Consume[] = [
+            { contentType: 'multipart/form-data' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['file'] != null) {
+            formParams.append('file', requestParameters['file'] as any);
+        }
+
+        const response = await this.request({
+            path: `/api/v1/blueprint/{id}/vk`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: formParams,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * add verification key to blueprint
+     */
+    async uploadVk(requestParameters: UploadVkRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.uploadVkRaw(requestParameters, initOverrides);
     }
 
 }

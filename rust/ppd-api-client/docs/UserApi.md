@@ -65,7 +65,7 @@ This endpoint does not need any parameter.
 
 ## post_login
 
-> String post_login(password, username, next)
+> post_login(password, username, next)
 
 
 ### Parameters
@@ -79,7 +79,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-**String**
+ (empty response body)
 
 ### Authorization
 
@@ -87,8 +87,8 @@ Name | Type | Description  | Required | Notes
 
 ### HTTP request headers
 
-- **Content-Type**: multipart/form-data
-- **Accept**: text/plain, application/json
+- **Content-Type**: application/x-www-form-urlencoded
+- **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

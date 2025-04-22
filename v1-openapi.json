@@ -14,10 +14,51 @@
     "version": "1.0"
   },
   "paths": {
+    "/api/v1/blueprint/code": {
+      "get": {
+        "tags": [
+          "blueprint"
+        ],
+        "summary": "create a new job",
+        "operationId": "issue_cosnark_code",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IssueCoSnarkCodeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The code that enables issuing a coSNARK job",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/blueprint/create": {
       "put": {
         "tags": [
-          "CoSnarkBlueprint"
+          "blueprint"
         ],
         "summary": "create a new coSNARK blueprint",
         "operationId": "create",
@@ -58,9 +99,9 @@
     "/api/v1/blueprint/{id}/circuit": {
       "put": {
         "tags": [
-          "CoSnarkBlueprint"
+          "blueprint"
         ],
-        "summary": "add proving key to blueprint",
+        "summary": "add circuit to blueprint",
         "operationId": "upload_circuit",
         "parameters": [
           {
@@ -113,7 +154,7 @@
     "/api/v1/blueprint/{id}/pk": {
       "put": {
         "tags": [
-          "CoSnarkBlueprint"
+          "blueprint"
         ],
         "summary": "add proving key to blueprint",
         "operationId": "upload_pk",
@@ -165,18 +206,82 @@
         }
       }
     },
-    "/api/v1/jobs/code": {
+    "/api/v1/blueprint/{id}/ready": {
       "get": {
         "tags": [
-          "Job"
+          "blueprint"
         ],
-        "summary": "create a new job",
-        "operationId": "issue_cosnark_code",
+        "summary": "checks whether a blueprint is already ready",
+        "operationId": "blueprint_ready",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The id of the blueprint",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Indicating whether the blueprint is ready. If not ready provides information about what data is missing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BlueprintReadyProbe"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/blueprint/{id}/vk": {
+      "put": {
+        "tags": [
+          "blueprint"
+        ],
+        "summary": "add verification key to blueprint",
+        "operationId": "upload_vk",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The id of the blueprint",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/IssueCoSnarkCodeRequest"
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
               }
             }
           },
@@ -184,14 +289,66 @@
         },
         "responses": {
           "200": {
-            "description": "The code that enables issuing a coSNARK job",
+            "description": "Sucessfully added vk key"
+          },
+          "5XX": {
+            "description": "Internal Server Error",
             "content": {
-              "text/plain": {
+              "application/json": {
                 "schema": {
-                  "type": "string"
+                  "$ref": "#/components/schemas/ApiError"
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/v1/dashboard": {
+      "get": {
+        "tags": [
+          "Dashboard"
+        ],
+        "operationId": "welcome",
+        "responses": {
+          "200": {
+            "description": "The landing page"
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/job/{id}": {
+      "get": {
+        "tags": [
+          "Job"
+        ],
+        "summary": "get job result",
+        "operationId": "get_result",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The uuid of the job",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns job status and if present the finished proof or error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such job"
           },
           "5XX": {
             "description": "Internal Server Error",
@@ -312,6 +469,68 @@
         }
       }
     },
+    "/api/v1/nps/list": {
+      "get": {
+        "tags": [
+          "NPS"
+        ],
+        "summary": "get paginated node providers - used for blueprint creators to define clusters",
+        "operationId": "list",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A paginated list of NPS",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NpsHeader"
+                  }
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/nps/register": {
       "post": {
         "tags": [
@@ -385,7 +604,7 @@
         "operationId": "post_login",
         "requestBody": {
           "content": {
-            "multipart/form-data": {
+            "application/x-www-form-urlencoded": {
               "schema": {
                 "$ref": "#/components/schemas/Credentials"
               }
@@ -395,14 +614,7 @@
         },
         "responses": {
           "200": {
-            "description": "The code that enables issuing a coSNARK job",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
+            "description": "The user is logged in and redirected to the next page"
           },
           "5XX": {
             "description": "Internal Server Error",
@@ -521,6 +733,14 @@
           }
         }
       },
+      "AuxiliaryType": {
+        "type": "string",
+        "enum": [
+          "Pk",
+          "Vk",
+          "Circuit"
+        ]
+      },
       "BlueprintCurve": {
         "type": "string",
         "enum": [
@@ -528,6 +748,24 @@
           "Bls381",
           "Bls377"
         ]
+      },
+      "BlueprintReadyProbe": {
+        "type": "object",
+        "required": [
+          "nodes_ready",
+          "missing_aux_data"
+        ],
+        "properties": {
+          "missing_aux_data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuxiliaryType"
+            }
+          },
+          "nodes_ready": {
+            "type": "boolean"
+          }
+        }
       },
       "BlueprintType": {
         "type": "string",
@@ -540,16 +778,19 @@
       "CreateBlueprintRequest": {
         "type": "object",
         "required": [
+          "name",
           "typ",
           "curve",
           "node_provider0",
           "node_provider1",
-          "node_provider2",
-          "vk"
+          "node_provider2"
         ],
         "properties": {
           "curve": {
             "$ref": "#/components/schemas/BlueprintCurve"
+          },
+          "name": {
+            "type": "string"
           },
           "node_provider0": {
             "type": "integer",
@@ -565,9 +806,6 @@
           },
           "typ": {
             "$ref": "#/components/schemas/BlueprintType"
-          },
-          "vk": {
-            "type": "string"
           }
         }
       },
@@ -623,6 +861,43 @@
           }
         }
       },
+      "JobResult": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "ok": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ProofResult"
+              }
+            ]
+          },
+          "status": {
+            "$ref": "#/components/schemas/JobStatus"
+          }
+        }
+      },
+      "JobStatus": {
+        "type": "string",
+        "enum": [
+          "WaitingForInputs",
+          "WaitingForNodes",
+          "InProgress",
+          "Failed",
+          "Success"
+        ]
+      },
       "JobType": {
         "type": "string",
         "enum": [
@@ -631,9 +906,26 @@
           "ShamirProve"
         ]
       },
+      "NpsHeader": {
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
       "NpsKeyMaterial": {
         "type": "object",
         "required": [
+          "name",
           "enc_key",
           "verify_key"
         ],
@@ -641,7 +933,25 @@
           "enc_key": {
             "type": "string"
           },
+          "name": {
+            "type": "string"
+          },
           "verify_key": {
+            "type": "string"
+          }
+        }
+      },
+      "ProofResult": {
+        "type": "object",
+        "required": [
+          "proof",
+          "public_inputs"
+        ],
+        "properties": {
+          "proof": {
+            "type": "string"
+          },
+          "public_inputs": {
             "type": "string"
           }
         }
@@ -651,10 +961,18 @@
         "required": [
           "name",
           "enc_key",
-          "verifying_key"
+          "verifying_key",
+          "grpc_url",
+          "cert"
         ],
         "properties": {
+          "cert": {
+            "type": "string"
+          },
           "enc_key": {
+            "type": "string"
+          },
+          "grpc_url": {
             "type": "string"
           },
           "name": {
@@ -670,12 +988,24 @@
         "required": [
           "nps_id",
           "sqs_queue",
-          "sns_topic"
+          "aws_access_key_id",
+          "aws_secret_access_key_enc",
+          "sns_topic",
+          "s3_bucket"
         ],
         "properties": {
+          "aws_access_key_id": {
+            "type": "string"
+          },
+          "aws_secret_access_key_enc": {
+            "type": "string"
+          },
           "nps_id": {
             "type": "integer",
             "format": "int32"
+          },
+          "s3_bucket": {
+            "type": "string"
           },
           "sns_topic": {
             "type": "string"

@@ -1,6 +1,6 @@
 {
-  "name": "@taceo/ppd-api-client",
-  "version": "0.0.0",
+  "name": "ppd-api-client",
+  "version": "1.0",
   "description": "OpenAPI client for ppd-api-client",
   "author": "OpenAPI-Generator",
   "repository": {

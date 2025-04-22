@@ -42,6 +42,12 @@ export interface CreateBlueprintRequest {
     curve: BlueprintCurve;
     /**
      * 
+     * @type {string}
+     * @memberof CreateBlueprintRequest
+     */
+    name: string;
+    /**
+     * 
      * @type {number}
      * @memberof CreateBlueprintRequest
      */
@@ -64,12 +70,6 @@ export interface CreateBlueprintRequest {
      * @memberof CreateBlueprintRequest
      */
     typ: BlueprintType;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreateBlueprintRequest
-     */
-    vk: string;
 }
 
 
@@ -79,11 +79,11 @@ export interface CreateBlueprintRequest {
  */
 export function instanceOfCreateBlueprintRequest(value: object): value is CreateBlueprintRequest {
     if (!('curve' in value) || value['curve'] === undefined) return false;
+    if (!('name' in value) || value['name'] === undefined) return false;
     if (!('nodeProvider0' in value) || value['nodeProvider0'] === undefined) return false;
     if (!('nodeProvider1' in value) || value['nodeProvider1'] === undefined) return false;
     if (!('nodeProvider2' in value) || value['nodeProvider2'] === undefined) return false;
     if (!('typ' in value) || value['typ'] === undefined) return false;
-    if (!('vk' in value) || value['vk'] === undefined) return false;
     return true;
 }
 
@@ -98,11 +98,11 @@ export function CreateBlueprintRequestFromJSONTyped(json: any, ignoreDiscriminat
     return {
         
         'curve': BlueprintCurveFromJSON(json['curve']),
+        'name': json['name'],
         'nodeProvider0': json['node_provider0'],
         'nodeProvider1': json['node_provider1'],
         'nodeProvider2': json['node_provider2'],
         'typ': BlueprintTypeFromJSON(json['typ']),
-        'vk': json['vk'],
     };
 }
 
@@ -118,11 +118,11 @@ export function CreateBlueprintRequestToJSONTyped(value?: CreateBlueprintRequest
     return {
         
         'curve': BlueprintCurveToJSON(value['curve']),
+        'name': value['name'],
         'node_provider0': value['nodeProvider0'],
         'node_provider1': value['nodeProvider1'],
         'node_provider2': value['nodeProvider2'],
         'typ': BlueprintTypeToJSON(value['typ']),
-        'vk': value['vk'],
     };
 }
 

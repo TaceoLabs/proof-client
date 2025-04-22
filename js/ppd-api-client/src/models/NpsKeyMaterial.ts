@@ -30,6 +30,12 @@ export interface NpsKeyMaterial {
      * @type {string}
      * @memberof NpsKeyMaterial
      */
+    name: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof NpsKeyMaterial
+     */
     verifyKey: string;
 }
 
@@ -38,6 +44,7 @@ export interface NpsKeyMaterial {
  */
 export function instanceOfNpsKeyMaterial(value: object): value is NpsKeyMaterial {
     if (!('encKey' in value) || value['encKey'] === undefined) return false;
+    if (!('name' in value) || value['name'] === undefined) return false;
     if (!('verifyKey' in value) || value['verifyKey'] === undefined) return false;
     return true;
 }
@@ -53,6 +60,7 @@ export function NpsKeyMaterialFromJSONTyped(json: any, ignoreDiscriminator: bool
     return {
         
         'encKey': json['enc_key'],
+        'name': json['name'],
         'verifyKey': json['verify_key'],
     };
 }
@@ -69,6 +77,7 @@ export function NpsKeyMaterialToJSONTyped(value?: NpsKeyMaterial | null, ignoreD
     return {
         
         'enc_key': value['encKey'],
+        'name': value['name'],
         'verify_key': value['verifyKey'],
     };
 }

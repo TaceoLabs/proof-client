@@ -24,7 +24,19 @@ export interface RegisterNpsRequest {
      * @type {string}
      * @memberof RegisterNpsRequest
      */
+    cert: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RegisterNpsRequest
+     */
     encKey: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RegisterNpsRequest
+     */
+    grpcUrl: string;
     /**
      * 
      * @type {string}
@@ -43,7 +55,9 @@ export interface RegisterNpsRequest {
  * Check if a given object implements the RegisterNpsRequest interface.
  */
 export function instanceOfRegisterNpsRequest(value: object): value is RegisterNpsRequest {
+    if (!('cert' in value) || value['cert'] === undefined) return false;
     if (!('encKey' in value) || value['encKey'] === undefined) return false;
+    if (!('grpcUrl' in value) || value['grpcUrl'] === undefined) return false;
     if (!('name' in value) || value['name'] === undefined) return false;
     if (!('verifyingKey' in value) || value['verifyingKey'] === undefined) return false;
     return true;
@@ -59,7 +73,9 @@ export function RegisterNpsRequestFromJSONTyped(json: any, ignoreDiscriminator: 
     }
     return {
         
+        'cert': json['cert'],
         'encKey': json['enc_key'],
+        'grpcUrl': json['grpc_url'],
         'name': json['name'],
         'verifyingKey': json['verifying_key'],
     };
@@ -76,7 +92,9 @@ export function RegisterNpsRequestToJSONTyped(value?: RegisterNpsRequest | null,
 
     return {
         
+        'cert': value['cert'],
         'enc_key': value['encKey'],
+        'grpc_url': value['grpcUrl'],
         'name': value['name'],
         'verifying_key': value['verifyingKey'],
     };

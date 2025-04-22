@@ -12,21 +12,18 @@ use crate::models;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
-pub struct NpsKeyMaterial {
-    #[serde(rename = "enc_key")]
-    pub enc_key: String,
-    #[serde(rename = "name")]
-    pub name: String,
-    #[serde(rename = "verify_key")]
-    pub verify_key: String,
+pub struct ProofResult {
+    #[serde(rename = "proof")]
+    pub proof: String,
+    #[serde(rename = "public_inputs")]
+    pub public_inputs: String,
 }
 
-impl NpsKeyMaterial {
-    pub fn new(enc_key: String, name: String, verify_key: String) -> NpsKeyMaterial {
-        NpsKeyMaterial {
-            enc_key,
-            name,
-            verify_key,
+impl ProofResult {
+    pub fn new(proof: String, public_inputs: String) -> ProofResult {
+        ProofResult {
+            proof,
+            public_inputs,
         }
     }
 }

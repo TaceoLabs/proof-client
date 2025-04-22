@@ -12,21 +12,15 @@ use crate::models;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
-pub struct NpsKeyMaterial {
-    #[serde(rename = "enc_key")]
-    pub enc_key: String,
+pub struct NpsHeader {
+    #[serde(rename = "id")]
+    pub id: i32,
     #[serde(rename = "name")]
     pub name: String,
-    #[serde(rename = "verify_key")]
-    pub verify_key: String,
 }
 
-impl NpsKeyMaterial {
-    pub fn new(enc_key: String, name: String, verify_key: String) -> NpsKeyMaterial {
-        NpsKeyMaterial {
-            enc_key,
-            name,
-            verify_key,
-        }
+impl NpsHeader {
+    pub fn new(id: i32, name: String) -> NpsHeader {
+        NpsHeader { id, name }
     }
 }

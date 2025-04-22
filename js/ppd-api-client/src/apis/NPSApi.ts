@@ -16,17 +16,25 @@
 import * as runtime from '../runtime';
 import type {
   ApiError,
+  NpsHeader,
   RegisterNpsRequest,
   RegisterNpsResponse,
 } from '../models/index';
 import {
     ApiErrorFromJSON,
     ApiErrorToJSON,
+    NpsHeaderFromJSON,
+    NpsHeaderToJSON,
     RegisterNpsRequestFromJSON,
     RegisterNpsRequestToJSON,
     RegisterNpsResponseFromJSON,
     RegisterNpsResponseToJSON,
 } from '../models/index';
+
+export interface ListRequest {
+    cursor?: number | null;
+    perPage?: number | null;
+}
 
 export interface RegisterRequest {
     registerNpsRequest: RegisterNpsRequest;
@@ -36,6 +44,48 @@ export interface RegisterRequest {
  * 
  */
 export class NPSApi extends runtime.BaseAPI {
+
+    /**
+     * get paginated node providers - used for blueprint creators to define clusters
+     */
+    async listRaw(requestParameters: ListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<NpsHeader>>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['cursor'] != null) {
+            queryParameters['cursor'] = requestParameters['cursor'];
+        }
+
+        if (requestParameters['perPage'] != null) {
+            queryParameters['per_page'] = requestParameters['perPage'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/v1/nps/list`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(NpsHeaderFromJSON));
+    }
+
+    /**
+     * get paginated node providers - used for blueprint creators to define clusters
+     */
+    async list(requestParameters: ListRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<NpsHeader>> {
+        const response = await this.listRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * register a new node provider

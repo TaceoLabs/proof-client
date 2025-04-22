@@ -13,8 +13,14 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct RegisterNpsResponse {
+    #[serde(rename = "aws_access_key_id")]
+    pub aws_access_key_id: String,
+    #[serde(rename = "aws_secret_access_key_enc")]
+    pub aws_secret_access_key_enc: String,
     #[serde(rename = "nps_id")]
     pub nps_id: i32,
+    #[serde(rename = "s3_bucket")]
+    pub s3_bucket: String,
     #[serde(rename = "sns_topic")]
     pub sns_topic: String,
     #[serde(rename = "sqs_queue")]
@@ -22,9 +28,19 @@ pub struct RegisterNpsResponse {
 }
 
 impl RegisterNpsResponse {
-    pub fn new(nps_id: i32, sns_topic: String, sqs_queue: String) -> RegisterNpsResponse {
+    pub fn new(
+        aws_access_key_id: String,
+        aws_secret_access_key_enc: String,
+        nps_id: i32,
+        s3_bucket: String,
+        sns_topic: String,
+        sqs_queue: String,
+    ) -> RegisterNpsResponse {
         RegisterNpsResponse {
+            aws_access_key_id,
+            aws_secret_access_key_enc,
             nps_id,
+            s3_bucket,
             sns_topic,
             sqs_queue,
         }

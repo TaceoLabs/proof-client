@@ -35,10 +35,15 @@ impl Configuration {
 
 impl Default for Configuration {
     fn default() -> Self {
+        use reqwest::ClientBuilder;
+        let client = ClientBuilder::new()
+            .cookie_store(true)
+            .build()
+            .expect("can build reqwest client");
         Configuration {
             base_path: "http://localhost".to_owned(),
             user_agent: Some("OpenAPI-Generator/1.0/rust".to_owned()),
-            client: reqwest::Client::new(),
+            client,
             basic_auth: None,
             oauth_access_token: None,
             bearer_access_token: None,

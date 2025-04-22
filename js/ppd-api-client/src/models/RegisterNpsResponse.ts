@@ -21,10 +21,28 @@ import { mapValues } from '../runtime';
 export interface RegisterNpsResponse {
     /**
      * 
+     * @type {string}
+     * @memberof RegisterNpsResponse
+     */
+    awsAccessKeyId: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RegisterNpsResponse
+     */
+    awsSecretAccessKeyEnc: string;
+    /**
+     * 
      * @type {number}
      * @memberof RegisterNpsResponse
      */
     npsId: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof RegisterNpsResponse
+     */
+    s3Bucket: string;
     /**
      * 
      * @type {string}
@@ -43,7 +61,10 @@ export interface RegisterNpsResponse {
  * Check if a given object implements the RegisterNpsResponse interface.
  */
 export function instanceOfRegisterNpsResponse(value: object): value is RegisterNpsResponse {
+    if (!('awsAccessKeyId' in value) || value['awsAccessKeyId'] === undefined) return false;
+    if (!('awsSecretAccessKeyEnc' in value) || value['awsSecretAccessKeyEnc'] === undefined) return false;
     if (!('npsId' in value) || value['npsId'] === undefined) return false;
+    if (!('s3Bucket' in value) || value['s3Bucket'] === undefined) return false;
     if (!('snsTopic' in value) || value['snsTopic'] === undefined) return false;
     if (!('sqsQueue' in value) || value['sqsQueue'] === undefined) return false;
     return true;
@@ -59,7 +80,10 @@ export function RegisterNpsResponseFromJSONTyped(json: any, ignoreDiscriminator:
     }
     return {
         
+        'awsAccessKeyId': json['aws_access_key_id'],
+        'awsSecretAccessKeyEnc': json['aws_secret_access_key_enc'],
         'npsId': json['nps_id'],
+        's3Bucket': json['s3_bucket'],
         'snsTopic': json['sns_topic'],
         'sqsQueue': json['sqs_queue'],
     };
@@ -76,7 +100,10 @@ export function RegisterNpsResponseToJSONTyped(value?: RegisterNpsResponse | nul
 
     return {
         
+        'aws_access_key_id': value['awsAccessKeyId'],
+        'aws_secret_access_key_enc': value['awsSecretAccessKeyEnc'],
         'nps_id': value['npsId'],
+        's3_bucket': value['s3Bucket'],
         'sns_topic': value['snsTopic'],
         'sqs_queue': value['sqsQueue'],
     };

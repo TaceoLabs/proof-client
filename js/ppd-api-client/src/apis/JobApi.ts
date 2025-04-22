@@ -16,15 +16,15 @@
 import * as runtime from '../runtime';
 import type {
   ApiError,
-  IssueCoSnarkCodeRequest,
+  JobResult,
   ScheduleJobRequest,
   ScheduleJobResponse,
 } from '../models/index';
 import {
     ApiErrorFromJSON,
     ApiErrorToJSON,
-    IssueCoSnarkCodeRequestFromJSON,
-    IssueCoSnarkCodeRequestToJSON,
+    JobResultFromJSON,
+    JobResultToJSON,
     ScheduleJobRequestFromJSON,
     ScheduleJobRequestToJSON,
     ScheduleJobResponseFromJSON,
@@ -38,8 +38,8 @@ export interface AddInputRequest {
     inputParty2: Blob;
 }
 
-export interface IssueCosnarkCodeRequest {
-    issueCoSnarkCodeRequest: IssueCoSnarkCodeRequest;
+export interface GetResultRequest {
+    id: string;
 }
 
 export interface ScheduleJobOperationRequest {
@@ -146,21 +146,19 @@ export class JobApi extends runtime.BaseAPI {
     }
 
     /**
-     * create a new job
+     * get job result
      */
-    async issueCosnarkCodeRaw(requestParameters: IssueCosnarkCodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
-        if (requestParameters['issueCoSnarkCodeRequest'] == null) {
+    async getResultRaw(requestParameters: GetResultRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<JobResult>> {
+        if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
-                'issueCoSnarkCodeRequest',
-                'Required parameter "issueCoSnarkCodeRequest" was null or undefined when calling issueCosnarkCode().'
+                'id',
+                'Required parameter "id" was null or undefined when calling getResult().'
             );
         }
 
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
 
         if (this.configuration && this.configuration.accessToken) {
             const token = this.configuration.accessToken;
@@ -171,25 +169,20 @@ export class JobApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/api/v1/jobs/code`,
+            path: `/api/v1/jobs/job/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-            body: IssueCoSnarkCodeRequestToJSON(requestParameters['issueCoSnarkCodeRequest']),
         }, initOverrides);
 
-        if (this.isJsonMime(response.headers.get('content-type'))) {
-            return new runtime.JSONApiResponse<string>(response);
-        } else {
-            return new runtime.TextApiResponse(response) as any;
-        }
+        return new runtime.JSONApiResponse(response, (jsonValue) => JobResultFromJSON(jsonValue));
     }
 
     /**
-     * create a new job
+     * get job result
      */
-    async issueCosnarkCode(requestParameters: IssueCosnarkCodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
-        const response = await this.issueCosnarkCodeRaw(requestParameters, initOverrides);
+    async getResult(requestParameters: GetResultRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<JobResult> {
+        const response = await this.getResultRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

@@ -105,7 +105,7 @@ export class UserApi extends runtime.BaseAPI {
 
     /**
      */
-    async postLoginRaw(requestParameters: PostLoginRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
+    async postLoginRaw(requestParameters: PostLoginRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['password'] == null) {
             throw new runtime.RequiredError(
                 'password',
@@ -133,7 +133,7 @@ export class UserApi extends runtime.BaseAPI {
             }
         }
         const consumes: runtime.Consume[] = [
-            { contentType: 'multipart/form-data' },
+            { contentType: 'application/x-www-form-urlencoded' },
         ];
         // @ts-ignore: canConsumeForm may be unused
         const canConsumeForm = runtime.canConsumeForm(consumes);
@@ -166,18 +166,13 @@ export class UserApi extends runtime.BaseAPI {
             body: formParams,
         }, initOverrides);
 
-        if (this.isJsonMime(response.headers.get('content-type'))) {
-            return new runtime.JSONApiResponse<string>(response);
-        } else {
-            return new runtime.TextApiResponse(response) as any;
-        }
+        return new runtime.VoidApiResponse(response);
     }
 
     /**
      */
-    async postLogin(requestParameters: PostLoginRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
-        const response = await this.postLoginRaw(requestParameters, initOverrides);
-        return await response.value();
+    async postLogin(requestParameters: PostLoginRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.postLoginRaw(requestParameters, initOverrides);
     }
 
 }

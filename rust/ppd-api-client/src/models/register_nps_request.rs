@@ -13,8 +13,12 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct RegisterNpsRequest {
+    #[serde(rename = "cert")]
+    pub cert: String,
     #[serde(rename = "enc_key")]
     pub enc_key: String,
+    #[serde(rename = "grpc_url")]
+    pub grpc_url: String,
     #[serde(rename = "name")]
     pub name: String,
     #[serde(rename = "verifying_key")]
@@ -22,9 +26,17 @@ pub struct RegisterNpsRequest {
 }
 
 impl RegisterNpsRequest {
-    pub fn new(enc_key: String, name: String, verifying_key: String) -> RegisterNpsRequest {
+    pub fn new(
+        cert: String,
+        enc_key: String,
+        grpc_url: String,
+        name: String,
+        verifying_key: String,
+    ) -> RegisterNpsRequest {
         RegisterNpsRequest {
+            cert,
             enc_key,
+            grpc_url,
             name,
             verifying_key,
         }

@@ -15,6 +15,8 @@ use serde::{Deserialize, Serialize};
 pub struct CreateBlueprintRequest {
     #[serde(rename = "curve")]
     pub curve: models::BlueprintCurve,
+    #[serde(rename = "name")]
+    pub name: String,
     #[serde(rename = "node_provider0")]
     pub node_provider0: i32,
     #[serde(rename = "node_provider1")]
@@ -23,26 +25,24 @@ pub struct CreateBlueprintRequest {
     pub node_provider2: i32,
     #[serde(rename = "typ")]
     pub typ: models::BlueprintType,
-    #[serde(rename = "vk")]
-    pub vk: String,
 }
 
 impl CreateBlueprintRequest {
     pub fn new(
         curve: models::BlueprintCurve,
+        name: String,
         node_provider0: i32,
         node_provider1: i32,
         node_provider2: i32,
         typ: models::BlueprintType,
-        vk: String,
     ) -> CreateBlueprintRequest {
         CreateBlueprintRequest {
             curve,
+            name,
             node_provider0,
             node_provider1,
             node_provider2,
             typ,
-            vk,
         }
     }
 }

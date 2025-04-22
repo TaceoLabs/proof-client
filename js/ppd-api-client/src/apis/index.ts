@@ -1,6 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
-export * from './CoSnarkBlueprintApi';
+export * from './BlueprintApi';
+export * from './DashboardApi';
 export * from './HealthApi';
 export * from './JobApi';
 export * from './NPSApi';
