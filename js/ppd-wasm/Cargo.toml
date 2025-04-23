@@ -23,9 +23,8 @@ wasm-bindgen = "0.2.100"
 serde-wasm-bindgen = "0.6.5"
 bincode = { version = "1.3.3", default-features = false }
 crypto_box = { version = "0.9.1", features = ["seal"] }
-co-circom-types = { git = "https://github.com/TaceoLabs/co-snarks", rev = "81a4fca" }
-ppd-api-client = { git = "https://github.com/TaceoLabs/ppd-network" }
-circom-types = { git = "https://github.com/TaceoLabs/co-snarks", rev = "81a4fca", features = ["ark-bls12-377", "ark-bls12-381"] }
+co-circom-types = { git = "https://github.com/TaceoLabs/co-snarks", rev = "36d73df" }
+circom-types = { git = "https://github.com/TaceoLabs/co-snarks", rev = "36d73df", features = ["ark-bls12-377", "ark-bls12-381"] }
 base64ct = { version = "1.7.3", features = ["alloc"] }
 rand = "0.8.5"
 getrandom = { version = "0.2.15", default-features = false, features = ["js"] }

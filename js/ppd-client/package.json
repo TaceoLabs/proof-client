@@ -1,6 +1,6 @@
 {
-  "name": "@taceo/csn-client",
-  "version": "0.7.0",
+  "name": "@taceo/ppd-client",
+  "version": "0.0.0",
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
