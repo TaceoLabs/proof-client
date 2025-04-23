@@ -1,4 +1,5 @@
 use ark_ec::pairing::Pairing;
+use ark_serialize::CanonicalDeserialize;
 use base64ct::{Base64, Encoding};
 use circom_types::{
     Witness,
@@ -7,11 +8,12 @@ use circom_types::{
 use co_circom_types::{
     CompressedRep3SharedWitness, Compression, Input, ShamirSharedWitness, split_input,
 };
+use co_groth16::Proof;
 use crypto_box::{PublicKey, aead::OsRng};
 use eyre::Context;
 use ppd_api_client::{
     apis::{configuration::Configuration, job_api},
-    models::{JobType, ScheduleJobRequest, ScheduleJobResponse},
+    models::{JobStatus, JobType, ScheduleJobRequest, ScheduleJobResponse},
 };
 use uuid::Uuid;
 
@@ -146,4 +148,33 @@ where
     ];
     add_input(config, &res, shares).await?;
     Ok(res.job_id)
+}
+
+/// The result of a scheduled job, represents either a successful proof, a error, or the status of a still running job
+#[derive(Debug, Clone)]
+pub enum JobResult<P: Pairing> {
+    Ok((Proof<P>, Vec<P::ScalarField>)),
+    Running(JobStatus),
+    Err(String),
+}
+
+pub async fn get_job_result<P: Pairing>(
+    config: &Configuration,
+    id: Uuid,
+) -> eyre::Result<JobResult<P>> {
+    let res = job_api::get_result(config, &id.to_string()).await?;
+    match res.status {
+        JobStatus::Success => {
+            let proof_res = res.ok.unwrap().unwrap();
+            let proof = Proof::<P>::deserialize_uncompressed_unchecked(
+                Base64::decode_vec(&proof_res.proof)?.as_slice(),
+            )?;
+            let public_inputs = Vec::<P::ScalarField>::deserialize_uncompressed_unchecked(
+                Base64::decode_vec(&proof_res.public_inputs)?.as_slice(),
+            )?;
+            Ok(JobResult::Ok((proof, public_inputs)))
+        }
+        JobStatus::Failed => Ok(JobResult::Err(res.error.unwrap().unwrap())),
+        status => Ok(JobResult::Running(status)),
+    }
 }
