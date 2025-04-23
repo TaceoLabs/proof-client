@@ -7,9 +7,7 @@ Method | HTTP request | Description
 [**blueprint_ready**](BlueprintApi.md#blueprint_ready) | **GET** /api/v1/blueprint/{id}/ready | checks whether a blueprint is already ready
 [**create**](BlueprintApi.md#create) | **PUT** /api/v1/blueprint/create | create a new coSNARK blueprint
 [**issue_cosnark_code**](BlueprintApi.md#issue_cosnark_code) | **GET** /api/v1/blueprint/code | create a new job
-[**upload_circuit**](BlueprintApi.md#upload_circuit) | **PUT** /api/v1/blueprint/{id}/circuit | add circuit to blueprint
-[**upload_pk**](BlueprintApi.md#upload_pk) | **PUT** /api/v1/blueprint/{id}/pk | add proving key to blueprint
-[**upload_vk**](BlueprintApi.md#upload_vk) | **PUT** /api/v1/blueprint/{id}/vk | add verification key to blueprint
+[**upload_aux_data**](BlueprintApi.md#upload_aux_data) | **PUT** /api/v1/blueprint/{id}/aux/{aux_type} | add proving key to blueprint
 
 
 
@@ -23,7 +21,7 @@ checks whether a blueprint is already ready
 
 Name | Type | Description  | Required | Notes
 ------------- | ------------- | ------------- | ------------- | -------------
-**id** | **i32** | The id of the blueprint | [required] |
+**id** | **uuid::Uuid** | The id of the blueprint | [required] |
 
 ### Return type
 
@@ -97,38 +95,9 @@ Name | Type | Description  | Required | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 
-## upload_circuit
+## upload_aux_data
 
-> upload_circuit(id, file)
-add circuit to blueprint
-
-### Parameters
-
-
-Name | Type | Description  | Required | Notes
-------------- | ------------- | ------------- | ------------- | -------------
-**id** | **i32** | The id of the blueprint | [required] |
-**file** | **std::path::PathBuf** |  | [required] |
-
-### Return type
-
- (empty response body)
-
-### Authorization
-
-[bearer](../README.md#bearer)
-
-### HTTP request headers
-
-- **Content-Type**: multipart/form-data
-- **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-
-## upload_pk
-
-> upload_pk(id, file)
+> upload_aux_data(id, aux_type, file)
 add proving key to blueprint
 
 ### Parameters
@@ -136,36 +105,8 @@ add proving key to blueprint
 
 Name | Type | Description  | Required | Notes
 ------------- | ------------- | ------------- | ------------- | -------------
-**id** | **i32** | The id of the blueprint | [required] |
-**file** | **std::path::PathBuf** |  | [required] |
-
-### Return type
-
- (empty response body)
-
-### Authorization
-
-[bearer](../README.md#bearer)
-
-### HTTP request headers
-
-- **Content-Type**: multipart/form-data
-- **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-
-## upload_vk
-
-> upload_vk(id, file)
-add verification key to blueprint
-
-### Parameters
-
-
-Name | Type | Description  | Required | Notes
-------------- | ------------- | ------------- | ------------- | -------------
-**id** | **i32** | The id of the blueprint | [required] |
+**id** | **uuid::Uuid** | The id of the blueprint | [required] |
+**aux_type** | [**AuxiliaryType**](.md) | The type of the auxiliary data | [required] |
 **file** | **std::path::PathBuf** |  | [required] |
 
 ### Return type

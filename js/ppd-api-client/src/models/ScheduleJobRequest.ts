@@ -29,10 +29,10 @@ import {
 export interface ScheduleJobRequest {
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof ScheduleJobRequest
      */
-    blueprintId: number;
+    blueprintId: string;
     /**
      * 
      * @type {string}

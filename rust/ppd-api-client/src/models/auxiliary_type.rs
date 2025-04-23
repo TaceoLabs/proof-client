@@ -14,20 +14,23 @@ use serde::{Deserialize, Serialize};
 ///
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
 pub enum AuxiliaryType {
-    #[serde(rename = "Pk")]
+    #[serde(rename = "pk")]
     Pk,
-    #[serde(rename = "Vk")]
+    #[serde(rename = "vk")]
     Vk,
-    #[serde(rename = "Circuit")]
+    #[serde(rename = "circuit")]
     Circuit,
+    #[serde(rename = "matrices")]
+    Matrices,
 }
 
 impl std::fmt::Display for AuxiliaryType {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Self::Pk => write!(f, "Pk"),
-            Self::Vk => write!(f, "Vk"),
-            Self::Circuit => write!(f, "Circuit"),
+            Self::Pk => write!(f, "pk"),
+            Self::Vk => write!(f, "vk"),
+            Self::Circuit => write!(f, "circuit"),
+            Self::Matrices => write!(f, "matrices"),
         }
     }
 }

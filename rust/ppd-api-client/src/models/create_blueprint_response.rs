@@ -14,11 +14,11 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct CreateBlueprintResponse {
     #[serde(rename = "id")]
-    pub id: i32,
+    pub id: uuid::Uuid,
 }
 
 impl CreateBlueprintResponse {
-    pub fn new(id: i32) -> CreateBlueprintResponse {
+    pub fn new(id: uuid::Uuid) -> CreateBlueprintResponse {
         CreateBlueprintResponse { id }
     }
 }

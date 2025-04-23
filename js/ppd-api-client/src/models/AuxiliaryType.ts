@@ -18,9 +18,10 @@
  * @export
  */
 export const AuxiliaryType = {
-    Pk: 'Pk',
-    Vk: 'Vk',
-    Circuit: 'Circuit'
+    Pk: 'pk',
+    Vk: 'vk',
+    Circuit: 'circuit',
+    Matrices: 'matrices'
 } as const;
 export type AuxiliaryType = typeof AuxiliaryType[keyof typeof AuxiliaryType];
 

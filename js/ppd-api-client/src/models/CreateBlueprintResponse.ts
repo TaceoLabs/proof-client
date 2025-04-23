@@ -21,10 +21,10 @@ import { mapValues } from '../runtime';
 export interface CreateBlueprintResponse {
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof CreateBlueprintResponse
      */
-    id: number;
+    id: string;
 }
 
 /**

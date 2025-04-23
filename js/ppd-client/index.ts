@@ -4,7 +4,7 @@ import { JobApi, JobType } from "@taceo/ppd-api-client";
 
 export { JobApi, Configuration, ConfigurationParameters } from "@taceo/ppd-api-client";
 
-async function scheduleJob(apiInstance: JobApi, code: string, blueprintId: number, jobType: JobType): Promise<ScheduleJobResponse> {
+async function scheduleJob(apiInstance: JobApi, code: string, blueprintId: string, jobType: JobType): Promise<ScheduleJobResponse> {
   const request: ScheduleJobRequest = {
     blueprintId,
     jobType,
@@ -33,7 +33,7 @@ async function addInput(apiInstance: JobApi, scheduleJobResponse: ScheduleJobRes
 /**
  * Schedule a full job including witness extension. The retuned job id can be used to query the job status.
  */
-export async function scheduleFullJobRep3Bn254(apiInstance: JobApi, code: string, blueprintId: number, public_inputs: string[], input: any): Promise<string> {
+export async function scheduleFullJobRep3Bn254(apiInstance: JobApi, code: string, blueprintId: string, public_inputs: string[], input: any): Promise<string> {
   const scheduleJobResponse = await scheduleJob(apiInstance, code, blueprintId, JobType.Rep3Full);
   const sharedInput = split_input_rep3_bn254(input, public_inputs);
   addInput(apiInstance, scheduleJobResponse, sharedInput)
@@ -43,7 +43,7 @@ export async function scheduleFullJobRep3Bn254(apiInstance: JobApi, code: string
 /**
  * Schedule a Rep3 prove job. The retuned job id can be used to query the job status.
  */
-export async function scheduleProveJobRep3Bn254(apiInstance: JobApi, code: string, blueprintId: number, num_pub_inputs: number, witness: Uint8Array): Promise<string> {
+export async function scheduleProveJobRep3Bn254(apiInstance: JobApi, code: string, blueprintId: string, num_pub_inputs: number, witness: Uint8Array): Promise<string> {
   const scheduleJobResponse = await scheduleJob(apiInstance, code, blueprintId, JobType.Rep3Prove);
   const sharedInput = split_witness_rep3_bn254(witness, num_pub_inputs);
   addInput(apiInstance, scheduleJobResponse, sharedInput)
@@ -53,7 +53,7 @@ export async function scheduleProveJobRep3Bn254(apiInstance: JobApi, code: strin
 /**
  * Schedule a Shamir prove job. The retuned job id can be used to query the job status.
  */
-export async function scheduleProveJobShamirBn254(apiInstance: JobApi, code: string, blueprintId: number, num_pub_inputs: number, witness: Uint8Array): Promise<string> {
+export async function scheduleProveJobShamirBn254(apiInstance: JobApi, code: string, blueprintId: string, num_pub_inputs: number, witness: Uint8Array): Promise<string> {
   const scheduleJobResponse = await scheduleJob(apiInstance, code, blueprintId, JobType.ShamirProve);
   const sharedInput = split_witness_shamir_bn254(witness, num_pub_inputs);
   addInput(apiInstance, scheduleJobResponse, sharedInput)
@@ -63,7 +63,7 @@ export async function scheduleProveJobShamirBn254(apiInstance: JobApi, code: str
 /**
  * Schedule a full job including witness extension. The retuned job id can be used to query the job status.
  */
-export async function scheduleFullJobRep3Bls381(apiInstance: JobApi, code: string, blueprintId: number, public_inputs: string[], input: any): Promise<string> {
+export async function scheduleFullJobRep3Bls381(apiInstance: JobApi, code: string, blueprintId: string, public_inputs: string[], input: any): Promise<string> {
   const scheduleJobResponse = await scheduleJob(apiInstance, code, blueprintId, JobType.Rep3Full);
   const sharedInput = split_input_rep3_bls12_381(input, public_inputs);
   addInput(apiInstance, scheduleJobResponse, sharedInput)
@@ -73,7 +73,7 @@ export async function scheduleFullJobRep3Bls381(apiInstance: JobApi, code: strin
 /**
  * Schedule a Rep3 prove job. The retuned job id can be used to query the job status.
  */
-export async function scheduleProveJobRep3Bls381(apiInstance: JobApi, code: string, blueprintId: number, num_pub_inputs: number, witness: Uint8Array): Promise<string> {
+export async function scheduleProveJobRep3Bls381(apiInstance: JobApi, code: string, blueprintId: string, num_pub_inputs: number, witness: Uint8Array): Promise<string> {
   const scheduleJobResponse = await scheduleJob(apiInstance, code, blueprintId, JobType.Rep3Prove);
   const sharedInput = split_witness_rep3_bls12_381(witness, num_pub_inputs);
   addInput(apiInstance, scheduleJobResponse, sharedInput)
@@ -83,7 +83,7 @@ export async function scheduleProveJobRep3Bls381(apiInstance: JobApi, code: stri
 /**
  * Schedule a Shamir prove job. The retuned job id can be used to query the job status.
  */
-export async function scheduleProveJobShamirBls381(apiInstance: JobApi, code: string, blueprintId: number, num_pub_inputs: number, witness: Uint8Array): Promise<string> {
+export async function scheduleProveJobShamirBls381(apiInstance: JobApi, code: string, blueprintId: string, num_pub_inputs: number, witness: Uint8Array): Promise<string> {
   const scheduleJobResponse = await scheduleJob(apiInstance, code, blueprintId, JobType.ShamirProve);
   const sharedInput = split_witness_shamir_bls12_381(witness, num_pub_inputs);
   addInput(apiInstance, scheduleJobResponse, sharedInput)
@@ -93,7 +93,7 @@ export async function scheduleProveJobShamirBls381(apiInstance: JobApi, code: st
 /**
  * Schedule a full job including witness extension. The retuned job id can be used to query the job status.
  */
-export async function scheduleFullJobRep3Bls377(apiInstance: JobApi, code: string, blueprintId: number, public_inputs: string[], input: any): Promise<string> {
+export async function scheduleFullJobRep3Bls377(apiInstance: JobApi, code: string, blueprintId: string, public_inputs: string[], input: any): Promise<string> {
   const scheduleJobResponse = await scheduleJob(apiInstance, code, blueprintId, JobType.Rep3Full);
   const sharedInput = split_input_rep3_bls12_377(input, public_inputs);
   addInput(apiInstance, scheduleJobResponse, sharedInput)
@@ -103,7 +103,7 @@ export async function scheduleFullJobRep3Bls377(apiInstance: JobApi, code: strin
 /**
  * Schedule a Rep3 prove job. The retuned job id can be used to query the job status.
  */
-export async function scheduleProveJobRep3Bls377(apiInstance: JobApi, code: string, blueprintId: number, num_pub_inputs: number, witness: Uint8Array): Promise<string> {
+export async function scheduleProveJobRep3Bls377(apiInstance: JobApi, code: string, blueprintId: string, num_pub_inputs: number, witness: Uint8Array): Promise<string> {
   const scheduleJobResponse = await scheduleJob(apiInstance, code, blueprintId, JobType.Rep3Prove);
   const sharedInput = split_witness_rep3_bls12_377(witness, num_pub_inputs);
   addInput(apiInstance, scheduleJobResponse, sharedInput)
@@ -113,7 +113,7 @@ export async function scheduleProveJobRep3Bls377(apiInstance: JobApi, code: stri
 /**
  * Schedule a Shamir prove job. The retuned job id can be used to query the job status.
  */
-export async function scheduleProveJobShamirBls377(apiInstance: JobApi, code: string, blueprintId: number, num_pub_inputs: number, witness: Uint8Array): Promise<string> {
+export async function scheduleProveJobShamirBls377(apiInstance: JobApi, code: string, blueprintId: string, num_pub_inputs: number, witness: Uint8Array): Promise<string> {
   const scheduleJobResponse = await scheduleJob(apiInstance, code, blueprintId, JobType.ShamirProve);
   const sharedInput = split_witness_shamir_bls12_377(witness, num_pub_inputs);
   addInput(apiInstance, scheduleJobResponse, sharedInput)

@@ -20,7 +20,7 @@ use uuid::Uuid;
 async fn schedule_job(
     config: &Configuration,
     code: &str,
-    blueprint_id: i32,
+    blueprint_id: Uuid,
     job_type: JobType,
 ) -> eyre::Result<ScheduleJobResponse> {
     Ok(job_api::schedule_job(
@@ -71,7 +71,7 @@ async fn add_input(
 pub async fn schedule_full_job_rep3<P>(
     config: &Configuration,
     code: &str,
-    blueprint_id: i32,
+    blueprint_id: Uuid,
     input: Input,
     public_inputs: &[String],
 ) -> eyre::Result<Uuid>
@@ -100,7 +100,7 @@ where
 pub async fn schedule_prove_job_rep3<P>(
     config: &Configuration,
     code: &str,
-    blueprint_id: i32,
+    blueprint_id: Uuid,
     witness: Witness<P::ScalarField>,
     num_pub_inputs: usize,
 ) -> eyre::Result<Uuid>
@@ -135,7 +135,7 @@ where
 pub async fn schedule_prove_job_shamir<P>(
     config: &Configuration,
     code: &str,
-    blueprint_id: i32,
+    blueprint_id: Uuid,
     witness: Witness<P::ScalarField>,
     num_pub_inputs: usize,
 ) -> eyre::Result<Uuid>

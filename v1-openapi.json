@@ -96,68 +96,13 @@
         }
       }
     },
-    "/api/v1/blueprint/{id}/circuit": {
-      "put": {
-        "tags": [
-          "blueprint"
-        ],
-        "summary": "add circuit to blueprint",
-        "operationId": "upload_circuit",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "The id of the blueprint",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "file"
-                ],
-                "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary"
-                  }
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Sucessfully added circuit"
-          },
-          "5XX": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/blueprint/{id}/pk": {
+    "/api/v1/blueprint/{id}/aux/{aux_type}": {
       "put": {
         "tags": [
           "blueprint"
         ],
         "summary": "add proving key to blueprint",
-        "operationId": "upload_pk",
+        "operationId": "upload_aux_data",
         "parameters": [
           {
             "name": "id",
@@ -165,8 +110,17 @@
             "description": "The id of the blueprint",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "aux_type",
+            "in": "path",
+            "description": "The type of the auxiliary data",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AuxiliaryType"
             }
           }
         ],
@@ -191,7 +145,16 @@
         },
         "responses": {
           "200": {
-            "description": "Sucessfully added proving key"
+            "description": "Sucessfully added the auxiliary data"
+          },
+          "400": {
+            "description": "e.g. Aux type is not needed for this blueprint"
+          },
+          "401": {
+            "description": "Logged-in user is not allowed to perform that action"
+          },
+          "404": {
+            "description": "Unknown blueprint id"
           },
           "5XX": {
             "description": "Internal Server Error",
@@ -220,8 +183,8 @@
             "description": "The id of the blueprint",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
@@ -235,61 +198,6 @@
                 }
               }
             }
-          },
-          "5XX": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/blueprint/{id}/vk": {
-      "put": {
-        "tags": [
-          "blueprint"
-        ],
-        "summary": "add verification key to blueprint",
-        "operationId": "upload_vk",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "The id of the blueprint",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "file"
-                ],
-                "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary"
-                  }
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Sucessfully added vk key"
           },
           "5XX": {
             "description": "Internal Server Error",
@@ -736,9 +644,10 @@
       "AuxiliaryType": {
         "type": "string",
         "enum": [
-          "Pk",
-          "Vk",
-          "Circuit"
+          "pk",
+          "vk",
+          "circuit",
+          "matrices"
         ]
       },
       "BlueprintCurve": {
@@ -816,8 +725,8 @@
         ],
         "properties": {
           "id": {
-            "type": "integer",
-            "format": "int32"
+            "type": "string",
+            "format": "uuid"
           }
         }
       },
@@ -1024,8 +933,8 @@
         ],
         "properties": {
           "blueprint_id": {
-            "type": "integer",
-            "format": "int32"
+            "type": "string",
+            "format": "uuid"
           },
           "code": {
             "type": "string"

@@ -29,9 +29,7 @@ Class | Method | HTTP request | Description
 *BlueprintApi* | [**blueprint_ready**](docs/BlueprintApi.md#blueprint_ready) | **GET** /api/v1/blueprint/{id}/ready | checks whether a blueprint is already ready
 *BlueprintApi* | [**create**](docs/BlueprintApi.md#create) | **PUT** /api/v1/blueprint/create | create a new coSNARK blueprint
 *BlueprintApi* | [**issue_cosnark_code**](docs/BlueprintApi.md#issue_cosnark_code) | **GET** /api/v1/blueprint/code | create a new job
-*BlueprintApi* | [**upload_circuit**](docs/BlueprintApi.md#upload_circuit) | **PUT** /api/v1/blueprint/{id}/circuit | add circuit to blueprint
-*BlueprintApi* | [**upload_pk**](docs/BlueprintApi.md#upload_pk) | **PUT** /api/v1/blueprint/{id}/pk | add proving key to blueprint
-*BlueprintApi* | [**upload_vk**](docs/BlueprintApi.md#upload_vk) | **PUT** /api/v1/blueprint/{id}/vk | add verification key to blueprint
+*BlueprintApi* | [**upload_aux_data**](docs/BlueprintApi.md#upload_aux_data) | **PUT** /api/v1/blueprint/{id}/aux/{aux_type} | add proving key to blueprint
 *DashboardApi* | [**welcome**](docs/DashboardApi.md#welcome) | **GET** /api/v1/dashboard | 
 *HealthApi* | [**health**](docs/HealthApi.md#health) | **GET** /health | 
 *HealthApi* | [**live**](docs/HealthApi.md#live) | **GET** /health/live | 

@@ -95,7 +95,7 @@ where
             ppd_client::schedule_full_job_rep3::<P>(
                 config,
                 &args.code,
-                1,
+                args.blueprint,
                 input,
                 &args
                     .public_inputs
@@ -105,13 +105,25 @@ where
         }
         JobType::Rep3Prove => {
             let witness = Witness::from_reader(File::open(args.input)?)?;
-            ppd_client::schedule_prove_job_rep3::<P>(config, &args.code, 1, witness, num_inputs)
-                .await?
+            ppd_client::schedule_prove_job_rep3::<P>(
+                config,
+                &args.code,
+                args.blueprint,
+                witness,
+                num_inputs,
+            )
+            .await?
         }
         JobType::ShamirProve => {
             let witness = Witness::from_reader(File::open(args.input)?)?;
-            ppd_client::schedule_prove_job_shamir::<P>(config, &args.code, 1, witness, num_inputs)
-                .await?
+            ppd_client::schedule_prove_job_shamir::<P>(
+                config,
+                &args.code,
+                args.blueprint,
+                witness,
+                num_inputs,
+            )
+            .await?
         }
     };
 

@@ -14,7 +14,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct ScheduleJobRequest {
     #[serde(rename = "blueprint_id")]
-    pub blueprint_id: i32,
+    pub blueprint_id: uuid::Uuid,
     #[serde(rename = "code")]
     pub code: String,
     #[serde(rename = "job_type")]
@@ -22,7 +22,11 @@ pub struct ScheduleJobRequest {
 }
 
 impl ScheduleJobRequest {
-    pub fn new(blueprint_id: i32, code: String, job_type: models::JobType) -> ScheduleJobRequest {
+    pub fn new(
+        blueprint_id: uuid::Uuid,
+        code: String,
+        job_type: models::JobType,
+    ) -> ScheduleJobRequest {
         ScheduleJobRequest {
             blueprint_id,
             code,

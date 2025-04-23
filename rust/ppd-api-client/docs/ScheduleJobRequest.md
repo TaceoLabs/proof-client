@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**blueprint_id** | **i32** |  | 
+**blueprint_id** | [**uuid::Uuid**](uuid::Uuid.md) |  | 
 **code** | **String** |  | 
 **job_type** | [**models::JobType**](JobType.md) |  | 
 
