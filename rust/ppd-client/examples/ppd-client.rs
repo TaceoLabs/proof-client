@@ -41,6 +41,10 @@ struct Args {
     /// The job type
     pub job: JobType,
 
+    /// The API endpoint URL
+    #[clap(long, env = "PPD_API_URL", default_value = "http://localhost:1234")]
+    pub api_url: String,
+
     /// The curve
     #[clap(long, env = "PPD_CURVE")]
     pub curve: Curve,
@@ -176,8 +180,10 @@ fn install_tracing() {
 async fn main() -> eyre::Result<()> {
     install_tracing();
     let args = Args::parse();
-    let mut config = Configuration::new();
-    config.base_path += ":1234";
+    let config = Configuration {
+        base_path: args.api_url.clone(),
+        ..Default::default()
+    };
 
     match args.curve {
         Curve::Bn254 => run::<Bn254>(&config, args).await?,
