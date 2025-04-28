@@ -2,9 +2,7 @@
 > A client library for interacting with TACEO:Proof.
 
 ## Overview
-**TACEO:Proof** provides a simple and consistent client for communicating with **TACEO:Proof**.
-
-It handles authentication, API requests, error management, and more — so you can focus on building your application.
+This repository provides a simple and consistent client for communicating with **TACEO:Proof**.
 
 We offer multiple client implementations to best fit your environment and use case.
 
@@ -13,7 +11,7 @@ Blueprint Creators upload circuits and provide cryptographic material (circuit b
 
 In the primary use case, End-Users interact with services provided by Blueprint Creators and outsource proof generation to TACEO:Proof.
 
-This repository focuses on helping Blueprint Creators integrate a client for TACEO:Proof, demonstrating the full workflow — from authenticating to computing a coSNARK using TACEO’s proving engine.
+This repository focuses on helping Blueprint Creators integrate a client for TACEO:Proof, demonstrating the full workflow — from authenticating to computing a proof using TACEO’s coSNARK-engine.
 
 It is designed to help you seamlessly integrate the API into your project and enable your users to leverage the power of outsourced proving.
 
@@ -63,3 +61,13 @@ Compared to generating the proof locally, the End-User simply:
 * Performs two HTTP requests,
 * Secret-shares their private input,
 * Encrypts the shares — and lets TACEO:Proof handle the proving process.
+
+## Supported Languages
+
+We currently offer official client libraries for:
+
+* Rust
+* JavaScript/TypeScript
+
+If you would like to see support for additional languages, please feel free to open an [https://github.com/TaceoLabs/proof-client/issues](issue) and let us know!
+We’re happy to prioritize new language bindings based on community demand.
