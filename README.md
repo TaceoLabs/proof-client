@@ -1,7 +1,7 @@
 # TACEO:Proof Client
 > A client library for interacting with TACEO:Proof.
 
-⚠️ **Disclaimer:**
+## ⚠️ Disclaimer
 This project is currently a **work in progress.**
 Expect frequent changes, potential API updates, and evolving features.
 
