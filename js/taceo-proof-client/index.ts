@@ -1,8 +1,8 @@
-import { seal_share, split_input_rep3_bls12_381, split_input_rep3_bn254, split_witness_rep3_bls12_381, split_witness_rep3_bn254, split_witness_shamir_bls12_381, split_witness_shamir_bn254, split_input_rep3_bls12_377, split_witness_rep3_bls12_377, split_witness_shamir_bls12_377 } from "@taceo/ppd-wasm";
-import type { ScheduleJobRequest, ScheduleJobResponse } from '@taceo/ppd-api-client';
-import { JobApi, JobType } from "@taceo/ppd-api-client";
+import { seal_share, split_input_rep3_bls12_381, split_input_rep3_bn254, split_witness_rep3_bls12_381, split_witness_rep3_bn254, split_witness_shamir_bls12_381, split_witness_shamir_bn254, split_input_rep3_bls12_377, split_witness_rep3_bls12_377, split_witness_shamir_bls12_377 } from "@taceo/proof-wasm";
+import type { ScheduleJobRequest, ScheduleJobResponse } from '@taceo/proof-api-client';
+import { JobApi, JobType } from "@taceo/proof-api-client";
 
-export { JobApi, Configuration, ConfigurationParameters } from "@taceo/ppd-api-client";
+export { JobApi, Configuration, ConfigurationParameters } from "@taceo/proof-api-client";
 
 async function scheduleJob(apiInstance: JobApi, code: string, blueprintId: string, jobType: JobType): Promise<ScheduleJobResponse> {
   const request: ScheduleJobRequest = {

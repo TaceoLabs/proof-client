@@ -1,5 +1,5 @@
 [package]
-name = "ppd-client"
+name = "taceo-proof-client"
 version = "0.1.0"
 edition = "2024"
 rust-version = "1.85"
@@ -19,7 +19,7 @@ crypto_box = { version = "0.9.1", features = ["std", "seal"] }
 co-circom-types = { git = "https://github.com/TaceoLabs/co-snarks", rev = "36d73df" }
 co-groth16 = { git = "https://github.com/TaceoLabs/co-snarks", rev = "36d73df", features = ["verifier"] }
 circom-types = { git = "https://github.com/TaceoLabs/co-snarks", rev = "36d73df", features = ["ark-bls12-377", "ark-bls12-381"] }
-ppd-api-client = { path = "../ppd-api-client" }
+taceo-proof-api-client = { path = "../taceo-proof-api-client" }
 base64ct = { version = "1.7.3", features = ["alloc"] }
 rand = "0.8.5"
 eyre = "0.6.12"

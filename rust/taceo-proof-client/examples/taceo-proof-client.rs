@@ -13,8 +13,8 @@ use circom_types::{
 };
 use clap::{ArgGroup, Parser, ValueEnum};
 use co_groth16::CoGroth16;
-use ppd_api_client::apis::configuration::Configuration;
-use ppd_client::JobResult;
+use taceo_proof_api_client::apis::configuration::Configuration;
+use taceo_proof_client::JobResult;
 use uuid::Uuid;
 
 #[derive(Debug, Clone, Copy, ValueEnum)]
@@ -96,7 +96,7 @@ where
     let job_id = match args.job {
         JobType::Rep3Full => {
             let input = serde_json::from_reader(File::open(args.input)?)?;
-            ppd_client::schedule_full_job_rep3::<P>(
+            taceo_proof_client::schedule_full_job_rep3::<P>(
                 config,
                 &args.code,
                 args.blueprint,
@@ -109,7 +109,7 @@ where
         }
         JobType::Rep3Prove => {
             let witness = Witness::from_reader(File::open(args.input)?)?;
-            ppd_client::schedule_prove_job_rep3::<P>(
+            taceo_proof_client::schedule_prove_job_rep3::<P>(
                 config,
                 &args.code,
                 args.blueprint,
@@ -120,7 +120,7 @@ where
         }
         JobType::ShamirProve => {
             let witness = Witness::from_reader(File::open(args.input)?)?;
-            ppd_client::schedule_prove_job_shamir::<P>(
+            taceo_proof_client::schedule_prove_job_shamir::<P>(
                 config,
                 &args.code,
                 args.blueprint,
@@ -134,7 +134,7 @@ where
     // poll job status to get result
     tracing::info!("waiting for result...");
     loop {
-        match ppd_client::get_job_result(config, job_id).await? {
+        match taceo_proof_client::get_job_result(config, job_id).await? {
             JobResult::Ok((proof, public_inputs)) => {
                 tracing::info!("got proof");
                 if let Some(vk) = args.vk {

@@ -2406,46 +2406,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "439ee305def115ba05938db6eb1644ff94165c5ab5e9420d1c1bcedbba909391"
 
 [[package]]
-name = "ppd-api-client"
-version = "1.0.0"
-dependencies = [
- "reqwest",
- "serde",
- "serde_json",
- "serde_repr",
- "serde_with",
- "url",
- "uuid",
-]
-
-[[package]]
-name = "ppd-client"
-version = "0.1.0"
-dependencies = [
- "ark-bls12-377",
- "ark-bls12-381",
- "ark-bn254",
- "ark-ec",
- "ark-groth16",
- "ark-serialize",
- "base64ct",
- "bincode",
- "circom-types",
- "clap",
- "co-circom-types",
- "co-groth16",
- "crypto_box",
- "eyre",
- "ppd-api-client",
- "rand 0.8.5",
- "serde_json",
- "tokio",
- "tracing",
- "tracing-subscriber 0.3.19",
- "uuid",
-]
-
-[[package]]
 name = "ppv-lite86"
 version = "0.2.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3391,6 +3351,46 @@ checksum = "8e1d1b10ced5ca923a1fcb8d03e96b8d3268065d724548c0211415ff6ac6bac4"
 dependencies = [
  "core-foundation-sys",
  "libc",
+]
+
+[[package]]
+name = "taceo-proof-api-client"
+version = "1.0.0"
+dependencies = [
+ "reqwest",
+ "serde",
+ "serde_json",
+ "serde_repr",
+ "serde_with",
+ "url",
+ "uuid",
+]
+
+[[package]]
+name = "taceo-proof-client"
+version = "0.1.0"
+dependencies = [
+ "ark-bls12-377",
+ "ark-bls12-381",
+ "ark-bn254",
+ "ark-ec",
+ "ark-groth16",
+ "ark-serialize",
+ "base64ct",
+ "bincode",
+ "circom-types",
+ "clap",
+ "co-circom-types",
+ "co-groth16",
+ "crypto_box",
+ "eyre",
+ "rand 0.8.5",
+ "serde_json",
+ "taceo-proof-api-client",
+ "tokio",
+ "tracing",
+ "tracing-subscriber 0.3.19",
+ "uuid",
 ]
 
 [[package]]

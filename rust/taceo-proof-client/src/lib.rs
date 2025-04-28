@@ -11,7 +11,7 @@ use co_circom_types::{
 use co_groth16::Proof;
 use crypto_box::{PublicKey, aead::OsRng};
 use eyre::Context;
-use ppd_api_client::{
+use taceo_proof_api_client::{
     apis::{configuration::Configuration, job_api},
     models::{JobStatus, JobType, ScheduleJobRequest, ScheduleJobResponse},
 };
