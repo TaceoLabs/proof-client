@@ -42,39 +42,39 @@ struct Args {
     pub job: JobType,
 
     /// The API endpoint URL
-    #[clap(long, env = "PPD_API_URL", default_value = "http://localhost:1234")]
+    #[clap(long, env = "PROOF_API_URL", default_value = "http://localhost:1234")]
     pub api_url: String,
 
     /// The curve
-    #[clap(long, env = "PPD_CURVE")]
+    #[clap(long, env = "PROOF_CURVE")]
     pub curve: Curve,
 
     /// The path to the job input
-    #[clap(long, env = "PPD_INPUT")]
+    #[clap(long, env = "PROOF_INPUT")]
     pub input: PathBuf,
 
     /// The ppd-network code
-    #[clap(long, env = "PPD_CODE")]
+    #[clap(long, env = "PROOF_CODE")]
     pub code: String,
 
     /// The job blueprint
-    #[clap(long, env = "PPD_BLUEPRINT")]
+    #[clap(long, env = "PROOF_BLUEPRINT")]
     pub blueprint: Uuid,
 
     /// The path to the r1cs file
-    #[clap(long, env = "PPD_R1CS")]
+    #[clap(long, env = "PROOF_R1CS")]
     pub r1cs: Option<PathBuf>,
 
     /// The number of inputs for the circuit
-    #[clap(long, env = "PPD_NUM_INPUTS")]
+    #[clap(long, env = "PROOF_NUM_INPUTS")]
     pub num_inputs: Option<usize>,
 
     /// The public inputs for witness extension
-    #[clap(long, env = "PPD_PUBLIC_INPUTS", required_if_eq("job", "rep3-full"))]
+    #[clap(long, env = "PROOF_PUBLIC_INPUTS", required_if_eq("job", "rep3-full"))]
     pub public_inputs: Option<Vec<String>>,
 
     /// The path to verifying key
-    #[clap(long, env = "PPD_VERIFYING_KEY")]
+    #[clap(long, env = "PROOF_VERIFYING_KEY")]
     pub vk: Option<PathBuf>,
 }
 

@@ -1,11 +1,11 @@
 [package]
-name = "ppd-wasm"
+name = "taceo-proof-wasm"
 version = "0.1.0"
 edition = "2021"
 rust-version = "1.85"
 authors = ["TACEO GmbH <hello@taceo.io>"]
 homepage = "https://www.taceo.io"
-repository = "https:://github.com/TaceoLabs/ppd-network"
+repository = "https:://github.com/TaceoLabs/proof-client"
 license = "MIT OR Apache-2.0"
 publish = false
 readme = "./README.md"
