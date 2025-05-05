@@ -1,5 +1,5 @@
 {
-  "name": "@taceo/proof-client",
+  "name": "@taceo/proof-client-browser",
   "version": "0.0.0",
   "main": "index.js",
   "types": "index.d.ts",
@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc"
   },
+  "files": [ "index.ts", "index.js", "index.d.ts", "./pkg/taceo_proof_wasm.js", "./pkg/taceo_proof_wasm_bg.wasm", "./pkg/taceo_proof_wasm.d.ts", "./pkg/taceo_proof_wasm_bg.js", "./pkg/taceo_proof_wasm_bg.js", "./pkg/taceo_proof_wasm_bg.wasm.d.ts" ],
   "keywords": [],
   "author": "",
   "license": "MIT",
@@ -16,7 +17,6 @@
     "typescript": "^5.6.3"
   },
   "dependencies": {
-    "@taceo/proof-api-client": "^0.0.0",
-    "@taceo/proof-wasm": "^0.0.0"
+    "@taceo/proof-api-client": "^0.0.0"
   }
 }

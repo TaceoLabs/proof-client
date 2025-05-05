@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useRef, useState } from "react";
-import { Configuration, ConfigurationParameters, JobApi, JobStatus, JobType, ProofResult } from '@taceo/proof-api-client';
-import { scheduleFullJobRep3Bn254, scheduleProveJobShamirBn254, scheduleProveJobRep3Bn254 } from '@taceo/proof-client-browser'
+import { BlueprintCurve, Configuration, ConfigurationParameters, JobApi, JobStatus, JobType, ProofResult } from '@taceo/proof-api-client';
+import { scheduleFullJobRep3, scheduleProveJobShamir, scheduleProveJobRep3 } from '@taceo/proof-client-browser'
 import wc from "../witness-calculator.js"; // generated with circom
 
 const configParams: ConfigurationParameters = {
@@ -12,6 +12,7 @@ const apiInstance = new JobApi(congiuration);
 export default function Home() {
   const [code, setCode] = useState<string | null>(null);
   const [blueprint, setBlueprint] = useState<string | null>(null);
+  const [curve, setCurve] = useState<BlueprintCurve>(BlueprintCurve.Bn254);
   const [result, setResult] = useState<ProofResult | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,29 +45,40 @@ export default function Home() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    setLoading(true);
     setError(null);
     setResult(null);
+
+    if (selectedFile == null) {
+      setError("input file missing");
+      return;
+    }
+
+    if (wasm == null && jobType != JobType.Rep3Full) {
+      setError("wasm file missing");
+      return;
+    }
 
     const input = JSON.parse(await selectedFile!.text());
     let jobId;
     let witnessCalculator;
     let witness;
 
+    setLoading(true);
+
     try {
       switch (jobType) {
         case JobType.Rep3Full:
-          jobId = await scheduleFullJobRep3Bn254(apiInstance, code!, blueprint!, publicInputs!, input);
+          jobId = await scheduleFullJobRep3(apiInstance, code!, blueprint!, curve, publicInputs!, input);
           break;
         case JobType.Rep3Prove:
           witnessCalculator = await wc(await wasm!.bytes());
           witness = await witnessCalculator.calculateWTNSBin(input, 0);
-          jobId = await scheduleProveJobRep3Bn254(apiInstance, code!, blueprint!, numInputs!, witness);
+          jobId = await scheduleProveJobRep3(apiInstance, code!, blueprint!, curve, numInputs!, witness);
           break;
         case JobType.ShamirProve:
           witnessCalculator = await wc(await wasm!.bytes());
           witness = await witnessCalculator.calculateWTNSBin(input, 0);
-          jobId = await scheduleProveJobShamirBn254(apiInstance, code!, blueprint!, numInputs!, witness);
+          jobId = await scheduleProveJobShamir(apiInstance, code!, blueprint!, curve, numInputs!, witness);
           break;
 
       }
@@ -102,33 +114,41 @@ export default function Home() {
   };
 
   return (
-    <div className="flex items-center justify-center bg-[#033b41] rounded-[10pt] p-8 w-96">
+    <div className="flex items-center justify-center bg-[#033b41] rounded-[10pt] pl-8 pr-8 pt-10 pb-10 w-96 text-white">
       <form onSubmit={handleSubmit}>
         <div className="grid gap-2">
-          <h1 className="text-[30px] font-bold">TACEO:Proof</h1>
+          <h1 className="text-[40px] font-bold pb-5">TACEO:Proof</h1>
           <div>
-            <h2>Access Code</h2>
-            <input className="bg-white text-black rounded-[5pt] p-2 w-full" type="text" onChange={(e) => setCode(e.target.value)} />
+            <h2 className="text-[14pt] font-bold pb-1">Access Code</h2>
+            <input required className="bg-white text-black rounded-[5pt] p-2 w-full" type="text" onChange={(e) => setCode(e.target.value)} />
           </div>
           <div>
-            <h2>Blueprint</h2>
-            <input className="bg-white text-black rounded-[5pt] p-2 w-full" type="text" onChange={(e) => setBlueprint(e.target.value)} />
+            <h2 className="text-[14pt] font-bold pb-1">Blueprint</h2>
+            <input required className="bg-white text-black rounded-[5pt] p-2 w-full" type="text" onChange={(e) => setBlueprint(e.target.value)} />
           </div>
           <div>
-            <h2>Input</h2>
+            <h2 className="text-[14pt] font-bold pb-1">Curve</h2>
+            <select required className="bg-white text-black font-bold rounded-[5pt] p-2 w-full" onChange={(e) => setCurve(e.target.value as BlueprintCurve)}>
+              <option value='Bn254'>Bn254</option>
+              <option value='Bls381'>Bls12_381</option>
+              <option value='Bls377'>Bls12_377</option>
+            </select>
+          </div>
+          <div>
+            <h2 className="text-[14pt] font-bold pb-1">Input</h2>
             <input
               type="file"
               ref={fileInputRef}
               onChange={handleInputFileChange}
               style={{ display: 'none' }}
             />
-            <button className="bg-white text-black upload-trigger rounded-[5pt] p-2 w-full" onClick={handleInputUploadClick} type="button">
+            <button className="bg-white text-black font-bold upload-trigger rounded-[5pt] p-2 w-full" onClick={handleInputUploadClick} type="button">
               {selectedFile ? selectedFile.name : 'Choose File'}
             </button>
           </div>
           <div>
-            <h2>Job Type</h2>
-            <select className="bg-white text-black rounded-[5pt] p-2 w-full" onChange={(e) => setJobType(e.target.value as JobType)}>
+            <h2 className="text-[14pt] font-bold pb-1">Job Type</h2>
+            <select required className="bg-white text-black font-bold rounded-[5pt] p-2 w-full" onChange={(e) => setJobType(e.target.value as JobType)}>
               <option value='ShamirPove'>Shamir Prove</option>
               <option value='Rep3Pove'>REP3 Prove</option>
               <option value='Rep3Full'>Witness Extension + Prove</option>
@@ -136,39 +156,39 @@ export default function Home() {
           </div>
           {jobType != JobType.Rep3Full && (
             <div>
-              <h2>Circom WASM</h2>
+              <h2 className="text-[14pt] font-bold pb-1">Circom WASM</h2>
               <input
                 type="file"
                 ref={wasmRef}
                 onChange={handleWasmFileChange}
                 style={{ display: 'none' }}
               />
-              <button className="bg-white text-black upload-trigger rounded-[5pt] p-2 w-full" onClick={handleWasmUploadClick} type="button">
+              <button className="bg-white text-black font-bold upload-trigger rounded-[5pt] p-2 w-full" onClick={handleWasmUploadClick} type="button">
                 {wasm ? wasm.name : 'Choose File'}
               </button>
             </div>
           )}
           {jobType == JobType.Rep3Full ?
             <div>
-              <h2>Public Inputs</h2>
-              <input className="bg-white text-black rounded-[5pt] p-2 w-full" type="text" onChange={(e) => setPublicInputs(e.target.value.split(','))} />
+              <h2 className="text-[14pt] font-bold pb-1">Public Inputs</h2>
+              <input required className="bg-white text-black rounded-[5pt] p-2 w-full" type="text" onChange={(e) => setPublicInputs(e.target.value.split(','))} />
             </div>
             :
             <div>
-              <h2>Number of Inputs</h2>
-              <input className="bg-white text-black rounded-[5pt] p-2 w-full" type="text" onChange={(e) => setNumInputs(parseInt(e.target.value, 10))} />
+              <h2 className="text-[14pt] font-bold pb-1">Number of Inputs</h2>
+              <input required className="bg-white text-black rounded-[5pt] p-2 w-full" type="text" onChange={(e) => setNumInputs(parseInt(e.target.value, 10))} />
             </div>
           }
           <div className="pt-5">
-            <button className="bg-white text-black rounded-[5pt] p-2 w-full" type="submit" disabled={loading}>
-               {loading ? 'Loading...' : 'Submit'}
+            <button className="bg-white text-black font-bold rounded-[5pt] p-2 w-full" type="submit" disabled={loading}>
+               {loading ? ('Loading...') : 'Submit'}
             </button>
           </div>
           <div className="pt-5">
-          {error && <div className="text-red">{error}</div>}
+          {error && <div className="text-[#ff0000]">{error}</div>}
           {result && (
             <div>
-              <a className="text-white" href={`data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(result))}`} download="result.json">
+              <a className="underline text-white" href={`data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(result))}`} download="result.json">
                 Download Result
               </a>
             </div>
