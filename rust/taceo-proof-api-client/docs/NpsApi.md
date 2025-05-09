@@ -11,7 +11,7 @@ Method | HTTP request | Description
 
 ## list
 
-> Vec<models::NpsHeader> list(cursor, per_page)
+> models::PaginationResultNpsHeader list(cursor, per_page)
 get paginated node providers - used for blueprint creators to define clusters
 
 ### Parameters
@@ -24,11 +24,11 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**Vec<models::NpsHeader>**](NpsHeader.md)
+[**models::PaginationResultNpsHeader**](PaginationResult_NpsHeader.md)
 
 ### Authorization
 
-[bearer](../README.md#bearer)
+No authorization required
 
 ### HTTP request headers
 
@@ -40,7 +40,7 @@ Name | Type | Description  | Required | Notes
 
 ## register
 
-> models::RegisterNpsResponse register(register_nps_request)
+> models::RegisterNpsResponse register(cert, enc_key, grpc_url, name, password, verifying_key, version)
 register a new node provider
 
 ### Parameters
@@ -48,7 +48,13 @@ register a new node provider
 
 Name | Type | Description  | Required | Notes
 ------------- | ------------- | ------------- | ------------- | -------------
-**register_nps_request** | [**RegisterNpsRequest**](RegisterNpsRequest.md) |  | [required] |
+**cert** | **String** |  | [required] |
+**enc_key** | **String** |  | [required] |
+**grpc_url** | **String** |  | [required] |
+**name** | **String** |  | [required] |
+**password** | **String** |  | [required] |
+**verifying_key** | **String** |  | [required] |
+**version** | **String** |  | [required] |
 
 ### Return type
 
@@ -56,11 +62,11 @@ Name | Type | Description  | Required | Notes
 
 ### Authorization
 
-[bearer](../README.md#bearer)
+No authorization required
 
 ### HTTP request headers
 
-- **Content-Type**: application/json
+- **Content-Type**: application/x-www-form-urlencoded
 - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

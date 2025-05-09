@@ -4,9 +4,9 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**get_login**](UserApi.md#get_login) | **GET** /api/v1/users/login | 
-[**logout**](UserApi.md#logout) | **GET** /api/v1/users/logout | 
-[**post_login**](UserApi.md#post_login) | **POST** /api/v1/users/login | 
+[**get_login**](UserApi.md#get_login) | **GET** /login | 
+[**logout**](UserApi.md#logout) | **GET** /logout | 
+[**post_login**](UserApi.md#post_login) | **POST** /login | 
 
 
 
@@ -28,7 +28,7 @@ Name | Type | Description  | Required | Notes
 
 ### Authorization
 
-[bearer](../README.md#bearer)
+No authorization required
 
 ### HTTP request headers
 
@@ -53,7 +53,7 @@ This endpoint does not need any parameter.
 
 ### Authorization
 
-[bearer](../README.md#bearer)
+No authorization required
 
 ### HTTP request headers
 
@@ -83,7 +83,7 @@ Name | Type | Description  | Required | Notes
 
 ### Authorization
 
-[bearer](../README.md#bearer)
+No authorization required
 
 ### HTTP request headers
 

@@ -5,6 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **aws_access_key_id** | **String** |  | 
+**aws_region** | **String** |  | 
 **aws_secret_access_key_enc** | **String** |  | 
 **nps_id** | **i32** |  | 
 **s3_bucket** | **String** |  | 

@@ -1,5 +1,5 @@
-import { JobApi, Configuration, ConfigurationParameters, BlueprintCurve } from "@taceo/proof-api-client";
-import { scheduleProveJobRep3 } from "../index";
+import { JobApi, Configuration, ConfigurationParameters, BlueprintCurve, BlueprintApi } from "@taceo/proof-api-client";
+import { getEncKeysB64, scheduleProveJobRep3 } from "../index";
 import { readFileSync } from 'fs';
 
 const configParams: ConfigurationParameters = {
@@ -9,6 +9,7 @@ const configParams: ConfigurationParameters = {
 
 const congiuration = new Configuration(configParams)
 const jobInstance = new JobApi(congiuration);
+const blueprintInstance = new BlueprintApi(congiuration);
 
 async function main() {
   const code = "foo";
@@ -16,11 +17,13 @@ async function main() {
   const numPublicInputs = 2;
   const witness = readFileSync("foo");
 
+  const keys = await getEncKeysB64(blueprintInstance, blueprintId);
   const jobId = scheduleProveJobRep3(
     jobInstance,
-    code,
     blueprintId,
+    code,
     BlueprintCurve.Bn254,
+    keys,
     numPublicInputs,
     witness
   );

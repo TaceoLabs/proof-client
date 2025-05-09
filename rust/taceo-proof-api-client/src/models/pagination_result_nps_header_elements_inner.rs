@@ -12,18 +12,15 @@ use crate::models;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
-pub struct ScheduleJobResponse {
-    #[serde(rename = "job_id")]
-    pub job_id: uuid::Uuid,
-    #[serde(rename = "remaining_permits")]
-    pub remaining_permits: i32,
+pub struct PaginationResultNpsHeaderElementsInner {
+    #[serde(rename = "id")]
+    pub id: i32,
+    #[serde(rename = "name")]
+    pub name: String,
 }
 
-impl ScheduleJobResponse {
-    pub fn new(job_id: uuid::Uuid, remaining_permits: i32) -> ScheduleJobResponse {
-        ScheduleJobResponse {
-            job_id,
-            remaining_permits,
-        }
+impl PaginationResultNpsHeaderElementsInner {
+    pub fn new(id: i32, name: String) -> PaginationResultNpsHeaderElementsInner {
+        PaginationResultNpsHeaderElementsInner { id, name }
     }
 }

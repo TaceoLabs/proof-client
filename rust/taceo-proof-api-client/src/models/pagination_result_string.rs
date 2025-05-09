@@ -12,31 +12,23 @@ use crate::models;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
-pub struct JobResult {
+pub struct PaginationResultString {
+    #[serde(rename = "elements")]
+    pub elements: Vec<String>,
     #[serde(
-        rename = "error",
+        rename = "total_amount",
         default,
         with = "::serde_with::rust::double_option",
         skip_serializing_if = "Option::is_none"
     )]
-    pub error: Option<Option<String>>,
-    #[serde(
-        rename = "ok",
-        default,
-        with = "::serde_with::rust::double_option",
-        skip_serializing_if = "Option::is_none"
-    )]
-    pub ok: Option<Option<Box<models::ProofResult>>>,
-    #[serde(rename = "status")]
-    pub status: models::JobStatus,
+    pub total_amount: Option<Option<i64>>,
 }
 
-impl JobResult {
-    pub fn new(status: models::JobStatus) -> JobResult {
-        JobResult {
-            error: None,
-            ok: None,
-            status,
+impl PaginationResultString {
+    pub fn new(elements: Vec<String>) -> PaginationResultString {
+        PaginationResultString {
+            elements,
+            total_amount: None,
         }
     }
 }

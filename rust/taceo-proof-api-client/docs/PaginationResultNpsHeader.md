@@ -1,14 +1,11 @@
-# RegisterNpsRequest
+# PaginationResultNpsHeader
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**cert** | **String** |  | 
-**enc_key** | **String** |  | 
-**grpc_url** | **String** |  | 
-**name** | **String** |  | 
-**verifying_key** | **String** |  | 
+**elements** | [**Vec<models::PaginationResultNpsHeaderElementsInner>**](PaginationResult_NpsHeader_elements_inner.md) |  | 
+**total_amount** | Option<**i64**> |  | [optional]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

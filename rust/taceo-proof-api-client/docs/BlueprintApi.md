@@ -4,11 +4,40 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**blueprint_key_material**](BlueprintApi.md#blueprint_key_material) | **GET** /api/v1/blueprint/{id}/key-material | returns the key material of the NPSs associated with the blueprint
 [**blueprint_ready**](BlueprintApi.md#blueprint_ready) | **GET** /api/v1/blueprint/{id}/ready | checks whether a blueprint is already ready
-[**create**](BlueprintApi.md#create) | **PUT** /api/v1/blueprint/create | create a new coSNARK blueprint
-[**issue_cosnark_code**](BlueprintApi.md#issue_cosnark_code) | **GET** /api/v1/blueprint/code | create a new job
-[**upload_aux_data**](BlueprintApi.md#upload_aux_data) | **PUT** /api/v1/blueprint/{id}/aux/{aux_type} | add proving key to blueprint
+[**create**](BlueprintApi.md#create) | **POST** /api/v1/blueprint/create | create a new coSNARK blueprint
+[**issue_cosnark_code**](BlueprintApi.md#issue_cosnark_code) | **POST** /api/v1/blueprint/code | create a new job
+[**upload_aux_data**](BlueprintApi.md#upload_aux_data) | **POST** /api/v1/blueprint/{id}/aux/{aux_type} | add proving key to blueprint
 
+
+
+## blueprint_key_material
+
+> Vec<models::NpsKeyMaterial> blueprint_key_material(id)
+returns the key material of the NPSs associated with the blueprint
+
+### Parameters
+
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**id** | **uuid::Uuid** | The id of the blueprint | [required] |
+
+### Return type
+
+[**Vec<models::NpsKeyMaterial>**](NpsKeyMaterial.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 
 ## blueprint_ready
@@ -29,7 +58,7 @@ Name | Type | Description  | Required | Notes
 
 ### Authorization
 
-[bearer](../README.md#bearer)
+No authorization required
 
 ### HTTP request headers
 
@@ -41,7 +70,7 @@ Name | Type | Description  | Required | Notes
 
 ## create
 
-> models::CreateBlueprintResponse create(create_blueprint_request)
+> models::CreateBlueprintResponse create(curve, name, node_provider0, node_provider1, node_provider2, typ)
 create a new coSNARK blueprint
 
 ### Parameters
@@ -49,7 +78,12 @@ create a new coSNARK blueprint
 
 Name | Type | Description  | Required | Notes
 ------------- | ------------- | ------------- | ------------- | -------------
-**create_blueprint_request** | [**CreateBlueprintRequest**](CreateBlueprintRequest.md) |  | [required] |
+**curve** | [**models::BlueprintCurve**](BlueprintCurve.md) |  | [required] |
+**name** | **String** |  | [required] |
+**node_provider0** | **i32** |  | [required] |
+**node_provider1** | **i32** |  | [required] |
+**node_provider2** | **i32** |  | [required] |
+**typ** | [**models::BlueprintType**](BlueprintType.md) |  | [required] |
 
 ### Return type
 
@@ -57,11 +91,11 @@ Name | Type | Description  | Required | Notes
 
 ### Authorization
 
-[bearer](../README.md#bearer)
+No authorization required
 
 ### HTTP request headers
 
-- **Content-Type**: application/json
+- **Content-Type**: application/x-www-form-urlencoded
 - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -69,7 +103,7 @@ Name | Type | Description  | Required | Notes
 
 ## issue_cosnark_code
 
-> String issue_cosnark_code(issue_co_snark_code_request)
+> String issue_cosnark_code(amount, validity_in_seconds)
 create a new job
 
 ### Parameters
@@ -77,7 +111,8 @@ create a new job
 
 Name | Type | Description  | Required | Notes
 ------------- | ------------- | ------------- | ------------- | -------------
-**issue_co_snark_code_request** | [**IssueCoSnarkCodeRequest**](IssueCoSnarkCodeRequest.md) |  | [required] |
+**amount** | **i32** |  | [required] |
+**validity_in_seconds** | **i64** |  | [required] |
 
 ### Return type
 
@@ -85,11 +120,11 @@ Name | Type | Description  | Required | Notes
 
 ### Authorization
 
-[bearer](../README.md#bearer)
+No authorization required
 
 ### HTTP request headers
 
-- **Content-Type**: application/json
+- **Content-Type**: application/x-www-form-urlencoded
 - **Accept**: text/plain, application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -115,7 +150,7 @@ Name | Type | Description  | Required | Notes
 
 ### Authorization
 
-[bearer](../README.md#bearer)
+No authorization required
 
 ### HTTP request headers
 

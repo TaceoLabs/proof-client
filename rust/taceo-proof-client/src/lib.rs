@@ -12,66 +12,63 @@ use co_groth16::Proof;
 use crypto_box::{PublicKey, aead::OsRng};
 use eyre::Context;
 use taceo_proof_api_client::{
-    apis::{configuration::Configuration, job_api},
-    models::{JobStatus, JobType, ScheduleJobRequest, ScheduleJobResponse},
+    apis::{blueprint_api, configuration::Configuration, job_api},
+    models::{JobStatus, JobType},
 };
 use uuid::Uuid;
 
-async fn schedule_job(
+/// Download the encryption keys for the 3 nodes that will run the job.
+pub async fn get_enc_keys(
     config: &Configuration,
-    code: &str,
     blueprint_id: Uuid,
-    job_type: JobType,
-) -> eyre::Result<ScheduleJobResponse> {
-    Ok(job_api::schedule_job(
-        config,
-        ScheduleJobRequest::new(blueprint_id, code.to_string(), job_type),
-    )
-    .await?)
-}
-
-async fn add_input(
-    config: &Configuration,
-    res: &ScheduleJobResponse,
-    shares: [Vec<u8>; 3],
-) -> eyre::Result<()> {
+) -> eyre::Result<[PublicKey; 3]> {
+    tracing::debug!("fetching key material for blueprint {blueprint_id}");
+    let key_material =
+        blueprint_api::blueprint_key_material(config, &blueprint_id.to_string()).await?;
+    if key_material.len() != 3 {
+        eyre::bail!("got wrong number of key_material");
+    }
     tracing::debug!("decode pub key 0");
     let pk0 = PublicKey::from_bytes(
-        Base64::decode_vec(&res.key_material[0].enc_key)?
+        Base64::decode_vec(&key_material[0].enc_key)?
             .try_into()
             .expect("correct len"),
     );
     tracing::debug!("decode pub key 0");
     let pk1 = PublicKey::from_bytes(
-        Base64::decode_vec(&res.key_material[1].enc_key)?
+        Base64::decode_vec(&key_material[1].enc_key)?
             .try_into()
             .expect("correct len"),
     );
     tracing::debug!("decode pub key 0");
     let pk2 = PublicKey::from_bytes(
-        Base64::decode_vec(&res.key_material[2].enc_key)?
+        Base64::decode_vec(&key_material[2].enc_key)?
             .try_into()
             .expect("correct len"),
     );
-    tracing::debug!("sealing shares...");
-    let ct0 = pk0
-        .seal(&mut OsRng, &shares[0])
-        .context("while sealing share")?;
-    let ct1 = pk1
-        .seal(&mut OsRng, &shares[1])
-        .context("while sealing share")?;
-    let ct2 = pk2
-        .seal(&mut OsRng, &shares[2])
-        .context("while sealing share")?;
-    job_api::add_input(config, &res.job_id.to_string(), ct0, ct1, ct2).await?;
-    Ok(())
+    Ok([pk0, pk1, pk2])
 }
 
-/// Schedule a full REP3 job including witness extenesion.
+fn seal_shares(keys: &[PublicKey; 3], shares: [Vec<u8>; 3]) -> eyre::Result<[Vec<u8>; 3]> {
+    tracing::debug!("sealing shares...");
+    let ct0 = keys[0]
+        .seal(&mut OsRng, &shares[0])
+        .context("while sealing share")?;
+    let ct1 = keys[1]
+        .seal(&mut OsRng, &shares[1])
+        .context("while sealing share")?;
+    let ct2 = keys[2]
+        .seal(&mut OsRng, &shares[2])
+        .context("while sealing share")?;
+    Ok([ct0, ct1, ct2])
+}
+
+/// Schedule a full REP3 job including witness extension.
 pub async fn schedule_full_job_rep3<P>(
     config: &Configuration,
-    code: &str,
     blueprint_id: Uuid,
+    code: &str,
+    keys: &[PublicKey; 3],
     input: Input,
     public_inputs: &[String],
 ) -> eyre::Result<Uuid>
@@ -81,8 +78,6 @@ where
     P::BaseField: CircomArkworksPrimeFieldBridge,
 {
     tracing::debug!("schedule_job Rep3Full for blueprint_id {blueprint_id}");
-    let res = schedule_job(config, code, blueprint_id, JobType::Rep3Full).await?;
-    tracing::info!("got job_id {}", res.job_id);
     tracing::debug!("sharing input...");
     let [share0, share1, share2] = split_input::<P::ScalarField>(input, public_inputs)?;
     let shares = [
@@ -90,17 +85,30 @@ where
         bincode::serialize(&share1)?,
         bincode::serialize(&share2)?,
     ];
-    tracing::debug!("adding input for job...");
-    add_input(config, &res, shares).await?;
-    tracing::debug!("done");
-    Ok(res.job_id)
+    tracing::debug!("sealing shares...");
+    let [ct0, ct1, ct2] = seal_shares(keys, shares)?;
+    tracing::debug!("scheduling job...");
+    let res = job_api::schedule_job(
+        config,
+        &blueprint_id.to_string(),
+        JobType::Rep3Full,
+        code,
+        ct0,
+        ct1,
+        ct2,
+    )
+    .await?;
+    let job_id = res.job_id;
+    tracing::debug!("job_id = {job_id}");
+    Ok(job_id)
 }
 
 /// Schedule a REP3 prove job.
 pub async fn schedule_prove_job_rep3<P>(
     config: &Configuration,
-    code: &str,
     blueprint_id: Uuid,
+    code: &str,
+    keys: &[PublicKey; 3],
     witness: Witness<P::ScalarField>,
     num_pub_inputs: usize,
 ) -> eyre::Result<Uuid>
@@ -110,8 +118,6 @@ where
     P::BaseField: CircomArkworksPrimeFieldBridge,
 {
     tracing::debug!("schedule_job Rep3Prove for blueprint_id {blueprint_id}");
-    let res = schedule_job(config, code, blueprint_id, JobType::Rep3Prove).await?;
-    tracing::info!("got job_id {}", res.job_id);
     let mut rng = rand::thread_rng();
     tracing::debug!("sharing witness...");
     let [share0, share1, share2] = CompressedRep3SharedWitness::<P::ScalarField>::share_rep3(
@@ -125,17 +131,30 @@ where
         bincode::serialize(&share1)?,
         bincode::serialize(&share2)?,
     ];
-    tracing::debug!("adding input for job...");
-    add_input(config, &res, shares).await?;
-    tracing::debug!("done");
-    Ok(res.job_id)
+    tracing::debug!("sealing shares...");
+    let [ct0, ct1, ct2] = seal_shares(keys, shares)?;
+    tracing::debug!("scheduling job...");
+    let res = job_api::schedule_job(
+        config,
+        &blueprint_id.to_string(),
+        JobType::Rep3Prove,
+        code,
+        ct0,
+        ct1,
+        ct2,
+    )
+    .await?;
+    let job_id = res.job_id;
+    tracing::debug!("job_id = {job_id}");
+    Ok(job_id)
 }
 
 /// Schedule a Shamir prove job.
 pub async fn schedule_prove_job_shamir<P>(
     config: &Configuration,
-    code: &str,
     blueprint_id: Uuid,
+    code: &str,
+    keys: &[PublicKey; 3],
     witness: Witness<P::ScalarField>,
     num_pub_inputs: usize,
 ) -> eyre::Result<Uuid>
@@ -145,9 +164,8 @@ where
     P::BaseField: CircomArkworksPrimeFieldBridge,
 {
     tracing::debug!("schedule_job ShamirProve for blueprint_id {blueprint_id}");
-    let res = schedule_job(config, code, blueprint_id, JobType::ShamirProve).await?;
-    tracing::info!("got job_id {}", res.job_id);
     let mut rng = rand::thread_rng();
+    tracing::debug!("sharing witness...");
     tracing::debug!("sharing witness...");
     let [share0, share1, share2] = ShamirSharedWitness::<P::ScalarField>::share_shamir(
         witness,
@@ -163,10 +181,22 @@ where
         bincode::serialize(&share1)?,
         bincode::serialize(&share2)?,
     ];
-    tracing::debug!("adding input for job...");
-    add_input(config, &res, shares).await?;
-    tracing::debug!("done");
-    Ok(res.job_id)
+    tracing::debug!("sealing shares...");
+    let [ct0, ct1, ct2] = seal_shares(keys, shares)?;
+    tracing::debug!("scheduling job...");
+    let res = job_api::schedule_job(
+        config,
+        &blueprint_id.to_string(),
+        JobType::ShamirProve,
+        code,
+        ct0,
+        ct1,
+        ct2,
+    )
+    .await?;
+    let job_id = res.job_id;
+    tracing::debug!("job_id = {job_id}");
+    Ok(job_id)
 }
 
 /// The result of a scheduled job, represents either a successful proof, a error, or the status of a still running job

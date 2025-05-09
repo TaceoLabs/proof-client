@@ -1,12 +1,11 @@
-# ScheduleJobRequest
+# PaginationResultString
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**blueprint_id** | [**uuid::Uuid**](uuid::Uuid.md) |  | 
-**code** | **String** |  | 
-**job_type** | [**models::JobType**](JobType.md) |  | 
+**elements** | **Vec<String>** |  | 
+**total_amount** | Option<**i64**> |  | [optional]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 
