@@ -91,6 +91,8 @@ where
         args.num_inputs.expect("must be present if r1cs is not")
     };
 
+    let keys = taceo_proof_client::get_enc_keys(config, args.blueprint).await?;
+
     // schedule job
     tracing::info!("scheduling job...");
     let job_id = match args.job {
@@ -98,8 +100,9 @@ where
             let input = serde_json::from_reader(File::open(args.input)?)?;
             taceo_proof_client::schedule_full_job_rep3::<P>(
                 config,
-                &args.code,
                 args.blueprint,
+                &args.code,
+                &keys,
                 input,
                 &args
                     .public_inputs
@@ -111,8 +114,9 @@ where
             let witness = Witness::from_reader(File::open(args.input)?)?;
             taceo_proof_client::schedule_prove_job_rep3::<P>(
                 config,
-                &args.code,
                 args.blueprint,
+                &args.code,
+                &keys,
                 witness,
                 num_inputs,
             )
@@ -122,8 +126,9 @@ where
             let witness = Witness::from_reader(File::open(args.input)?)?;
             taceo_proof_client::schedule_prove_job_shamir::<P>(
                 config,
-                &args.code,
                 args.blueprint,
+                &args.code,
+                &keys,
                 witness,
                 num_inputs,
             )

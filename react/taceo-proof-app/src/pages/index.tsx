@@ -1,33 +1,37 @@
 import React, { ChangeEvent, useRef, useState } from "react";
-import { BlueprintCurve, Configuration, ConfigurationParameters, JobApi, JobStatus, JobType, ProofResult } from '@taceo/proof-api-client';
-import { scheduleFullJobRep3, scheduleProveJobShamir, scheduleProveJobRep3 } from '@taceo/proof-client-browser'
+import { BlueprintApi, BlueprintCurve, Configuration, ConfigurationParameters, JobApi, JobStatus, JobType, ProofResult } from '@taceo/proof-api-client';
+import { scheduleFullJobRep3, scheduleProveJobShamir, scheduleProveJobRep3, getEncKeysB64 } from '@taceo/proof-client-browser'
 import wc from "../witness-calculator.js"; // generated with circom
 
 const configParams: ConfigurationParameters = {
   basePath: "http://localhost:1234",
 }
 const congiuration = new Configuration(configParams)
-const apiInstance = new JobApi(congiuration);
+const jobInstance = new JobApi(congiuration);
+const blueprintInstance = new BlueprintApi(congiuration);
+
+type WitnessExtension = "Upload" | "Browser";
 
 export default function Home() {
-  const [code, setCode] = useState<string | null>(null);
-  const [blueprint, setBlueprint] = useState<string | null>(null);
+  const [code, setCode] = useState<string>("");
+  const [blueprint, setBlueprint] = useState<string>("");
   const [curve, setCurve] = useState<BlueprintCurve>(BlueprintCurve.Bn254);
   const [result, setResult] = useState<ProofResult | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [jobType, setJobType] = useState<JobType>(JobType.ShamirProve);
-  const [numInputs, setNumInputs] = useState<number | null>(null);
+  const [numInputs, setNumInputs] = useState<number>(0);
   const [publicInputs, setPublicInputs] = useState<Array<string>>([]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [wasm, setWasm] = useState<File | null>(null);
   const wasmRef = useRef<HTMLInputElement>(null);
+  const [wtnsExt, setWtnsExt] = useState<WitnessExtension>("Upload");
 
   const pollProofResult = async (id: string): Promise<ProofResult | null> => {
     while (true) {
       try {
-        const getResultRes = await apiInstance.getResult({ id: id });
+        const getResultRes = await jobInstance.getResult({ id: id });
         if (getResultRes.status == JobStatus.Success) {
           return getResultRes.ok!;
         } else if (getResultRes.status == JobStatus.Failed) {
@@ -53,12 +57,12 @@ export default function Home() {
       return;
     }
 
-    if (wasm == null && jobType != JobType.Rep3Full) {
+    if (wasm == null && jobType != JobType.Rep3Full && wtnsExt == "Browser") {
       setError("wasm file missing");
       return;
     }
 
-    const input = JSON.parse(await selectedFile!.text());
+    let input;
     let jobId;
     let witnessCalculator;
     let witness;
@@ -66,23 +70,25 @@ export default function Home() {
     setLoading(true);
 
     try {
-      switch (jobType) {
-        case JobType.Rep3Full:
-          jobId = await scheduleFullJobRep3(apiInstance, code!, blueprint!, curve, publicInputs!, input);
-          break;
-        case JobType.Rep3Prove:
+      const keys = await getEncKeysB64(blueprintInstance, blueprint);
+      if (jobType == JobType.Rep3Full) {
+        input = JSON.parse(await selectedFile!.text());
+        jobId = await scheduleFullJobRep3(jobInstance, blueprint, code, curve, keys, publicInputs, input);
+      } else {
+        if (wtnsExt == "Browser") {
+          input = JSON.parse(await selectedFile!.text());
           witnessCalculator = await wc(await wasm!.bytes());
           witness = await witnessCalculator.calculateWTNSBin(input, 0);
-          jobId = await scheduleProveJobRep3(apiInstance, code!, blueprint!, curve, numInputs!, witness);
-          break;
-        case JobType.ShamirProve:
-          witnessCalculator = await wc(await wasm!.bytes());
-          witness = await witnessCalculator.calculateWTNSBin(input, 0);
-          jobId = await scheduleProveJobShamir(apiInstance, code!, blueprint!, curve, numInputs!, witness);
-          break;
-
+        } else {
+          witness = await selectedFile!.bytes();
+        }
+        if (jobType == JobType.ShamirProve) {
+          jobId = await scheduleProveJobShamir(jobInstance, blueprint, code, curve, keys, numInputs, witness);
+        } else {
+          jobId = await scheduleProveJobRep3(jobInstance, blueprint, code, curve, keys, numInputs, witness);
+        }
       }
-      const result = await pollProofResult(jobId!);
+      const result = await pollProofResult(jobId);
       setResult(result);
     } catch (error: any) {
       setError(error.message);
@@ -135,26 +141,23 @@ export default function Home() {
             </select>
           </div>
           <div>
-            <h2 className="text-[14pt] font-bold pb-1">Input</h2>
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleInputFileChange}
-              style={{ display: 'none' }}
-            />
-            <button className="bg-white text-black font-bold upload-trigger rounded-[5pt] p-2 w-full" onClick={handleInputUploadClick} type="button">
-              {selectedFile ? selectedFile.name : 'Choose File'}
-            </button>
-          </div>
-          <div>
             <h2 className="text-[14pt] font-bold pb-1">Job Type</h2>
             <select required className="bg-white text-black font-bold rounded-[5pt] p-2 w-full" onChange={(e) => setJobType(e.target.value as JobType)}>
-              <option value='ShamirPove'>Shamir Prove</option>
-              <option value='Rep3Pove'>REP3 Prove</option>
+              <option value='ShamirProve'>Shamir Prove</option>
+              <option value='Rep3Prove'>REP3 Prove</option>
               <option value='Rep3Full'>Witness Extension + Prove</option>
             </select>
           </div>
           {jobType != JobType.Rep3Full && (
+            <div>
+              <h2 className="text-[14pt] font-bold pb-1">Witness Extension</h2>
+              <select required className="bg-white text-black font-bold rounded-[5pt] p-2 w-full" onChange={(e) => setWtnsExt(e.target.value as WitnessExtension)}>
+                <option value='Upload'>Upload Witness</option>
+                <option value='Browser'>Compute in Browser</option>
+              </select>
+            </div>
+          )}
+          {jobType != JobType.Rep3Full && wtnsExt == "Browser" && (
             <div>
               <h2 className="text-[14pt] font-bold pb-1">Circom WASM</h2>
               <input
@@ -168,6 +171,20 @@ export default function Home() {
               </button>
             </div>
           )}
+          <div>
+            <h2 className="text-[14pt] font-bold pb-1">
+              { jobType == JobType.Rep3Full || wtnsExt == "Browser" ? 'Input' : 'Witness' }
+            </h2>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleInputFileChange}
+              style={{ display: 'none' }}
+            />
+            <button className="bg-white text-black font-bold upload-trigger rounded-[5pt] p-2 w-full" onClick={handleInputUploadClick} type="button">
+              {selectedFile ? selectedFile.name : 'Choose File'}
+            </button>
+          </div>
           {jobType == JobType.Rep3Full ?
             <div>
               <h2 className="text-[14pt] font-bold pb-1">Public Inputs</h2>
@@ -181,18 +198,18 @@ export default function Home() {
           }
           <div className="pt-5">
             <button className="bg-white text-black font-bold rounded-[5pt] p-2 w-full" type="submit" disabled={loading}>
-               {loading ? ('Loading...') : 'Submit'}
+              {loading ? ('Loading...') : 'Submit'}
             </button>
           </div>
           <div className="pt-5">
-          {error && <div className="text-[#ff0000]">{error}</div>}
-          {result && (
-            <div>
-              <a className="underline text-white" href={`data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(result))}`} download="result.json">
-                Download Result
-              </a>
-            </div>
-          )}
+            {error && <div className="text-[#ff0000]">{error}</div>}
+            {result && (
+              <div>
+                <a className="underline text-white" href={`data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(result))}`} download="result.json">
+                  Download Result
+                </a>
+              </div>
+            )}
           </div>
         </div>
       </form>

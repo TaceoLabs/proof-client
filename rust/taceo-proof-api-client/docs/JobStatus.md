@@ -4,8 +4,7 @@
 
 | Name | Value |
 |---- | -----|
-| WaitingForInputs | WaitingForInputs |
-| WaitingForNodes | WaitingForNodes |
+| Pending | Pending |
 | InProgress | InProgress |
 | Failed | Failed |
 | Success | Success |

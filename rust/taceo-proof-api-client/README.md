@@ -26,22 +26,25 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*AdminApi* | [**create_invitation_code**](docs/AdminApi.md#create_invitation_code) | **POST** /admin/nps/invitation/create | 
+*AdminApi* | [**create_user**](docs/AdminApi.md#create_user) | **POST** /admin/user/create | 
+*AdminApi* | [**paginate_invitations**](docs/AdminApi.md#paginate_invitations) | **GET** /admin/nps/invitation/list | 
+*AdminApi* | [**revoke_invitation_code**](docs/AdminApi.md#revoke_invitation_code) | **POST** /admin/nps/invitation/revoke | 
+*BlueprintApi* | [**blueprint_key_material**](docs/BlueprintApi.md#blueprint_key_material) | **GET** /api/v1/blueprint/{id}/key-material | returns the key material of the NPSs associated with the blueprint
 *BlueprintApi* | [**blueprint_ready**](docs/BlueprintApi.md#blueprint_ready) | **GET** /api/v1/blueprint/{id}/ready | checks whether a blueprint is already ready
-*BlueprintApi* | [**create**](docs/BlueprintApi.md#create) | **PUT** /api/v1/blueprint/create | create a new coSNARK blueprint
-*BlueprintApi* | [**issue_cosnark_code**](docs/BlueprintApi.md#issue_cosnark_code) | **GET** /api/v1/blueprint/code | create a new job
-*BlueprintApi* | [**upload_aux_data**](docs/BlueprintApi.md#upload_aux_data) | **PUT** /api/v1/blueprint/{id}/aux/{aux_type} | add proving key to blueprint
+*BlueprintApi* | [**create**](docs/BlueprintApi.md#create) | **POST** /api/v1/blueprint/create | create a new coSNARK blueprint
+*BlueprintApi* | [**issue_cosnark_code**](docs/BlueprintApi.md#issue_cosnark_code) | **POST** /api/v1/blueprint/code | create a new job
+*BlueprintApi* | [**upload_aux_data**](docs/BlueprintApi.md#upload_aux_data) | **POST** /api/v1/blueprint/{id}/aux/{aux_type} | add proving key to blueprint
 *DashboardApi* | [**welcome**](docs/DashboardApi.md#welcome) | **GET** /api/v1/dashboard | 
 *HealthApi* | [**health**](docs/HealthApi.md#health) | **GET** /health | 
 *HealthApi* | [**live**](docs/HealthApi.md#live) | **GET** /health/live | 
 *HealthApi* | [**ready**](docs/HealthApi.md#ready) | **GET** /health/ready | 
-*JobApi* | [**add_input**](docs/JobApi.md#add_input) | **PUT** /api/v1/jobs/{id}/input | add input data to a job
 *JobApi* | [**get_result**](docs/JobApi.md#get_result) | **GET** /api/v1/jobs/job/{id} | get job result
 *JobApi* | [**schedule_job**](docs/JobApi.md#schedule_job) | **POST** /api/v1/jobs/schedule | create a new job
 *NpsApi* | [**list**](docs/NpsApi.md#list) | **GET** /api/v1/nps/list | get paginated node providers - used for blueprint creators to define clusters
-*NpsApi* | [**register**](docs/NpsApi.md#register) | **POST** /api/v1/nps/register | register a new node provider
-*UserApi* | [**get_login**](docs/UserApi.md#get_login) | **GET** /api/v1/users/login | 
-*UserApi* | [**logout**](docs/UserApi.md#logout) | **GET** /api/v1/users/logout | 
-*UserApi* | [**post_login**](docs/UserApi.md#post_login) | **POST** /api/v1/users/login | 
+*UserApi* | [**get_login**](docs/UserApi.md#get_login) | **GET** /login | 
+*UserApi* | [**logout**](docs/UserApi.md#logout) | **GET** /logout | 
+*UserApi* | [**post_login**](docs/UserApi.md#post_login) | **POST** /login | 
 
 
 ## Documentation For Models
@@ -51,18 +54,16 @@ Class | Method | HTTP request | Description
  - [BlueprintCurve](docs/BlueprintCurve.md)
  - [BlueprintReadyProbe](docs/BlueprintReadyProbe.md)
  - [BlueprintType](docs/BlueprintType.md)
- - [CreateBlueprintRequest](docs/CreateBlueprintRequest.md)
  - [CreateBlueprintResponse](docs/CreateBlueprintResponse.md)
- - [IssueCoSnarkCodeRequest](docs/IssueCoSnarkCodeRequest.md)
  - [JobResult](docs/JobResult.md)
  - [JobStatus](docs/JobStatus.md)
  - [JobType](docs/JobType.md)
  - [NpsHeader](docs/NpsHeader.md)
  - [NpsKeyMaterial](docs/NpsKeyMaterial.md)
+ - [PaginationResultNpsHeader](docs/PaginationResultNpsHeader.md)
+ - [PaginationResultNpsHeaderElementsInner](docs/PaginationResultNpsHeaderElementsInner.md)
+ - [PaginationResultString](docs/PaginationResultString.md)
  - [ProofResult](docs/ProofResult.md)
- - [RegisterNpsRequest](docs/RegisterNpsRequest.md)
- - [RegisterNpsResponse](docs/RegisterNpsResponse.md)
- - [ScheduleJobRequest](docs/ScheduleJobRequest.md)
  - [ScheduleJobResponse](docs/ScheduleJobResponse.md)
 
 
