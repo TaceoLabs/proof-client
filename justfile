@@ -5,7 +5,7 @@ generate-js-api-client:
     -i /local/v1-openapi.json \
     -g typescript-fetch \
     -o /local/js/taceo-proof-api-client \
-    --additional-properties=supportsES6=true,npmName=@taceo/proof-api-client,npmVersion=0.0.0
+    --additional-properties=supportsES6=true,npmName=@taceo/proof-api-client,npmVersion=0.0.0 && cd js/taceo-proof-api-client && npm i
 
 generate-rust-api-client:
   (rm -r rust/taceo-proof-api-client || true) && docker run --rm \
