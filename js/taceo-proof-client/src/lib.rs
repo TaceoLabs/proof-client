@@ -11,8 +11,19 @@ use circom_types::{
 };
 use co_circom_types::{CompressedRep3SharedWitness, Compression, Input, ShamirSharedWitness};
 use crypto_box::PublicKey;
+use ed25519_dalek::{Signature, VerifyingKey};
 use rand::rngs::OsRng;
+use sha2::{Digest as _, Sha512};
+use uuid::Uuid;
 use wasm_bindgen::prelude::*;
+
+#[wasm_bindgen]
+extern "C" {
+    // Use `js_namespace` here to bind `console.log(..)` instead of just
+    // `log(..)`
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(s: &str);
+}
 
 /// Seal the share with the given public key
 #[wasm_bindgen]
@@ -27,6 +38,48 @@ pub fn seal_share(pk_b64: &str, share: Vec<u8>) -> Result<Vec<u8>, JsError> {
         .seal(&mut OsRng, &share)
         .map_err(|_| JsError::new("encryption error"))?;
     Ok(ciphertext)
+}
+
+/// Verify the signature with the given verifying key
+#[wasm_bindgen]
+pub fn verify_proof_result_signature(
+    job_id: &str,
+    proof_b64: &str,
+    public_inputs_b64: &str,
+    vk_b64: &str,
+    signature_b64: &str,
+) -> Result<(), JsError> {
+    let job_id = job_id
+        .parse::<Uuid>()
+        .map_err(|_| JsError::new("invalid uuid"))?;
+    let vk_bytes = Base64::decode_vec(vk_b64)?;
+    let vk = VerifyingKey::from_bytes(
+        &vk_bytes
+            .try_into()
+            .map_err(|_| JsError::new("invalid key size"))?,
+    )?;
+    let signature_bytes = Base64::decode_vec(signature_b64)?;
+    let signature = Signature::from_bytes(
+        &signature_bytes
+            .try_into()
+            .map_err(|_| JsError::new("invalid signature size"))?,
+    );
+    let proof_bytes = Base64::decode_vec(proof_b64)?;
+    let public_inputs_bytes = Base64::decode_vec(public_inputs_b64)?;
+
+    let mut digest = Sha512::new();
+    digest.update(job_id.as_bytes());
+    digest.update(proof_bytes);
+    digest.update(public_inputs_bytes);
+
+    vk.verify_prehashed_strict(
+        digest,
+        Some("taceo-proof-nps-reporting".as_bytes()),
+        &signature,
+    )
+    .map_err(|_| JsError::new("signature verification failed"))?;
+
+    Ok(())
 }
 
 /// A serialized REP3 shared input

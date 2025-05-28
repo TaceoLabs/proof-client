@@ -1,4 +1,4 @@
-import { seal_share, split_input_rep3_bls12_381, split_input_rep3_bn254, split_witness_rep3_bls12_381, split_witness_rep3_bn254, split_witness_shamir_bls12_381, split_witness_shamir_bn254, split_input_rep3_bls12_377, split_witness_rep3_bls12_377, split_witness_shamir_bls12_377} from "./pkg/taceo_proof_wasm.js";
+import { seal_share, split_input_rep3_bls12_381, split_input_rep3_bn254, split_witness_rep3_bls12_381, split_witness_rep3_bn254, split_witness_shamir_bls12_381, split_witness_shamir_bn254, split_input_rep3_bls12_377, split_witness_rep3_bls12_377, split_witness_shamir_bls12_377, verify_proof_result_signature } from "./pkg/taceo_proof_wasm.js";
 import { BlueprintCurve, JobApi, JobType, NpsKeyMaterial, ProofResult } from '@taceo/proof-api-client';
 
 
@@ -24,6 +24,14 @@ async function scheduleJob(
   });
 
   return scheduleJobResponse.jobId;
+}
+
+/**
+ * Verify the signature of a proof result. Throws an error if the signature cannot be verified.
+ */
+export function verifyProofResultSignature(jobId: string, proofResult: ProofResult, signature: string,
+  npsKeyMaterial: NpsKeyMaterial) {
+  verify_proof_result_signature(jobId, proofResult.proof, proofResult.publicInputs, npsKeyMaterial.verifyKey, signature)
 }
 
 /**

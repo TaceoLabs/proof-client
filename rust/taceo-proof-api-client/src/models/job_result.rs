@@ -27,6 +27,27 @@ pub struct JobResult {
         skip_serializing_if = "Option::is_none"
     )]
     pub ok: Option<Option<Box<models::ProofResult>>>,
+    #[serde(
+        rename = "signature0",
+        default,
+        with = "::serde_with::rust::double_option",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub signature0: Option<Option<String>>,
+    #[serde(
+        rename = "signature1",
+        default,
+        with = "::serde_with::rust::double_option",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub signature1: Option<Option<String>>,
+    #[serde(
+        rename = "signature2",
+        default,
+        with = "::serde_with::rust::double_option",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub signature2: Option<Option<String>>,
     #[serde(rename = "status")]
     pub status: models::JobStatus,
 }
@@ -36,6 +57,9 @@ impl JobResult {
         JobResult {
             error: None,
             ok: None,
+            signature0: None,
+            signature1: None,
+            signature2: None,
             status,
         }
     }

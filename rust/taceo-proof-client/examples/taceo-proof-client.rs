@@ -142,6 +142,7 @@ where
         match taceo_proof_client::get_job_result(config, job_id).await? {
             JobResult::Ok((proof, public_inputs)) => {
                 tracing::info!("got proof");
+
                 if let Some(vk) = args.vk {
                     let vk = if vk.extension().is_some_and(|ext| ext == "json") {
                         JsonVerificationKey::from_reader(File::open(vk)?)?.into()

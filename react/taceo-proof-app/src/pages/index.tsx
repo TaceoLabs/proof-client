@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useRef, useState } from "react";
-import { BlueprintApi, BlueprintCurve, Configuration, ConfigurationParameters, JobApi, JobStatus, JobType, ProofResult } from '@taceo/proof-api-client';
-import { scheduleFullJobRep3, scheduleProveJobShamir, scheduleProveJobRep3} from '@taceo/proof-client-browser'
+import { BlueprintApi, BlueprintCurve, Configuration, ConfigurationParameters, JobApi, JobStatus, JobType, NpsKeyMaterial, ProofResult } from '@taceo/proof-api-client';
+import { scheduleFullJobRep3, scheduleProveJobShamir, scheduleProveJobRep3, verifyProofResultSignature} from '@taceo/proof-client-browser'
 import wc from "../witness-calculator.js"; // generated with circom
 
 type WitnessExtension = "Upload" | "Browser";
@@ -28,12 +28,16 @@ export default function Home() {
   const wasmRef = useRef<HTMLInputElement>(null);
   const [wtnsExt, setWtnsExt] = useState<WitnessExtension>("Upload");
 
-  const pollProofResult = async (id: string): Promise<ProofResult | null> => {
+  const pollProofResult = async (jobId: string, keyMaterial: NpsKeyMaterial[]): Promise<ProofResult | null> => {
     while (true) {
       try {
-        const jobResult = await jobInstance.getResult({ id: id });
-        if (jobResult.status == JobStatus.Success) {
-          return jobResult.ok!;
+        const jobResult = await jobInstance.getResult({ id: jobId });
+        if (jobResult.status == JobStatus.Success && jobResult.signature0 != null && jobResult.signature1 != null && jobResult.signature2 != null) {
+          const proofResult = jobResult.ok!;
+          verifyProofResultSignature(jobId, proofResult, jobResult.signature0, keyMaterial[0]);
+          verifyProofResultSignature(jobId, proofResult, jobResult.signature1, keyMaterial[1]);
+          verifyProofResultSignature(jobId, proofResult, jobResult.signature2, keyMaterial[2]);
+          return proofResult;
         } else if (jobResult.status == JobStatus.Failed) {
           setError(jobResult.error ?? "something went wrong");
           return null;
@@ -88,7 +92,7 @@ export default function Home() {
           jobId = await scheduleProveJobRep3(jobInstance, blueprint, code, curve, keyMaterial, numInputs, witness);
         }
       }
-      const result = await pollProofResult(jobId);
+      const result = await pollProofResult(jobId, keyMaterial);
       setResult(result);
     } catch (error: any) {
       setError(error.message);
