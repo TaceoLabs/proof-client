@@ -417,6 +417,42 @@
         }
       }
     },
+    "/api/v1/blueprint/{id}/revoke": {
+      "post": {
+        "tags": [
+          "blueprint"
+        ],
+        "summary": "Revokes the blueprint identified by ID if the logged in user has the correct access rights.",
+        "operationId": "revoke",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The id of the blueprint",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The blueprint is now revoked."
+          },
+          "5XX": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/dashboard": {
       "get": {
         "tags": [
@@ -957,7 +993,8 @@
         "type": "object",
         "required": [
           "id",
-          "name"
+          "name",
+          "online"
         ],
         "properties": {
           "id": {
@@ -966,6 +1003,9 @@
           },
           "name": {
             "type": "string"
+          },
+          "online": {
+            "type": "boolean"
           }
         }
       },
@@ -1000,7 +1040,8 @@
               "type": "object",
               "required": [
                 "id",
-                "name"
+                "name",
+                "online"
               ],
               "properties": {
                 "id": {
@@ -1009,6 +1050,9 @@
                 },
                 "name": {
                   "type": "string"
+                },
+                "online": {
+                  "type": "boolean"
                 }
               }
             }

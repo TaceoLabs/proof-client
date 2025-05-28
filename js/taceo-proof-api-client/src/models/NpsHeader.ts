@@ -31,6 +31,12 @@ export interface NpsHeader {
      * @memberof NpsHeader
      */
     name: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof NpsHeader
+     */
+    online: boolean;
 }
 
 /**
@@ -39,6 +45,7 @@ export interface NpsHeader {
 export function instanceOfNpsHeader(value: object): value is NpsHeader {
     if (!('id' in value) || value['id'] === undefined) return false;
     if (!('name' in value) || value['name'] === undefined) return false;
+    if (!('online' in value) || value['online'] === undefined) return false;
     return true;
 }
 
@@ -54,6 +61,7 @@ export function NpsHeaderFromJSONTyped(json: any, ignoreDiscriminator: boolean):
         
         'id': json['id'],
         'name': json['name'],
+        'online': json['online'],
     };
 }
 
@@ -70,6 +78,7 @@ export function NpsHeaderToJSONTyped(value?: NpsHeader | null, ignoreDiscriminat
         
         'id': value['id'],
         'name': value['name'],
+        'online': value['online'],
     };
 }
 

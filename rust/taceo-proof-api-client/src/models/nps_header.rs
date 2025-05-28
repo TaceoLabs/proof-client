@@ -17,10 +17,12 @@ pub struct NpsHeader {
     pub id: i32,
     #[serde(rename = "name")]
     pub name: String,
+    #[serde(rename = "online")]
+    pub online: bool,
 }
 
 impl NpsHeader {
-    pub fn new(id: i32, name: String) -> NpsHeader {
-        NpsHeader { id, name }
+    pub fn new(id: i32, name: String, online: bool) -> NpsHeader {
+        NpsHeader { id, name, online }
     }
 }

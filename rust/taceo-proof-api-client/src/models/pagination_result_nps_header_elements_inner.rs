@@ -17,10 +17,12 @@ pub struct PaginationResultNpsHeaderElementsInner {
     pub id: i32,
     #[serde(rename = "name")]
     pub name: String,
+    #[serde(rename = "online")]
+    pub online: bool,
 }
 
 impl PaginationResultNpsHeaderElementsInner {
-    pub fn new(id: i32, name: String) -> PaginationResultNpsHeaderElementsInner {
-        PaginationResultNpsHeaderElementsInner { id, name }
+    pub fn new(id: i32, name: String, online: bool) -> PaginationResultNpsHeaderElementsInner {
+        PaginationResultNpsHeaderElementsInner { id, name, online }
     }
 }

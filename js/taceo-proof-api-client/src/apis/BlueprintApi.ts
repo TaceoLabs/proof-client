@@ -62,6 +62,10 @@ export interface IssueCosnarkCodeRequest {
     validityInSeconds: number;
 }
 
+export interface RevokeRequest {
+    id: string;
+}
+
 export interface UploadAuxDataRequest {
     id: string;
     auxType: AuxiliaryType;
@@ -311,6 +315,38 @@ export class BlueprintApi extends runtime.BaseAPI {
     async issueCosnarkCode(requestParameters: IssueCosnarkCodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
         const response = await this.issueCosnarkCodeRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     * Revokes the blueprint identified by ID if the logged in user has the correct access rights.
+     */
+    async revokeRaw(requestParameters: RevokeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling revoke().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/blueprint/{id}/revoke`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Revokes the blueprint identified by ID if the logged in user has the correct access rights.
+     */
+    async revoke(requestParameters: RevokeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.revokeRaw(requestParameters, initOverrides);
     }
 
     /**
