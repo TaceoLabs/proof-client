@@ -1,13 +1,6 @@
-import { seal_share, split_input_rep3_bls12_381, split_input_rep3_bn254, split_witness_rep3_bls12_381, split_witness_rep3_bn254, split_witness_shamir_bls12_381, split_witness_shamir_bn254, split_input_rep3_bls12_377, split_witness_rep3_bls12_377, split_witness_shamir_bls12_377 } from "./pkg/taceo_proof_wasm.js";
-import { BlueprintApi, BlueprintCurve, JobApi, JobType } from '@taceo/proof-api-client';
+import { seal_share, split_input_rep3_bls12_381, split_input_rep3_bn254, split_witness_rep3_bls12_381, split_witness_rep3_bn254, split_witness_shamir_bls12_381, split_witness_shamir_bn254, split_input_rep3_bls12_377, split_witness_rep3_bls12_377, split_witness_shamir_bls12_377} from "./pkg/taceo_proof_wasm.js";
+import { BlueprintCurve, JobApi, JobType, NpsKeyMaterial, ProofResult } from '@taceo/proof-api-client';
 
-/**
- * Download the base64 encoded encryption keys for the 3 nodes that will run the job.
- */
-export async function getEncKeysB64(apiInstance: BlueprintApi, blueprintId: string): Promise<string[]> {
-  const keyMaterial = await apiInstance.blueprintKeyMaterial({ id: blueprintId });
-  return [keyMaterial[0].encKey, keyMaterial[1].encKey, keyMaterial[2].encKey];
-}
 
 async function scheduleJob(
   apiInstance: JobApi,
@@ -15,11 +8,11 @@ async function scheduleJob(
   jobType: JobType,
   code: string,
   shares: Uint8Array[],
-  keys: string[],
+  keyMaterial: NpsKeyMaterial[],
 ): Promise<string> {
-  const share0Ciphertext = seal_share(keys[0], shares[0]);
-  const share1Ciphertext = seal_share(keys[1], shares[1]);
-  const share2Ciphertext = seal_share(keys[2], shares[2]);
+  const share0Ciphertext = seal_share(keyMaterial[0].encKey, shares[0]);
+  const share1Ciphertext = seal_share(keyMaterial[1].encKey, shares[1]);
+  const share2Ciphertext = seal_share(keyMaterial[2].encKey, shares[2]);
 
   const scheduleJobResponse = await apiInstance.scheduleJob({
     aBlueprintId: blueprintId,
@@ -41,7 +34,7 @@ export async function scheduleFullJobRep3(
   blueprintId: string,
   code: string,
   curve: BlueprintCurve,
-  keys: string[],
+  keyMaterial: NpsKeyMaterial[],
   public_inputs: string[],
   input: any
 ): Promise<string> {
@@ -58,7 +51,7 @@ export async function scheduleFullJobRep3(
       break;
   }
   const shares = [sharedInput.shares0, sharedInput.shares1, sharedInput.shares2];
-  return await scheduleJob(apiInstance, blueprintId, JobType.Rep3Full, code, shares, keys);
+  return await scheduleJob(apiInstance, blueprintId, JobType.Rep3Full, code, shares, keyMaterial);
 }
 
 /**
@@ -69,7 +62,7 @@ export async function scheduleProveJobRep3(
   blueprintId: string,
   code: string,
   curve: BlueprintCurve,
-  keys: string[],
+  keyMaterial: NpsKeyMaterial[],
   num_pub_inputs: number,
   witness: Uint8Array
 ): Promise<string> {
@@ -86,7 +79,7 @@ export async function scheduleProveJobRep3(
       break;
   }
   const shares = [sharedInput.shares0, sharedInput.shares1, sharedInput.shares2];
-  return await scheduleJob(apiInstance, blueprintId, JobType.Rep3Prove, code, shares, keys);
+  return await scheduleJob(apiInstance, blueprintId, JobType.Rep3Prove, code, shares, keyMaterial);
 }
 
 /**
@@ -96,7 +89,7 @@ export async function scheduleProveJobShamir(apiInstance: JobApi,
   blueprintId: string,
   code: string,
   curve: BlueprintCurve,
-  keys: string[],
+  keyMaterial: NpsKeyMaterial[],
   num_pub_inputs: number,
   witness: Uint8Array
 ): Promise<string> {
@@ -113,6 +106,6 @@ export async function scheduleProveJobShamir(apiInstance: JobApi,
       break;
   }
   const shares = [sharedInput.shares0, sharedInput.shares1, sharedInput.shares2];
-  return await scheduleJob(apiInstance, blueprintId, JobType.ShamirProve, code, shares, keys);
+  return await scheduleJob(apiInstance, blueprintId, JobType.ShamirProve, code, shares, keyMaterial);
 }
 

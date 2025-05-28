@@ -1,7 +1,9 @@
 import React, { ChangeEvent, useRef, useState } from "react";
 import { BlueprintApi, BlueprintCurve, Configuration, ConfigurationParameters, JobApi, JobStatus, JobType, ProofResult } from '@taceo/proof-api-client';
-import { scheduleFullJobRep3, scheduleProveJobShamir, scheduleProveJobRep3, getEncKeysB64 } from '@taceo/proof-client-browser'
+import { scheduleFullJobRep3, scheduleProveJobShamir, scheduleProveJobRep3} from '@taceo/proof-client-browser'
 import wc from "../witness-calculator.js"; // generated with circom
+
+type WitnessExtension = "Upload" | "Browser";
 
 const configParams: ConfigurationParameters = {
   basePath: "http://localhost:1234",
@@ -9,8 +11,6 @@ const configParams: ConfigurationParameters = {
 const congiuration = new Configuration(configParams)
 const jobInstance = new JobApi(congiuration);
 const blueprintInstance = new BlueprintApi(congiuration);
-
-type WitnessExtension = "Upload" | "Browser";
 
 export default function Home() {
   const [code, setCode] = useState<string>("");
@@ -31,11 +31,11 @@ export default function Home() {
   const pollProofResult = async (id: string): Promise<ProofResult | null> => {
     while (true) {
       try {
-        const getResultRes = await jobInstance.getResult({ id: id });
-        if (getResultRes.status == JobStatus.Success) {
-          return getResultRes.ok!;
-        } else if (getResultRes.status == JobStatus.Failed) {
-          setError(getResultRes.error ?? "something went wrong");
+        const jobResult = await jobInstance.getResult({ id: id });
+        if (jobResult.status == JobStatus.Success) {
+          return jobResult.ok!;
+        } else if (jobResult.status == JobStatus.Failed) {
+          setError(jobResult.error ?? "something went wrong");
           return null;
         }
       } catch (error) {
@@ -70,10 +70,10 @@ export default function Home() {
     setLoading(true);
 
     try {
-      const keys = await getEncKeysB64(blueprintInstance, blueprint);
+      const keyMaterial = await blueprintInstance.blueprintKeyMaterial({id: blueprint});
       if (jobType == JobType.Rep3Full) {
         input = JSON.parse(await selectedFile!.text());
-        jobId = await scheduleFullJobRep3(jobInstance, blueprint, code, curve, keys, publicInputs, input);
+        jobId = await scheduleFullJobRep3(jobInstance, blueprint, code, curve, keyMaterial, publicInputs, input);
       } else {
         if (wtnsExt == "Browser") {
           input = JSON.parse(await selectedFile!.text());
@@ -83,9 +83,9 @@ export default function Home() {
           witness = await selectedFile!.bytes();
         }
         if (jobType == JobType.ShamirProve) {
-          jobId = await scheduleProveJobShamir(jobInstance, blueprint, code, curve, keys, numInputs, witness);
+          jobId = await scheduleProveJobShamir(jobInstance, blueprint, code, curve, keyMaterial, numInputs, witness);
         } else {
-          jobId = await scheduleProveJobRep3(jobInstance, blueprint, code, curve, keys, numInputs, witness);
+          jobId = await scheduleProveJobRep3(jobInstance, blueprint, code, curve, keyMaterial, numInputs, witness);
         }
       }
       const result = await pollProofResult(jobId);
