@@ -967,6 +967,24 @@
               }
             ]
           },
+          "signature0": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "signature1": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "signature2": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "status": {
             "$ref": "#/components/schemas/JobStatus"
           }
