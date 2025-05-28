@@ -120,30 +120,30 @@ export default function Home() {
   };
 
   return (
-    <div className="flex items-center justify-center rounded-[10pt] shadow-xl border border-black p-10 w-md">
+    <div className="flex items-center justify-center rounded-[10pt] shadow-xl border border-current py-10 px-15 w-lg">
       <form className="w-full" onSubmit={handleSubmit}>
         <div className="grid gap-2">
           <h1 className="text-[40px] font-bold text-center">TACEO:Proof</h1>
           <div className="w-[5rem] h-[1rem] bg-[#52ffc5] mx-auto my-5"></div>
           <div>
             <h2 className="text-[14pt] font-bold pb-1">Access Code</h2>
-            <input required className="rounded-[5pt] shadow-xl border border-black p-2 w-full" type="text" onChange={(e) => setCode(e.target.value)} />
+            <input required className="rounded-[5pt] shadow-xl border border-current p-2 w-full" type="text" onChange={(e) => setCode(e.target.value)} />
           </div>
           <div>
             <h2 className="text-[14pt] font-bold pb-1">Blueprint</h2>
-            <input required className="rounded-[5pt] shadow-xl border border-black p-2 w-full" type="text" onChange={(e) => setBlueprint(e.target.value)} />
+            <input required className="rounded-[5pt] shadow-xl border border-current p-2 w-full" type="text" onChange={(e) => setBlueprint(e.target.value)} />
           </div>
           <div>
             <h2 className="text-[14pt] font-bold pb-1">Curve</h2>
-            <select required className="rounded-[5pt] shadow-xl border border-black p-2 w-full" onChange={(e) => setCurve(e.target.value as BlueprintCurve)}>
-              <option value='Bn254'>Bn254</option>
-              <option value='Bls381'>Bls12_381</option>
-              <option value='Bls377'>Bls12_377</option>
+            <select required className="rounded-[5pt] shadow-xl border border-current p-2 w-full" onChange={(e) => setCurve(e.target.value as BlueprintCurve)}>
+              <option value='Bn254'>BN254</option>
+              <option value='Bls381'>BLS12_381</option>
+              <option value='Bls377'>BLS12_377</option>
             </select>
           </div>
           <div>
             <h2 className="text-[14pt] font-bold pb-1">Job Type</h2>
-            <select required className="rounded-[5pt] shadow-xl border border-black p-2 w-full" onChange={(e) => setJobType(e.target.value as JobType)}>
+            <select required className="rounded-[5pt] shadow-xl border border-current p-2 w-full" onChange={(e) => setJobType(e.target.value as JobType)}>
               <option value='ShamirProve'>Shamir Prove</option>
               <option value='Rep3Prove'>REP3 Prove</option>
               <option value='Rep3Full'>Witness Extension + Prove</option>
@@ -152,7 +152,7 @@ export default function Home() {
           {jobType != JobType.Rep3Full && (
             <div>
               <h2 className="text-[14pt] font-bold pb-1">Witness Extension</h2>
-              <select required className="rounded-[5pt] shadow-xl border border-black p-2 w-full" onChange={(e) => setWtnsExt(e.target.value as WitnessExtension)}>
+              <select required className="rounded-[5pt] shadow-xl border border-current p-2 w-full" onChange={(e) => setWtnsExt(e.target.value as WitnessExtension)}>
                 <option value='Upload'>Upload Witness</option>
                 <option value='Browser'>Compute in Browser</option>
               </select>
@@ -167,7 +167,7 @@ export default function Home() {
                 onChange={handleWasmFileChange}
                 style={{ display: 'none' }}
               />
-              <button className="rounded-[5pt] shadow-xl border border-black p-2 w-full cursor-pointer" onClick={handleWasmUploadClick} type="button">
+              <button className="rounded-[5pt] shadow-xl border border-current p-2 w-full cursor-pointer" onClick={handleWasmUploadClick} type="button">
                 {wasm ? wasm.name : 'Choose File'}
               </button>
             </div>
@@ -182,32 +182,32 @@ export default function Home() {
               onChange={handleInputFileChange}
               style={{ display: 'none' }}
             />
-            <button className="rounded-[5pt] shadow-xl border border-black p-2 w-full cursor-pointer" onClick={handleInputUploadClick} type="button">
+            <button className="rounded-[5pt] shadow-xl border border-current p-2 w-full cursor-pointer" onClick={handleInputUploadClick} type="button">
               {selectedFile ? selectedFile.name : 'Choose File'}
             </button>
           </div>
           {jobType == JobType.Rep3Full ?
             <div>
               <h2 className="text-[14pt] font-bold pb-1">Public Inputs</h2>
-              <input required className="rounded-[5pt] shadow-xl border border-black p-2 w-full" type="text" onChange={(e) => setPublicInputs(e.target.value.split(','))} />
+              <input required className="rounded-[5pt] shadow-xl border border-current p-2 w-full" type="text" onChange={(e) => setPublicInputs(e.target.value.split(','))} />
             </div>
             :
             <div>
               <h2 className="text-[14pt] font-bold pb-1">Number of Inputs</h2>
-              <input required className="rounded-[5pt] shadow-xl border border-black p-2 w-full" type="text" onChange={(e) => setNumInputs(parseInt(e.target.value, 10))} />
+              <input required className="rounded-[5pt] shadow-xl border border-current p-2 w-full" type="number" onChange={(e) => setNumInputs(parseInt(e.target.value, 10))} />
             </div>
           }
           <div className="pt-8 mx-auto">
             {loading ?
-              <button className="text-[14pt] font-bold rounded-[5pt] bg-[#52ffc5] py-2 pl-3 pr-5 inline-flex items-center" type="submit" disabled={true}>
+              <button className="text-[14pt] text-black font-bold rounded-[5pt] bg-[#52ffc5] py-2 pl-3 pr-5 inline-flex items-center" type="submit" disabled={true}>
                 <svg className="mr-3 ml-1 size-6 animate-spin" viewBox="0 0 64 64">
-                  <circle fill="none" stroke-width="10" className="stroke-black opacity-40" cx="32" cy="32" r="24" />
-                  <circle fill="none" stroke-width="10" className="stroke-black" stroke-dasharray="250" stroke-dashoffset="210" cx="32" cy="32" r="24"/>
+                  <circle fill="none" strokeWidth="10" className="stroke-black opacity-40" cx="32" cy="32" r="24" />
+                  <circle fill="none" strokeWidth="10" className="stroke-black" strokeDasharray="250" strokeDashoffset="210" cx="32" cy="32" r="24"/>
                 </svg>
                 Loading...
               </button>
               :
-              <button className="text-[14pt] font-bold rounded-[5pt] bg-[#52ffc5] p-2 cursor-pointer px-12" type="submit">
+              <button className="text-[14pt] text-black font-bold rounded-[5pt] bg-[#52ffc5] p-2 cursor-pointer px-12" type="submit">
                 Submit
               </button>
             }
@@ -216,7 +216,7 @@ export default function Home() {
             {error && <div className="text-[#ff0000]">{error}</div>}
             {result && (
               <div>
-                <a className="underline text-white" href={`data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(result))}`} download="result.json">
+                <a className="underline text-current" href={`data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(result))}`} download="result.json">
                   Download Result
                 </a>
               </div>
