@@ -161,6 +161,7 @@ pub async fn blueprint_ready(
 
 pub async fn create(
     configuration: &configuration::Configuration,
+    access: models::BlueprintAccess,
     curve: models::BlueprintCurve,
     name: &str,
     node_provider0: i32,
@@ -169,6 +170,7 @@ pub async fn create(
     typ: models::BlueprintType,
 ) -> Result<models::CreateBlueprintResponse, Error<CreateError>> {
     // add a prefix to parameters to efficiently prevent name collisions
+    let p_access = access;
     let p_curve = curve;
     let p_name = name;
     let p_node_provider0 = node_provider0;
@@ -185,6 +187,7 @@ pub async fn create(
         req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
     }
     let mut multipart_form_params = std::collections::HashMap::new();
+    multipart_form_params.insert("access", p_access.to_string());
     multipart_form_params.insert("curve", p_curve.to_string());
     multipart_form_params.insert("name", p_name.to_string());
     multipart_form_params.insert("node_provider0", p_node_provider0.to_string());

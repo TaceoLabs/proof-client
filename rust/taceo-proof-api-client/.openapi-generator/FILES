@@ -6,6 +6,7 @@ README.md
 docs/AdminApi.md
 docs/ApiError.md
 docs/AuxiliaryType.md
+docs/BlueprintAccess.md
 docs/BlueprintApi.md
 docs/BlueprintCurve.md
 docs/BlueprintReadyProbe.md
@@ -39,6 +40,7 @@ src/apis/user_api.rs
 src/lib.rs
 src/models/api_error.rs
 src/models/auxiliary_type.rs
+src/models/blueprint_access.rs
 src/models/blueprint_curve.rs
 src/models/blueprint_ready_probe.rs
 src/models/blueprint_type.rs

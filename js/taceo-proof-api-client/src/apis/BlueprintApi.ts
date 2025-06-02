@@ -17,6 +17,7 @@ import * as runtime from '../runtime';
 import type {
   ApiError,
   AuxiliaryType,
+  BlueprintAccess,
   BlueprintCurve,
   BlueprintReadyProbe,
   BlueprintType,
@@ -28,6 +29,8 @@ import {
     ApiErrorToJSON,
     AuxiliaryTypeFromJSON,
     AuxiliaryTypeToJSON,
+    BlueprintAccessFromJSON,
+    BlueprintAccessToJSON,
     BlueprintCurveFromJSON,
     BlueprintCurveToJSON,
     BlueprintReadyProbeFromJSON,
@@ -49,6 +52,7 @@ export interface BlueprintReadyRequest {
 }
 
 export interface CreateRequest {
+    access: BlueprintAccess;
     curve: BlueprintCurve;
     name: string;
     nodeProvider0: number;
@@ -147,6 +151,13 @@ export class BlueprintApi extends runtime.BaseAPI {
      * create a new coSNARK blueprint
      */
     async createRaw(requestParameters: CreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateBlueprintResponse>> {
+        if (requestParameters['access'] == null) {
+            throw new runtime.RequiredError(
+                'access',
+                'Required parameter "access" was null or undefined when calling create().'
+            );
+        }
+
         if (requestParameters['curve'] == null) {
             throw new runtime.RequiredError(
                 'curve',
@@ -205,6 +216,10 @@ export class BlueprintApi extends runtime.BaseAPI {
             formParams = new FormData();
         } else {
             formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['access'] != null) {
+            formParams.append('access', requestParameters['access'] as any);
         }
 
         if (requestParameters['curve'] != null) {

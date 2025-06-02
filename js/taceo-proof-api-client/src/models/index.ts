@@ -2,6 +2,7 @@
 /* eslint-disable */
 export * from './ApiError';
 export * from './AuxiliaryType';
+export * from './BlueprintAccess';
 export * from './BlueprintCurve';
 export * from './BlueprintReadyProbe';
 export * from './BlueprintType';

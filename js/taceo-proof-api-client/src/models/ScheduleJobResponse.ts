@@ -30,7 +30,7 @@ export interface ScheduleJobResponse {
      * @type {number}
      * @memberof ScheduleJobResponse
      */
-    remainingPermits: number;
+    remainingPermits?: number | null;
 }
 
 /**
@@ -38,7 +38,6 @@ export interface ScheduleJobResponse {
  */
 export function instanceOfScheduleJobResponse(value: object): value is ScheduleJobResponse {
     if (!('jobId' in value) || value['jobId'] === undefined) return false;
-    if (!('remainingPermits' in value) || value['remainingPermits'] === undefined) return false;
     return true;
 }
 
@@ -53,7 +52,7 @@ export function ScheduleJobResponseFromJSONTyped(json: any, ignoreDiscriminator:
     return {
         
         'jobId': json['job_id'],
-        'remainingPermits': json['remaining_permits'],
+        'remainingPermits': json['remaining_permits'] == null ? undefined : json['remaining_permits'],
     };
 }
 

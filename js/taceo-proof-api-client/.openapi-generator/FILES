@@ -14,6 +14,7 @@ src/apis/index.ts
 src/index.ts
 src/models/ApiError.ts
 src/models/AuxiliaryType.ts
+src/models/BlueprintAccess.ts
 src/models/BlueprintCurve.ts
 src/models/BlueprintReadyProbe.ts
 src/models/BlueprintType.ts

@@ -15,15 +15,20 @@ use serde::{Deserialize, Serialize};
 pub struct ScheduleJobResponse {
     #[serde(rename = "job_id")]
     pub job_id: uuid::Uuid,
-    #[serde(rename = "remaining_permits")]
-    pub remaining_permits: i32,
+    #[serde(
+        rename = "remaining_permits",
+        default,
+        with = "::serde_with::rust::double_option",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub remaining_permits: Option<Option<i32>>,
 }
 
 impl ScheduleJobResponse {
-    pub fn new(job_id: uuid::Uuid, remaining_permits: i32) -> ScheduleJobResponse {
+    pub fn new(job_id: uuid::Uuid) -> ScheduleJobResponse {
         ScheduleJobResponse {
             job_id,
-            remaining_permits,
+            remaining_permits: None,
         }
     }
 }

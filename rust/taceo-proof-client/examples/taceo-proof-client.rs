@@ -13,6 +13,7 @@ use circom_types::{
 };
 use clap::{ArgGroup, Parser, ValueEnum};
 use co_groth16::CoGroth16;
+use crypto_box::PublicKey;
 use taceo_proof_api_client::apis::configuration::Configuration;
 use taceo_proof_client::JobResult;
 use uuid::Uuid;
@@ -55,7 +56,7 @@ struct Args {
 
     /// The ppd-network code
     #[clap(long, env = "PROOF_CODE")]
-    pub code: String,
+    pub code: Option<String>,
 
     /// The job blueprint
     #[clap(long, env = "PROOF_BLUEPRINT")]
@@ -91,7 +92,9 @@ where
         args.num_inputs.expect("must be present if r1cs is not")
     };
 
-    let keys = taceo_proof_client::get_enc_keys(config, args.blueprint).await?;
+    let keys = taceo_proof_client::get_nps_key_material(config, args.blueprint).await?;
+    let enc_keys = keys.clone().map(|k| k.enc_key);
+    let verify_keys = keys.clone().map(|k| k.verify_key);
 
     // schedule job
     tracing::info!("scheduling job...");
@@ -101,8 +104,8 @@ where
             taceo_proof_client::schedule_full_job_rep3::<P>(
                 config,
                 args.blueprint,
-                &args.code,
-                &keys,
+                args.code.as_deref(),
+                &enc_keys,
                 input,
                 &args
                     .public_inputs
@@ -115,8 +118,8 @@ where
             taceo_proof_client::schedule_prove_job_rep3::<P>(
                 config,
                 args.blueprint,
-                &args.code,
-                &keys,
+                args.code.as_deref(),
+                &enc_keys,
                 witness,
                 num_inputs,
             )
@@ -127,8 +130,8 @@ where
             taceo_proof_client::schedule_prove_job_shamir::<P>(
                 config,
                 args.blueprint,
-                &args.code,
-                &keys,
+                args.code.as_deref(),
+                &enc_keys,
                 witness,
                 num_inputs,
             )

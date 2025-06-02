@@ -71,7 +71,7 @@ No authorization required
 
 ## create
 
-> models::CreateBlueprintResponse create(curve, name, node_provider0, node_provider1, node_provider2, typ)
+> models::CreateBlueprintResponse create(access, curve, name, node_provider0, node_provider1, node_provider2, typ)
 create a new coSNARK blueprint
 
 ### Parameters
@@ -79,6 +79,7 @@ create a new coSNARK blueprint
 
 Name | Type | Description  | Required | Notes
 ------------- | ------------- | ------------- | ------------- | -------------
+**access** | [**models::BlueprintAccess**](BlueprintAccess.md) |  | [required] |
 **curve** | [**models::BlueprintCurve**](BlueprintCurve.md) |  | [required] |
 **name** | **String** |  | [required] |
 **node_provider0** | **i32** |  | [required] |

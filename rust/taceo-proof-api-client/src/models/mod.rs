@@ -2,6 +2,8 @@ pub mod api_error;
 pub use self::api_error::ApiError;
 pub mod auxiliary_type;
 pub use self::auxiliary_type::AuxiliaryType;
+pub mod blueprint_access;
+pub use self::blueprint_access::BlueprintAccess;
 pub mod blueprint_curve;
 pub use self::blueprint_curve::BlueprintCurve;
 pub mod blueprint_ready_probe;

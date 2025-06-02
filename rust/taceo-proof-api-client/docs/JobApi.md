@@ -39,7 +39,7 @@ No authorization required
 
 ## schedule_job
 
-> models::ScheduleJobResponse schedule_job(a_blueprint_id, b_job_type, c_code, input_party0, input_party1, input_party2)
+> models::ScheduleJobResponse schedule_job(a_blueprint_id, b_job_type, input_party0, input_party1, input_party2, c_code)
 create a new job
 
 ### Parameters
@@ -49,10 +49,10 @@ Name | Type | Description  | Required | Notes
 ------------- | ------------- | ------------- | ------------- | -------------
 **a_blueprint_id** | **uuid::Uuid** |  | [required] |
 **b_job_type** | [**models::JobType**](JobType.md) |  | [required] |
-**c_code** | **String** |  | [required] |
 **input_party0** | **std::path::PathBuf** |  | [required] |
 **input_party1** | **std::path::PathBuf** |  | [required] |
 **input_party2** | **std::path::PathBuf** |  | [required] |
+**c_code** | Option<**String**> |  |  |
 
 ### Return type
 

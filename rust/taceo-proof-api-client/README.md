@@ -52,6 +52,7 @@ Class | Method | HTTP request | Description
 
  - [ApiError](docs/ApiError.md)
  - [AuxiliaryType](docs/AuxiliaryType.md)
+ - [BlueprintAccess](docs/BlueprintAccess.md)
  - [BlueprintCurve](docs/BlueprintCurve.md)
  - [BlueprintReadyProbe](docs/BlueprintReadyProbe.md)
  - [BlueprintType](docs/BlueprintType.md)

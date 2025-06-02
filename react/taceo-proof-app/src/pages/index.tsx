@@ -13,7 +13,7 @@ const jobInstance = new JobApi(congiuration);
 const blueprintInstance = new BlueprintApi(congiuration);
 
 export default function Home() {
-  const [code, setCode] = useState<string>("");
+  const [code, setCode] = useState<string | null>(null);
   const [blueprint, setBlueprint] = useState<string>("");
   const [curve, setCurve] = useState<BlueprintCurve>(BlueprintCurve.Bn254);
   const [result, setResult] = useState<ProofResult | null>(null);
@@ -131,7 +131,7 @@ export default function Home() {
           <div className="w-[5rem] h-[1rem] bg-[#52ffc5] mx-auto my-5"></div>
           <div>
             <h2 className="text-[14pt] font-bold pb-1">Access Code</h2>
-            <input required className="rounded-[5pt] shadow-xl border border-current p-2 w-full" type="text" onChange={(e) => setCode(e.target.value)} />
+            <input className="rounded-[5pt] shadow-xl border border-current p-2 w-full" type="text" onChange={(e) => setCode(e.target.value)} />
           </div>
           <div>
             <h2 className="text-[14pt] font-bold pb-1">Blueprint</h2>

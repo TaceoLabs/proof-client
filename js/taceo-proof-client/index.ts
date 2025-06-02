@@ -6,7 +6,7 @@ async function scheduleJob(
   apiInstance: JobApi,
   blueprintId: string,
   jobType: JobType,
-  code: string,
+  code: string | null,
   shares: Uint8Array[],
   keyMaterial: NpsKeyMaterial[],
 ): Promise<string> {
@@ -40,7 +40,7 @@ export function verifyProofResultSignature(jobId: string, proofResult: ProofResu
 export async function scheduleFullJobRep3(
   apiInstance: JobApi,
   blueprintId: string,
-  code: string,
+  code: string | null,
   curve: BlueprintCurve,
   keyMaterial: NpsKeyMaterial[],
   public_inputs: string[],
@@ -68,7 +68,7 @@ export async function scheduleFullJobRep3(
 export async function scheduleProveJobRep3(
   apiInstance: JobApi,
   blueprintId: string,
-  code: string,
+  code: string | null,
   curve: BlueprintCurve,
   keyMaterial: NpsKeyMaterial[],
   num_pub_inputs: number,
@@ -95,7 +95,7 @@ export async function scheduleProveJobRep3(
  */
 export async function scheduleProveJobShamir(apiInstance: JobApi,
   blueprintId: string,
-  code: string,
+  code: string | null,
   curve: BlueprintCurve,
   keyMaterial: NpsKeyMaterial[],
   num_pub_inputs: number,

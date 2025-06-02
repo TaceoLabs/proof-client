@@ -527,7 +527,6 @@
                 "required": [
                   "a_blueprint_id",
                   "b_job_type",
-                  "c_code",
                   "input_party0",
                   "input_party1",
                   "input_party2"
@@ -541,7 +540,10 @@
                     "$ref": "#/components/schemas/JobType"
                   },
                   "c_code": {
-                    "type": "string"
+                    "type": [
+                      "string",
+                      "null"
+                    ]
                   },
                   "input_party0": {
                     "type": "string",
@@ -814,6 +816,13 @@
           "matrices"
         ]
       },
+      "BlueprintAccess": {
+        "type": "string",
+        "enum": [
+          "Restricted",
+          "Public"
+        ]
+      },
       "BlueprintCurve": {
         "type": "string",
         "enum": [
@@ -850,11 +859,15 @@
           "name",
           "typ",
           "curve",
+          "access",
           "node_provider0",
           "node_provider1",
           "node_provider2"
         ],
         "properties": {
+          "access": {
+            "$ref": "#/components/schemas/BlueprintAccess"
+          },
           "curve": {
             "$ref": "#/components/schemas/BlueprintCurve"
           },
@@ -1136,8 +1149,7 @@
       "ScheduleJobResponse": {
         "type": "object",
         "required": [
-          "job_id",
-          "remaining_permits"
+          "job_id"
         ],
         "properties": {
           "job_id": {
@@ -1145,7 +1157,10 @@
             "format": "uuid"
           },
           "remaining_permits": {
-            "type": "integer",
+            "type": [
+              "integer",
+              "null"
+            ],
             "format": "int32",
             "minimum": 0
           }

@@ -10,6 +10,7 @@ use co_circom_types::{
 };
 use co_groth16::Proof;
 use crypto_box::{PublicKey, aead::OsRng};
+use ed25519_dalek::VerifyingKey;
 use eyre::Context;
 use taceo_proof_api_client::{
     apis::{blueprint_api, configuration::Configuration, job_api},
@@ -17,36 +18,48 @@ use taceo_proof_api_client::{
 };
 use uuid::Uuid;
 
-/// Download the encryption keys for the 3 nodes that will run the job.
-pub async fn get_enc_keys(
+/// The encryption and verification keys for a NPS
+#[derive(Debug, Clone)]
+pub struct NpsKeyMaterial {
+    pub enc_key: PublicKey,
+    pub verify_key: VerifyingKey,
+}
+
+/// Download the encryption and verify keys for the 3 nodes that will run the job.
+pub async fn get_nps_key_material(
     config: &Configuration,
     blueprint_id: Uuid,
-) -> eyre::Result<[PublicKey; 3]> {
+) -> eyre::Result<[NpsKeyMaterial; 3]> {
     tracing::debug!("fetching key material for blueprint {blueprint_id}");
     let key_material =
         blueprint_api::blueprint_key_material(config, &blueprint_id.to_string()).await?;
     if key_material.len() != 3 {
         eyre::bail!("got wrong number of key_material");
     }
-    tracing::debug!("decode pub key 0");
-    let pk0 = PublicKey::from_bytes(
-        Base64::decode_vec(&key_material[0].enc_key)?
-            .try_into()
-            .expect("correct len"),
-    );
-    tracing::debug!("decode pub key 0");
-    let pk1 = PublicKey::from_bytes(
-        Base64::decode_vec(&key_material[1].enc_key)?
-            .try_into()
-            .expect("correct len"),
-    );
-    tracing::debug!("decode pub key 0");
-    let pk2 = PublicKey::from_bytes(
-        Base64::decode_vec(&key_material[2].enc_key)?
-            .try_into()
-            .expect("correct len"),
-    );
-    Ok([pk0, pk1, pk2])
+    // we checked len above, we can unwrap here
+    Ok(key_material
+        .iter()
+        .map(|nps| {
+            tracing::debug!("decode pub key");
+            let enc_key = PublicKey::from_bytes(
+                Base64::decode_vec(&nps.enc_key)?
+                    .try_into()
+                    .expect("correct len"),
+            );
+            let verify_key = VerifyingKey::from_bytes(
+                &Base64::decode_vec(&nps.verify_key)?
+                    .try_into()
+                    .expect("correct len"),
+            )?;
+
+            Ok(NpsKeyMaterial {
+                enc_key,
+                verify_key,
+            })
+        })
+        .collect::<eyre::Result<Vec<NpsKeyMaterial>>>()?
+        .try_into()
+        .unwrap())
 }
 
 fn seal_shares(keys: &[PublicKey; 3], shares: [Vec<u8>; 3]) -> eyre::Result<[Vec<u8>; 3]> {
@@ -67,7 +80,7 @@ fn seal_shares(keys: &[PublicKey; 3], shares: [Vec<u8>; 3]) -> eyre::Result<[Vec
 pub async fn schedule_full_job_rep3<P>(
     config: &Configuration,
     blueprint_id: Uuid,
-    code: &str,
+    code: Option<&str>,
     keys: &[PublicKey; 3],
     input: Input,
     public_inputs: &[String],
@@ -92,10 +105,10 @@ where
         config,
         &blueprint_id.to_string(),
         JobType::Rep3Full,
-        code,
         ct0,
         ct1,
         ct2,
+        code,
     )
     .await?;
     let job_id = res.job_id;
@@ -107,7 +120,7 @@ where
 pub async fn schedule_prove_job_rep3<P>(
     config: &Configuration,
     blueprint_id: Uuid,
-    code: &str,
+    code: Option<&str>,
     keys: &[PublicKey; 3],
     witness: Witness<P::ScalarField>,
     num_pub_inputs: usize,
@@ -138,10 +151,10 @@ where
         config,
         &blueprint_id.to_string(),
         JobType::Rep3Prove,
-        code,
         ct0,
         ct1,
         ct2,
+        code,
     )
     .await?;
     let job_id = res.job_id;
@@ -153,7 +166,7 @@ where
 pub async fn schedule_prove_job_shamir<P>(
     config: &Configuration,
     blueprint_id: Uuid,
-    code: &str,
+    code: Option<&str>,
     keys: &[PublicKey; 3],
     witness: Witness<P::ScalarField>,
     num_pub_inputs: usize,
@@ -188,10 +201,10 @@ where
         config,
         &blueprint_id.to_string(),
         JobType::ShamirProve,
-        code,
         ct0,
         ct1,
         ct2,
+        code,
     )
     .await?;
     let job_id = res.job_id;

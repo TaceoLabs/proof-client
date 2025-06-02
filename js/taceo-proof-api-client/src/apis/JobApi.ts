@@ -38,10 +38,10 @@ export interface GetResultRequest {
 export interface ScheduleJobRequest {
     aBlueprintId: string;
     bJobType: JobType;
-    cCode: string;
     inputParty0: Blob;
     inputParty1: Blob;
     inputParty2: Blob;
+    cCode?: string | null;
 }
 
 /**
@@ -97,13 +97,6 @@ export class JobApi extends runtime.BaseAPI {
             throw new runtime.RequiredError(
                 'bJobType',
                 'Required parameter "bJobType" was null or undefined when calling scheduleJob().'
-            );
-        }
-
-        if (requestParameters['cCode'] == null) {
-            throw new runtime.RequiredError(
-                'cCode',
-                'Required parameter "cCode" was null or undefined when calling scheduleJob().'
             );
         }
 

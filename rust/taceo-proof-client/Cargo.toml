@@ -25,6 +25,7 @@ rand = "0.8.5"
 eyre = "0.6.12"
 uuid = "1.16.0"
 tracing = "0.1.41"
+ed25519-dalek = { version = "2.1.1", features = ["digest"] }
 
 [dev-dependencies]
 ark-bn254 = "0.5.0"
