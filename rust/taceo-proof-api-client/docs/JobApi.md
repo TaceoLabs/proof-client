@@ -4,15 +4,15 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**get_result**](JobApi.md#get_result) | **GET** /api/v1/jobs/job/{id} | get job result
+[**get_results**](JobApi.md#get_results) | **GET** /api/v1/jobs/job/{id} | get job results
 [**schedule_job**](JobApi.md#schedule_job) | **POST** /api/v1/jobs/schedule | create a new job
 
 
 
-## get_result
+## get_results
 
-> models::JobResult get_result(id)
-get job result
+> models::JobResults get_results(id)
+get job results
 
 ### Parameters
 
@@ -23,7 +23,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**models::JobResult**](JobResult.md)
+[**models::JobResults**](JobResults.md)
 
 ### Authorization
 

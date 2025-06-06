@@ -14,6 +14,8 @@ pub mod create_blueprint_response;
 pub use self::create_blueprint_response::CreateBlueprintResponse;
 pub mod job_result;
 pub use self::job_result::JobResult;
+pub mod job_results;
+pub use self::job_results::JobResults;
 pub mod job_status;
 pub use self::job_status::JobStatus;
 pub mod job_type;

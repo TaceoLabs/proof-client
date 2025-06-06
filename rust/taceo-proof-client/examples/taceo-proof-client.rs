@@ -13,7 +13,6 @@ use circom_types::{
 };
 use clap::{ArgGroup, Parser, ValueEnum};
 use co_groth16::CoGroth16;
-use crypto_box::PublicKey;
 use taceo_proof_api_client::apis::configuration::Configuration;
 use taceo_proof_client::JobResult;
 use uuid::Uuid;
@@ -94,7 +93,7 @@ where
 
     let keys = taceo_proof_client::get_nps_key_material(config, args.blueprint).await?;
     let enc_keys = keys.clone().map(|k| k.enc_key);
-    let verify_keys = keys.clone().map(|k| k.verify_key);
+    let _verify_keys = keys.clone().map(|k| k.verify_key);
 
     // schedule job
     tracing::info!("scheduling job...");

@@ -27,12 +27,21 @@ export interface CreateUserRequest {
     username: string;
 }
 
-export interface PaginateInvitationsRequest {
+export interface PaginateNpsInvitationsRequest {
     cursor?: number | null;
     perPage?: number | null;
 }
 
-export interface RevokeInvitationCodeRequest {
+export interface PaginateUserInvitationsRequest {
+    cursor?: number | null;
+    perPage?: number | null;
+}
+
+export interface RevokeNpsInvitationCodeRequest {
+    code: string;
+}
+
+export interface RevokeUserInvitationCodeRequest {
     code: string;
 }
 
@@ -43,7 +52,7 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async createInvitationCodeRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
+    async createNpsInviteCodeRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -64,8 +73,8 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async createInvitationCode(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
-        const response = await this.createInvitationCodeRaw(initOverrides);
+    async createNpsInviteCode(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
+        const response = await this.createNpsInviteCodeRaw(initOverrides);
         return await response.value();
     }
 
@@ -131,7 +140,35 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async paginateInvitationsRaw(requestParameters: PaginateInvitationsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginationResultString>> {
+    async createUserInviteCodeRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/admin/user/invitation/create`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        if (this.isJsonMime(response.headers.get('content-type'))) {
+            return new runtime.JSONApiResponse<string>(response);
+        } else {
+            return new runtime.TextApiResponse(response) as any;
+        }
+    }
+
+    /**
+     */
+    async createUserInviteCode(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
+        const response = await this.createUserInviteCodeRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async paginateNpsInvitationsRaw(requestParameters: PaginateNpsInvitationsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginationResultString>> {
         const queryParameters: any = {};
 
         if (requestParameters['cursor'] != null) {
@@ -156,18 +193,50 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async paginateInvitations(requestParameters: PaginateInvitationsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginationResultString> {
-        const response = await this.paginateInvitationsRaw(requestParameters, initOverrides);
+    async paginateNpsInvitations(requestParameters: PaginateNpsInvitationsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginationResultString> {
+        const response = await this.paginateNpsInvitationsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
      */
-    async revokeInvitationCodeRaw(requestParameters: RevokeInvitationCodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async paginateUserInvitationsRaw(requestParameters: PaginateUserInvitationsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginationResultString>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['cursor'] != null) {
+            queryParameters['cursor'] = requestParameters['cursor'];
+        }
+
+        if (requestParameters['perPage'] != null) {
+            queryParameters['per_page'] = requestParameters['perPage'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/admin/user/invitation/list`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => PaginationResultStringFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async paginateUserInvitations(requestParameters: PaginateUserInvitationsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginationResultString> {
+        const response = await this.paginateUserInvitationsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async revokeNpsInvitationCodeRaw(requestParameters: RevokeNpsInvitationCodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['code'] == null) {
             throw new runtime.RequiredError(
                 'code',
-                'Required parameter "code" was null or undefined when calling revokeInvitationCode().'
+                'Required parameter "code" was null or undefined when calling revokeNpsInvitationCode().'
             );
         }
 
@@ -206,8 +275,57 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async revokeInvitationCode(requestParameters: RevokeInvitationCodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.revokeInvitationCodeRaw(requestParameters, initOverrides);
+    async revokeNpsInvitationCode(requestParameters: RevokeNpsInvitationCodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.revokeNpsInvitationCodeRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async revokeUserInvitationCodeRaw(requestParameters: RevokeUserInvitationCodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['code'] == null) {
+            throw new runtime.RequiredError(
+                'code',
+                'Required parameter "code" was null or undefined when calling revokeUserInvitationCode().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const consumes: runtime.Consume[] = [
+            { contentType: 'application/x-www-form-urlencoded' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['code'] != null) {
+            formParams.append('code', requestParameters['code'] as any);
+        }
+
+        const response = await this.request({
+            path: `/admin/user/invitation/revoke`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: formParams,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async revokeUserInvitationCode(requestParameters: RevokeUserInvitationCodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.revokeUserInvitationCodeRaw(requestParameters, initOverrides);
     }
 
 }

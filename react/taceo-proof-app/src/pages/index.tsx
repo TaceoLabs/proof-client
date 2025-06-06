@@ -31,15 +31,13 @@ export default function Home() {
   const pollProofResult = async (jobId: string, keyMaterial: NpsKeyMaterial[]): Promise<ProofResult | null> => {
     while (true) {
       try {
-        const jobResult = await jobInstance.getResult({ id: jobId });
-        if (jobResult.status == JobStatus.Success && jobResult.signature0 != null && jobResult.signature1 != null && jobResult.signature2 != null) {
-          const proofResult = jobResult.ok!;
-          verifyProofResultSignature(jobId, proofResult, jobResult.signature0, keyMaterial[0]);
-          verifyProofResultSignature(jobId, proofResult, jobResult.signature1, keyMaterial[1]);
-          verifyProofResultSignature(jobId, proofResult, jobResult.signature2, keyMaterial[2]);
+        const jobResults = await jobInstance.getResults({ id: jobId });
+        if (jobResults.result0.status == JobStatus.Success && jobResults.result0.signature != null) {
+          const proofResult = jobResults.result0.ok!;
+          verifyProofResultSignature(jobId, proofResult, jobResults.result0.signature, keyMaterial[0]);
           return proofResult;
-        } else if (jobResult.status == JobStatus.Failed) {
-          setError(jobResult.error ?? "something went wrong");
+        } else if (jobResults.result0.status == JobStatus.Failed) {
+          setError(jobResults.result0.error ?? "something went wrong");
           return null;
         }
       } catch (error) {

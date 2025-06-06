@@ -13,10 +13,10 @@ use crate::{apis::ResponseContent, models};
 use reqwest;
 use serde::{de::Error as _, Deserialize, Serialize};
 
-/// struct for typed errors of method [`get_result`]
+/// struct for typed errors of method [`get_results`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
-pub enum GetResultError {
+pub enum GetResultsError {
     Status404(),
     Status5XX(models::ApiError),
     UnknownValue(serde_json::Value),
@@ -30,10 +30,10 @@ pub enum ScheduleJobError {
     UnknownValue(serde_json::Value),
 }
 
-pub async fn get_result(
+pub async fn get_results(
     configuration: &configuration::Configuration,
     id: &str,
-) -> Result<models::JobResult, Error<GetResultError>> {
+) -> Result<models::JobResults, Error<GetResultsError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_id = id;
 
@@ -63,12 +63,12 @@ pub async fn get_result(
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::JobResult`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::JobResult`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::JobResults`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::JobResults`")))),
         }
     } else {
         let content = resp.text().await?;
-        let entity: Option<GetResultError> = serde_json::from_str(&content).ok();
+        let entity: Option<GetResultsError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,

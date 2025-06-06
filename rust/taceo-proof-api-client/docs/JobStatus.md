@@ -5,7 +5,9 @@
 | Name | Value |
 |---- | -----|
 | Pending | Pending |
-| InProgress | InProgress |
+| InNpsQueue | InNpsQueue |
+| InCseQueue | InCseQueue |
+| Running | Running |
 | Failed | Failed |
 | Success | Success |
 

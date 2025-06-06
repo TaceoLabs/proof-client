@@ -1,13 +1,12 @@
-# JobResult
+# JobResults
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**error** | Option<**String**> |  | [optional]
-**ok** | Option<[**models::ProofResult**](ProofResult.md)> |  | [optional]
-**signature** | Option<**String**> |  | [optional]
-**status** | [**models::JobStatus**](JobStatus.md) |  | 
+**result0** | [**models::JobResult**](JobResult.md) |  | 
+**result1** | [**models::JobResult**](JobResult.md) |  | 
+**result2** | [**models::JobResult**](JobResult.md) |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

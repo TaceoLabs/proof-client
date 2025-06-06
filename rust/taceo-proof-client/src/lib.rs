@@ -224,11 +224,11 @@ pub async fn get_job_result<P: Pairing>(
     config: &Configuration,
     id: Uuid,
 ) -> eyre::Result<JobResult<P>> {
-    let res = job_api::get_result(config, &id.to_string()).await?;
-    tracing::debug!("result from api: {res:?}");
-    match res.status {
+    let results = job_api::get_results(config, &id.to_string()).await?;
+    tracing::debug!("result from api: {results:?}");
+    match results.result0.status {
         JobStatus::Success => {
-            let proof_res = res.ok.unwrap().unwrap();
+            let proof_res = results.result0.ok.unwrap().unwrap();
             tracing::debug!("deser proof...");
             let proof = Proof::<P>::deserialize_uncompressed_unchecked(
                 Base64::decode_vec(&proof_res.proof)?.as_slice(),
@@ -240,7 +240,7 @@ pub async fn get_job_result<P: Pairing>(
             tracing::debug!("done");
             Ok(JobResult::Ok((proof, public_inputs)))
         }
-        JobStatus::Failed => Ok(JobResult::Err(res.error.unwrap().unwrap())),
+        JobStatus::Failed => Ok(JobResult::Err(results.result0.error.unwrap().unwrap())),
         status => Ok(JobResult::Running(status)),
     }
 }

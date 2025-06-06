@@ -19,7 +19,7 @@
         "tags": [
           "Admin"
         ],
-        "operationId": "create_invitation_code",
+        "operationId": "create_nps_invite_code",
         "responses": {
           "200": {
             "description": "Generated a new invitation code and returns it",
@@ -47,7 +47,7 @@
         "tags": [
           "Admin"
         ],
-        "operationId": "paginate_invitations",
+        "operationId": "paginate_nps_invitations",
         "parameters": [
           {
             "name": "cursor",
@@ -103,7 +103,7 @@
         "tags": [
           "Admin"
         ],
-        "operationId": "revoke_invitation_code",
+        "operationId": "revoke_nps_invitation_code",
         "requestBody": {
           "content": {
             "application/x-www-form-urlencoded": {
@@ -151,6 +151,121 @@
           },
           "403": {
             "description": "Not an admin"
+          }
+        },
+        "security": [
+          {
+            "adminAuth": []
+          }
+        ]
+      }
+    },
+    "/admin/user/invitation/create": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "create_user_invite_code",
+        "responses": {
+          "200": {
+            "description": "Generated a new invitation code and returns it",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not an admin"
+          }
+        },
+        "security": [
+          {
+            "adminAuth": []
+          }
+        ]
+      }
+    },
+    "/admin/user/invitation/list": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "paginate_user_invitations",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int32",
+              "minimum": 0
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int32",
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A paginated list of invitation codes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginationResult_String"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "You are not an admin"
+          }
+        },
+        "security": [
+          {
+            "adminAuth": []
+          }
+        ]
+      }
+    },
+    "/admin/user/invitation/revoke": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "revoke_user_invitation_code",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/RevokeInvitationCode"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The provided code was revoked"
+          },
+          "403": {
+            "description": "You are not an admin"
           }
         },
         "security": [
@@ -471,8 +586,8 @@
         "tags": [
           "Job"
         ],
-        "summary": "get job result",
-        "operationId": "get_result",
+        "summary": "get job results",
+        "operationId": "get_results",
         "parameters": [
           {
             "name": "id",
@@ -491,7 +606,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/JobResult"
+                  "$ref": "#/components/schemas/JobResults"
                 }
               }
             }
@@ -980,19 +1095,7 @@
               }
             ]
           },
-          "signature0": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "signature1": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "signature2": {
+          "signature": {
             "type": [
               "string",
               "null"
@@ -1003,11 +1106,32 @@
           }
         }
       },
+      "JobResults": {
+        "type": "object",
+        "required": [
+          "result0",
+          "result1",
+          "result2"
+        ],
+        "properties": {
+          "result0": {
+            "$ref": "#/components/schemas/JobResult"
+          },
+          "result1": {
+            "$ref": "#/components/schemas/JobResult"
+          },
+          "result2": {
+            "$ref": "#/components/schemas/JobResult"
+          }
+        }
+      },
       "JobStatus": {
         "type": "string",
         "enum": [
           "Pending",
-          "InProgress",
+          "InNpsQueue",
+          "InCseQueue",
+          "Running",
           "Failed",
           "Success"
         ]
