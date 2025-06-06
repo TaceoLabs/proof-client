@@ -26,10 +26,13 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*AdminApi* | [**create_invitation_code**](docs/AdminApi.md#create_invitation_code) | **POST** /admin/nps/invitation/create | 
+*AdminApi* | [**create_nps_invite_code**](docs/AdminApi.md#create_nps_invite_code) | **POST** /admin/nps/invitation/create | 
 *AdminApi* | [**create_user**](docs/AdminApi.md#create_user) | **POST** /admin/user/create | 
-*AdminApi* | [**paginate_invitations**](docs/AdminApi.md#paginate_invitations) | **GET** /admin/nps/invitation/list | 
-*AdminApi* | [**revoke_invitation_code**](docs/AdminApi.md#revoke_invitation_code) | **POST** /admin/nps/invitation/revoke | 
+*AdminApi* | [**create_user_invite_code**](docs/AdminApi.md#create_user_invite_code) | **POST** /admin/user/invitation/create | 
+*AdminApi* | [**paginate_nps_invitations**](docs/AdminApi.md#paginate_nps_invitations) | **GET** /admin/nps/invitation/list | 
+*AdminApi* | [**paginate_user_invitations**](docs/AdminApi.md#paginate_user_invitations) | **GET** /admin/user/invitation/list | 
+*AdminApi* | [**revoke_nps_invitation_code**](docs/AdminApi.md#revoke_nps_invitation_code) | **POST** /admin/nps/invitation/revoke | 
+*AdminApi* | [**revoke_user_invitation_code**](docs/AdminApi.md#revoke_user_invitation_code) | **POST** /admin/user/invitation/revoke | 
 *BlueprintApi* | [**blueprint_key_material**](docs/BlueprintApi.md#blueprint_key_material) | **GET** /api/v1/blueprint/{id}/key-material | returns the key material of the NPSs associated with the blueprint
 *BlueprintApi* | [**blueprint_ready**](docs/BlueprintApi.md#blueprint_ready) | **GET** /api/v1/blueprint/{id}/ready | checks whether a blueprint is already ready
 *BlueprintApi* | [**create**](docs/BlueprintApi.md#create) | **POST** /api/v1/blueprint/create | create a new coSNARK blueprint
@@ -40,7 +43,7 @@ Class | Method | HTTP request | Description
 *HealthApi* | [**health**](docs/HealthApi.md#health) | **GET** /health | 
 *HealthApi* | [**live**](docs/HealthApi.md#live) | **GET** /health/live | 
 *HealthApi* | [**ready**](docs/HealthApi.md#ready) | **GET** /health/ready | 
-*JobApi* | [**get_result**](docs/JobApi.md#get_result) | **GET** /api/v1/jobs/job/{id} | get job result
+*JobApi* | [**get_results**](docs/JobApi.md#get_results) | **GET** /api/v1/jobs/job/{id} | get job results
 *JobApi* | [**schedule_job**](docs/JobApi.md#schedule_job) | **POST** /api/v1/jobs/schedule | create a new job
 *NpsApi* | [**list**](docs/NpsApi.md#list) | **GET** /api/v1/nps/list | get paginated node providers - used for blueprint creators to define clusters
 *UserApi* | [**get_login**](docs/UserApi.md#get_login) | **GET** /login | 
@@ -58,6 +61,7 @@ Class | Method | HTTP request | Description
  - [BlueprintType](docs/BlueprintType.md)
  - [CreateBlueprintResponse](docs/CreateBlueprintResponse.md)
  - [JobResult](docs/JobResult.md)
+ - [JobResults](docs/JobResults.md)
  - [JobStatus](docs/JobStatus.md)
  - [JobType](docs/JobType.md)
  - [NpsHeader](docs/NpsHeader.md)

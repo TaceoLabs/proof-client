@@ -16,22 +16,22 @@
 import * as runtime from '../runtime';
 import type {
   ApiError,
-  JobResult,
+  JobResults,
   JobType,
   ScheduleJobResponse,
 } from '../models/index';
 import {
     ApiErrorFromJSON,
     ApiErrorToJSON,
-    JobResultFromJSON,
-    JobResultToJSON,
+    JobResultsFromJSON,
+    JobResultsToJSON,
     JobTypeFromJSON,
     JobTypeToJSON,
     ScheduleJobResponseFromJSON,
     ScheduleJobResponseToJSON,
 } from '../models/index';
 
-export interface GetResultRequest {
+export interface GetResultsRequest {
     id: string;
 }
 
@@ -50,13 +50,13 @@ export interface ScheduleJobRequest {
 export class JobApi extends runtime.BaseAPI {
 
     /**
-     * get job result
+     * get job results
      */
-    async getResultRaw(requestParameters: GetResultRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<JobResult>> {
+    async getResultsRaw(requestParameters: GetResultsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<JobResults>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling getResult().'
+                'Required parameter "id" was null or undefined when calling getResults().'
             );
         }
 
@@ -71,14 +71,14 @@ export class JobApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => JobResultFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => JobResultsFromJSON(jsonValue));
     }
 
     /**
-     * get job result
+     * get job results
      */
-    async getResult(requestParameters: GetResultRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<JobResult> {
-        const response = await this.getResultRaw(requestParameters, initOverrides);
+    async getResults(requestParameters: GetResultsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<JobResults> {
+        const response = await this.getResultsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

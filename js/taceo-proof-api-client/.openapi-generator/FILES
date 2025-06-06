@@ -20,6 +20,7 @@ src/models/BlueprintReadyProbe.ts
 src/models/BlueprintType.ts
 src/models/CreateBlueprintResponse.ts
 src/models/JobResult.ts
+src/models/JobResults.ts
 src/models/JobStatus.ts
 src/models/JobType.ts
 src/models/NpsHeader.ts

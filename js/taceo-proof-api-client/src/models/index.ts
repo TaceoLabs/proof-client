@@ -8,6 +8,7 @@ export * from './BlueprintReadyProbe';
 export * from './BlueprintType';
 export * from './CreateBlueprintResponse';
 export * from './JobResult';
+export * from './JobResults';
 export * from './JobStatus';
 export * from './JobType';
 export * from './NpsHeader';

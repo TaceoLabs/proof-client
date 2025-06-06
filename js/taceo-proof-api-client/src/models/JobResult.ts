@@ -51,19 +51,7 @@ export interface JobResult {
      * @type {string}
      * @memberof JobResult
      */
-    signature0?: string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof JobResult
-     */
-    signature1?: string | null;
-    /**
-     * 
-     * @type {string}
-     * @memberof JobResult
-     */
-    signature2?: string | null;
+    signature?: string | null;
     /**
      * 
      * @type {JobStatus}
@@ -94,9 +82,7 @@ export function JobResultFromJSONTyped(json: any, ignoreDiscriminator: boolean):
         
         'error': json['error'] == null ? undefined : json['error'],
         'ok': json['ok'] == null ? undefined : ProofResultFromJSON(json['ok']),
-        'signature0': json['signature0'] == null ? undefined : json['signature0'],
-        'signature1': json['signature1'] == null ? undefined : json['signature1'],
-        'signature2': json['signature2'] == null ? undefined : json['signature2'],
+        'signature': json['signature'] == null ? undefined : json['signature'],
         'status': JobStatusFromJSON(json['status']),
     };
 }
@@ -114,9 +100,7 @@ export function JobResultToJSONTyped(value?: JobResult | null, ignoreDiscriminat
         
         'error': value['error'],
         'ok': ProofResultToJSON(value['ok']),
-        'signature0': value['signature0'],
-        'signature1': value['signature1'],
-        'signature2': value['signature2'],
+        'signature': value['signature'],
         'status': JobStatusToJSON(value['status']),
     };
 }

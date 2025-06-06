@@ -4,16 +4,19 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**create_invitation_code**](AdminApi.md#create_invitation_code) | **POST** /admin/nps/invitation/create | 
+[**create_nps_invite_code**](AdminApi.md#create_nps_invite_code) | **POST** /admin/nps/invitation/create | 
 [**create_user**](AdminApi.md#create_user) | **POST** /admin/user/create | 
-[**paginate_invitations**](AdminApi.md#paginate_invitations) | **GET** /admin/nps/invitation/list | 
-[**revoke_invitation_code**](AdminApi.md#revoke_invitation_code) | **POST** /admin/nps/invitation/revoke | 
+[**create_user_invite_code**](AdminApi.md#create_user_invite_code) | **POST** /admin/user/invitation/create | 
+[**paginate_nps_invitations**](AdminApi.md#paginate_nps_invitations) | **GET** /admin/nps/invitation/list | 
+[**paginate_user_invitations**](AdminApi.md#paginate_user_invitations) | **GET** /admin/user/invitation/list | 
+[**revoke_nps_invitation_code**](AdminApi.md#revoke_nps_invitation_code) | **POST** /admin/nps/invitation/revoke | 
+[**revoke_user_invitation_code**](AdminApi.md#revoke_user_invitation_code) | **POST** /admin/user/invitation/revoke | 
 
 
 
-## create_invitation_code
+## create_nps_invite_code
 
-> String create_invitation_code()
+> String create_nps_invite_code()
 
 
 ### Parameters
@@ -65,9 +68,34 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 
-## paginate_invitations
+## create_user_invite_code
 
-> models::PaginationResultString paginate_invitations(cursor, per_page)
+> String create_user_invite_code()
+
+
+### Parameters
+
+This endpoint does not need any parameter.
+
+### Return type
+
+**String**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: text/plain
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
+## paginate_nps_invitations
+
+> models::PaginationResultString paginate_nps_invitations(cursor, per_page)
 
 
 ### Parameters
@@ -94,9 +122,66 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 
-## revoke_invitation_code
+## paginate_user_invitations
 
-> revoke_invitation_code(code)
+> models::PaginationResultString paginate_user_invitations(cursor, per_page)
+
+
+### Parameters
+
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**cursor** | Option<**i32**> |  |  |
+**per_page** | Option<**i32**> |  |  |
+
+### Return type
+
+[**models::PaginationResultString**](PaginationResult_String.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
+## revoke_nps_invitation_code
+
+> revoke_nps_invitation_code(code)
+
+
+### Parameters
+
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**code** | **String** |  | [required] |
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/x-www-form-urlencoded
+- **Accept**: Not defined
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
+## revoke_user_invitation_code
+
+> revoke_user_invitation_code(code)
 
 
 ### Parameters

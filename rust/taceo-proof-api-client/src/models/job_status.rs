@@ -16,8 +16,12 @@ use serde::{Deserialize, Serialize};
 pub enum JobStatus {
     #[serde(rename = "Pending")]
     Pending,
-    #[serde(rename = "InProgress")]
-    InProgress,
+    #[serde(rename = "InNpsQueue")]
+    InNpsQueue,
+    #[serde(rename = "InCseQueue")]
+    InCseQueue,
+    #[serde(rename = "Running")]
+    Running,
     #[serde(rename = "Failed")]
     Failed,
     #[serde(rename = "Success")]
@@ -28,7 +32,9 @@ impl std::fmt::Display for JobStatus {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             Self::Pending => write!(f, "Pending"),
-            Self::InProgress => write!(f, "InProgress"),
+            Self::InNpsQueue => write!(f, "InNpsQueue"),
+            Self::InCseQueue => write!(f, "InCseQueue"),
+            Self::Running => write!(f, "Running"),
             Self::Failed => write!(f, "Failed"),
             Self::Success => write!(f, "Success"),
         }

@@ -13,10 +13,10 @@ use crate::{apis::ResponseContent, models};
 use reqwest;
 use serde::{de::Error as _, Deserialize, Serialize};
 
-/// struct for typed errors of method [`create_invitation_code`]
+/// struct for typed errors of method [`create_nps_invite_code`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
-pub enum CreateInvitationCodeError {
+pub enum CreateNpsInviteCodeError {
     Status403(),
     UnknownValue(serde_json::Value),
 }
@@ -29,25 +29,49 @@ pub enum CreateUserError {
     UnknownValue(serde_json::Value),
 }
 
-/// struct for typed errors of method [`paginate_invitations`]
+/// struct for typed errors of method [`create_user_invite_code`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
-pub enum PaginateInvitationsError {
+pub enum CreateUserInviteCodeError {
     Status403(),
     UnknownValue(serde_json::Value),
 }
 
-/// struct for typed errors of method [`revoke_invitation_code`]
+/// struct for typed errors of method [`paginate_nps_invitations`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
-pub enum RevokeInvitationCodeError {
+pub enum PaginateNpsInvitationsError {
     Status403(),
     UnknownValue(serde_json::Value),
 }
 
-pub async fn create_invitation_code(
+/// struct for typed errors of method [`paginate_user_invitations`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum PaginateUserInvitationsError {
+    Status403(),
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`revoke_nps_invitation_code`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum RevokeNpsInvitationCodeError {
+    Status403(),
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`revoke_user_invitation_code`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum RevokeUserInvitationCodeError {
+    Status403(),
+    UnknownValue(serde_json::Value),
+}
+
+pub async fn create_nps_invite_code(
     configuration: &configuration::Configuration,
-) -> Result<String, Error<CreateInvitationCodeError>> {
+) -> Result<String, Error<CreateNpsInviteCodeError>> {
     let uri_str = format!("{}/admin/nps/invitation/create", configuration.base_path);
     let mut req_builder = configuration
         .client
@@ -77,7 +101,7 @@ pub async fn create_invitation_code(
         }
     } else {
         let content = resp.text().await?;
-        let entity: Option<CreateInvitationCodeError> = serde_json::from_str(&content).ok();
+        let entity: Option<CreateNpsInviteCodeError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,
@@ -126,11 +150,52 @@ pub async fn create_user(
     }
 }
 
-pub async fn paginate_invitations(
+pub async fn create_user_invite_code(
+    configuration: &configuration::Configuration,
+) -> Result<String, Error<CreateUserInviteCodeError>> {
+    let uri_str = format!("{}/admin/user/invitation/create", configuration.base_path);
+    let mut req_builder = configuration
+        .client
+        .request(reqwest::Method::POST, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => return Ok(content),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `String`")))),
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<CreateUserInviteCodeError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
+pub async fn paginate_nps_invitations(
     configuration: &configuration::Configuration,
     cursor: Option<i32>,
     per_page: Option<i32>,
-) -> Result<models::PaginationResultString, Error<PaginateInvitationsError>> {
+) -> Result<models::PaginationResultString, Error<PaginateNpsInvitationsError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_cursor = cursor;
     let p_per_page = per_page;
@@ -168,7 +233,7 @@ pub async fn paginate_invitations(
         }
     } else {
         let content = resp.text().await?;
-        let entity: Option<PaginateInvitationsError> = serde_json::from_str(&content).ok();
+        let entity: Option<PaginateNpsInvitationsError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,
@@ -177,10 +242,61 @@ pub async fn paginate_invitations(
     }
 }
 
-pub async fn revoke_invitation_code(
+pub async fn paginate_user_invitations(
+    configuration: &configuration::Configuration,
+    cursor: Option<i32>,
+    per_page: Option<i32>,
+) -> Result<models::PaginationResultString, Error<PaginateUserInvitationsError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_cursor = cursor;
+    let p_per_page = per_page;
+
+    let uri_str = format!("{}/admin/user/invitation/list", configuration.base_path);
+    let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
+
+    if let Some(ref param_value) = p_cursor {
+        req_builder = req_builder.query(&[("cursor", &param_value.to_string())]);
+    }
+    if let Some(ref param_value) = p_per_page {
+        req_builder = req_builder.query(&[("per_page", &param_value.to_string())]);
+    }
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::PaginationResultString`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::PaginationResultString`")))),
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<PaginateUserInvitationsError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
+pub async fn revoke_nps_invitation_code(
     configuration: &configuration::Configuration,
     code: &str,
-) -> Result<(), Error<RevokeInvitationCodeError>> {
+) -> Result<(), Error<RevokeNpsInvitationCodeError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_code = code;
 
@@ -205,7 +321,44 @@ pub async fn revoke_invitation_code(
         Ok(())
     } else {
         let content = resp.text().await?;
-        let entity: Option<RevokeInvitationCodeError> = serde_json::from_str(&content).ok();
+        let entity: Option<RevokeNpsInvitationCodeError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
+pub async fn revoke_user_invitation_code(
+    configuration: &configuration::Configuration,
+    code: &str,
+) -> Result<(), Error<RevokeUserInvitationCodeError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_code = code;
+
+    let uri_str = format!("{}/admin/user/invitation/revoke", configuration.base_path);
+    let mut req_builder = configuration
+        .client
+        .request(reqwest::Method::POST, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+    let mut multipart_form_params = std::collections::HashMap::new();
+    multipart_form_params.insert("code", p_code.to_string());
+    req_builder = req_builder.form(&multipart_form_params);
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+
+    if !status.is_client_error() && !status.is_server_error() {
+        Ok(())
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<RevokeUserInvitationCodeError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,
