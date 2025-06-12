@@ -13,7 +13,7 @@ const jobInstance = new JobApi(congiuration);
 const blueprintInstance = new BlueprintApi(congiuration);
 
 export default function Home() {
-  const [code, setCode] = useState<string | null>(null);
+  const [voucher, setVoucher] = useState<string | null>(null);
   const [blueprint, setBlueprint] = useState<string>("");
   const [curve, setCurve] = useState<BlueprintCurve>(BlueprintCurve.Bn254);
   const [result, setResult] = useState<ProofResult | null>(null);
@@ -75,7 +75,7 @@ export default function Home() {
       const keyMaterial = await blueprintInstance.blueprintKeyMaterial({id: blueprint});
       if (jobType == JobType.Rep3Full) {
         input = JSON.parse(await selectedFile!.text());
-        jobId = await scheduleFullJobRep3(jobInstance, blueprint, code, curve, keyMaterial, publicInputs, input);
+        jobId = await scheduleFullJobRep3(jobInstance, blueprint, voucher, curve, keyMaterial, publicInputs, input);
       } else {
         if (wtnsExt == "Browser") {
           input = JSON.parse(await selectedFile!.text());
@@ -85,9 +85,9 @@ export default function Home() {
           witness = await selectedFile!.bytes();
         }
         if (jobType == JobType.ShamirProve) {
-          jobId = await scheduleProveJobShamir(jobInstance, blueprint, code, curve, keyMaterial, numInputs, witness);
+          jobId = await scheduleProveJobShamir(jobInstance, blueprint, voucher, curve, keyMaterial, numInputs, witness);
         } else {
-          jobId = await scheduleProveJobRep3(jobInstance, blueprint, code, curve, keyMaterial, numInputs, witness);
+          jobId = await scheduleProveJobRep3(jobInstance, blueprint, voucher, curve, keyMaterial, numInputs, witness);
         }
       }
       const result = await pollProofResult(jobId, keyMaterial);
@@ -128,8 +128,8 @@ export default function Home() {
           <h1 className="text-[40px] font-bold text-center">TACEO:Proof</h1>
           <div className="w-[5rem] h-[1rem] bg-[#52ffc5] mx-auto my-5"></div>
           <div>
-            <h2 className="text-[14pt] font-bold pb-1">Access Code</h2>
-            <input className="rounded-[5pt] shadow-xl border border-current p-2 w-full" type="text" onChange={(e) => setCode(e.target.value)} />
+            <h2 className="text-[14pt] font-bold pb-1">Voucher</h2>
+            <input className="rounded-[5pt] shadow-xl border border-current p-2 w-full" type="text" onChange={(e) => setVoucher(e.target.value)} />
           </div>
           <div>
             <h2 className="text-[14pt] font-bold pb-1">Blueprint</h2>
