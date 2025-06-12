@@ -5,7 +5,6 @@ README.md
 package.json
 src/apis/AdminApi.ts
 src/apis/BlueprintApi.ts
-src/apis/DashboardApi.ts
 src/apis/HealthApi.ts
 src/apis/JobApi.ts
 src/apis/NPSApi.ts

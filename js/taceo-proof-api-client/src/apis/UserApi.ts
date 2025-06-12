@@ -22,11 +22,7 @@ import {
     ApiErrorToJSON,
 } from '../models/index';
 
-export interface GetLoginRequest {
-    next?: string | null;
-}
-
-export interface PostLoginRequest {
+export interface LoginRequest {
     password: string;
     username: string;
     next?: string | null;
@@ -39,68 +35,18 @@ export class UserApi extends runtime.BaseAPI {
 
     /**
      */
-    async getLoginRaw(requestParameters: GetLoginRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        const queryParameters: any = {};
-
-        if (requestParameters['next'] != null) {
-            queryParameters['next'] = requestParameters['next'];
-        }
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/login`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     */
-    async getLogin(requestParameters: GetLoginRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.getLoginRaw(requestParameters, initOverrides);
-    }
-
-    /**
-     */
-    async logoutRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/logout`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     */
-    async logout(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.logoutRaw(initOverrides);
-    }
-
-    /**
-     */
-    async postLoginRaw(requestParameters: PostLoginRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async loginRaw(requestParameters: LoginRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['password'] == null) {
             throw new runtime.RequiredError(
                 'password',
-                'Required parameter "password" was null or undefined when calling postLogin().'
+                'Required parameter "password" was null or undefined when calling login().'
             );
         }
 
         if (requestParameters['username'] == null) {
             throw new runtime.RequiredError(
                 'username',
-                'Required parameter "username" was null or undefined when calling postLogin().'
+                'Required parameter "username" was null or undefined when calling login().'
             );
         }
 
@@ -147,8 +93,31 @@ export class UserApi extends runtime.BaseAPI {
 
     /**
      */
-    async postLogin(requestParameters: PostLoginRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.postLoginRaw(requestParameters, initOverrides);
+    async login(requestParameters: LoginRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.loginRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async logoutRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/logout`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async logout(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.logoutRaw(initOverrides);
     }
 
 }

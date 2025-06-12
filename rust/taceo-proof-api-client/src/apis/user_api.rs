@@ -13,10 +13,11 @@ use crate::{apis::ResponseContent, models};
 use reqwest;
 use serde::{de::Error as _, Deserialize, Serialize};
 
-/// struct for typed errors of method [`get_login`]
+/// struct for typed errors of method [`login`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
-pub enum GetLoginError {
+pub enum LoginError {
+    Status5XX(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -27,83 +28,12 @@ pub enum LogoutError {
     UnknownValue(serde_json::Value),
 }
 
-/// struct for typed errors of method [`post_login`]
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(untagged)]
-pub enum PostLoginError {
-    Status5XX(models::ApiError),
-    UnknownValue(serde_json::Value),
-}
-
-pub async fn get_login(
-    configuration: &configuration::Configuration,
-    next: Option<&str>,
-) -> Result<(), Error<GetLoginError>> {
-    // add a prefix to parameters to efficiently prevent name collisions
-    let p_next = next;
-
-    let uri_str = format!("{}/login", configuration.base_path);
-    let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
-
-    if let Some(ref param_value) = p_next {
-        req_builder = req_builder.query(&[("next", &param_value.to_string())]);
-    }
-    if let Some(ref user_agent) = configuration.user_agent {
-        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
-    }
-
-    let req = req_builder.build()?;
-    let resp = configuration.client.execute(req).await?;
-
-    let status = resp.status();
-
-    if !status.is_client_error() && !status.is_server_error() {
-        Ok(())
-    } else {
-        let content = resp.text().await?;
-        let entity: Option<GetLoginError> = serde_json::from_str(&content).ok();
-        Err(Error::ResponseError(ResponseContent {
-            status,
-            content,
-            entity,
-        }))
-    }
-}
-
-pub async fn logout(
-    configuration: &configuration::Configuration,
-) -> Result<(), Error<LogoutError>> {
-    let uri_str = format!("{}/logout", configuration.base_path);
-    let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
-
-    if let Some(ref user_agent) = configuration.user_agent {
-        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
-    }
-
-    let req = req_builder.build()?;
-    let resp = configuration.client.execute(req).await?;
-
-    let status = resp.status();
-
-    if !status.is_client_error() && !status.is_server_error() {
-        Ok(())
-    } else {
-        let content = resp.text().await?;
-        let entity: Option<LogoutError> = serde_json::from_str(&content).ok();
-        Err(Error::ResponseError(ResponseContent {
-            status,
-            content,
-            entity,
-        }))
-    }
-}
-
-pub async fn post_login(
+pub async fn login(
     configuration: &configuration::Configuration,
     password: &str,
     username: &str,
     next: Option<&str>,
-) -> Result<(), Error<PostLoginError>> {
+) -> Result<(), Error<LoginError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_password = password;
     let p_username = username;
@@ -134,7 +64,37 @@ pub async fn post_login(
         Ok(())
     } else {
         let content = resp.text().await?;
-        let entity: Option<PostLoginError> = serde_json::from_str(&content).ok();
+        let entity: Option<LoginError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
+pub async fn logout(
+    configuration: &configuration::Configuration,
+) -> Result<(), Error<LogoutError>> {
+    let uri_str = format!("{}/logout", configuration.base_path);
+    let mut req_builder = configuration
+        .client
+        .request(reqwest::Method::POST, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+
+    if !status.is_client_error() && !status.is_server_error() {
+        Ok(())
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<LogoutError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,
