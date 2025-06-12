@@ -53,9 +53,9 @@ struct Args {
     #[clap(long, env = "PROOF_INPUT")]
     pub input: PathBuf,
 
-    /// The ppd-network code
-    #[clap(long, env = "PROOF_CODE")]
-    pub code: Option<String>,
+    /// The voucher for a proof job
+    #[clap(long, env = "PROOF_VOUCHER")]
+    pub voucher: Option<String>,
 
     /// The job blueprint
     #[clap(long, env = "PROOF_BLUEPRINT")]
@@ -103,7 +103,7 @@ where
             taceo_proof_client::schedule_full_job_rep3::<P>(
                 config,
                 args.blueprint,
-                args.code.as_deref(),
+                args.voucher.as_deref(),
                 &enc_keys,
                 input,
                 &args
@@ -117,7 +117,7 @@ where
             taceo_proof_client::schedule_prove_job_rep3::<P>(
                 config,
                 args.blueprint,
-                args.code.as_deref(),
+                args.voucher.as_deref(),
                 &enc_keys,
                 witness,
                 num_inputs,
@@ -129,7 +129,7 @@ where
             taceo_proof_client::schedule_prove_job_shamir::<P>(
                 config,
                 args.blueprint,
-                args.code.as_deref(),
+                args.voucher.as_deref(),
                 &enc_keys,
                 witness,
                 num_inputs,
