@@ -12,7 +12,6 @@ docs/BlueprintCurve.md
 docs/BlueprintReadyProbe.md
 docs/BlueprintType.md
 docs/CreateBlueprintResponse.md
-docs/DashboardApi.md
 docs/HealthApi.md
 docs/JobApi.md
 docs/JobResult.md
@@ -32,7 +31,6 @@ git_push.sh
 src/apis/admin_api.rs
 src/apis/blueprint_api.rs
 src/apis/configuration.rs
-src/apis/dashboard_api.rs
 src/apis/health_api.rs
 src/apis/job_api.rs
 src/apis/mod.rs

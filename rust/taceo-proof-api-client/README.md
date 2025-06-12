@@ -39,16 +39,14 @@ Class | Method | HTTP request | Description
 *BlueprintApi* | [**issue_cosnark_code**](docs/BlueprintApi.md#issue_cosnark_code) | **POST** /api/v1/blueprint/code | create a new job
 *BlueprintApi* | [**revoke**](docs/BlueprintApi.md#revoke) | **POST** /api/v1/blueprint/{id}/revoke | Revokes the blueprint identified by ID if the logged in user has the correct access rights.
 *BlueprintApi* | [**upload_aux_data**](docs/BlueprintApi.md#upload_aux_data) | **POST** /api/v1/blueprint/{id}/aux/{aux_type} | add proving key to blueprint
-*DashboardApi* | [**welcome**](docs/DashboardApi.md#welcome) | **GET** /api/v1/dashboard | 
 *HealthApi* | [**health**](docs/HealthApi.md#health) | **GET** /health | 
 *HealthApi* | [**live**](docs/HealthApi.md#live) | **GET** /health/live | 
 *HealthApi* | [**ready**](docs/HealthApi.md#ready) | **GET** /health/ready | 
 *JobApi* | [**get_results**](docs/JobApi.md#get_results) | **GET** /api/v1/jobs/job/{id} | get job results
 *JobApi* | [**schedule_job**](docs/JobApi.md#schedule_job) | **POST** /api/v1/jobs/schedule | create a new job
 *NpsApi* | [**list**](docs/NpsApi.md#list) | **GET** /api/v1/nps/list | get paginated node providers - used for blueprint creators to define clusters
-*UserApi* | [**get_login**](docs/UserApi.md#get_login) | **GET** /login | 
-*UserApi* | [**logout**](docs/UserApi.md#logout) | **GET** /logout | 
-*UserApi* | [**post_login**](docs/UserApi.md#post_login) | **POST** /login | 
+*UserApi* | [**login**](docs/UserApi.md#login) | **POST** /login | 
+*UserApi* | [**logout**](docs/UserApi.md#logout) | **POST** /logout | 
 
 
 ## Documentation For Models

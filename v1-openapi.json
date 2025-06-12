@@ -568,19 +568,6 @@
         }
       }
     },
-    "/api/v1/dashboard": {
-      "get": {
-        "tags": [
-          "Dashboard"
-        ],
-        "operationId": "welcome",
-        "responses": {
-          "200": {
-            "description": "The landing page"
-          }
-        }
-      }
-    },
     "/api/v1/jobs/job/{id}": {
       "get": {
         "tags": [
@@ -831,35 +818,11 @@
       }
     },
     "/login": {
-      "get": {
-        "tags": [
-          "User"
-        ],
-        "operationId": "get_login",
-        "parameters": [
-          {
-            "name": "next",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": [
-                "string",
-                "null"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The login form"
-          }
-        }
-      },
       "post": {
         "tags": [
           "User"
         ],
-        "operationId": "post_login",
+        "operationId": "login",
         "requestBody": {
           "content": {
             "application/x-www-form-urlencoded": {
@@ -888,7 +851,7 @@
       }
     },
     "/logout": {
-      "get": {
+      "post": {
         "tags": [
           "User"
         ],
