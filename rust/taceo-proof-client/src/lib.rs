@@ -10,11 +10,11 @@ use co_circom_types::{
 };
 use co_groth16::Proof;
 use crypto_box::{PublicKey, aead::OsRng};
-use ed25519_dalek::VerifyingKey;
+use ed25519_dalek::{Digest, Sha512, Signature, VerifyingKey};
 use eyre::Context;
 use taceo_proof_api_client::{
     apis::{blueprint_api, configuration::Configuration, job_api},
-    models::{JobStatus, JobType},
+    models::{JobStatus, JobType, ProofResult},
 };
 use uuid::Uuid;
 
@@ -62,6 +62,33 @@ pub async fn get_nps_key_material(
         .unwrap())
 }
 
+/// Verify the signature of a proof result.
+pub fn verify_proof_result_signature(
+    job_id: Uuid,
+    result: &ProofResult,
+    signature: Signature,
+    vk: VerifyingKey,
+) -> eyre::Result<()> {
+    tracing::debug!("verify result for job {job_id}");
+    let proof_bytes = Base64::decode_vec(&result.proof)?;
+    let public_inputs_bytes = Base64::decode_vec(&result.public_inputs)?;
+
+    let mut digest = Sha512::new();
+    digest.update(job_id.as_bytes());
+    digest.update(proof_bytes);
+    digest.update(public_inputs_bytes);
+
+    vk.verify_prehashed_strict(
+        digest,
+        Some("taceo-proof-nps-reporting".as_bytes()),
+        &signature,
+    )
+    .context("while verifying signature")?;
+    tracing::debug!("signature ok for job {job_id}");
+
+    Ok(())
+}
+
 fn seal_shares(keys: &[PublicKey; 3], shares: [Vec<u8>; 3]) -> eyre::Result<[Vec<u8>; 3]> {
     tracing::debug!("sealing shares...");
     let ct0 = keys[0]
@@ -80,7 +107,7 @@ fn seal_shares(keys: &[PublicKey; 3], shares: [Vec<u8>; 3]) -> eyre::Result<[Vec
 pub async fn schedule_full_job_rep3<P>(
     config: &Configuration,
     blueprint_id: Uuid,
-    code: Option<&str>,
+    voucher: Option<&str>,
     keys: &[PublicKey; 3],
     input: Input,
     public_inputs: &[String],
@@ -108,7 +135,7 @@ where
         ct0,
         ct1,
         ct2,
-        code,
+        voucher,
     )
     .await?;
     let job_id = res.job_id;
@@ -120,7 +147,7 @@ where
 pub async fn schedule_prove_job_rep3<P>(
     config: &Configuration,
     blueprint_id: Uuid,
-    code: Option<&str>,
+    voucher: Option<&str>,
     keys: &[PublicKey; 3],
     witness: Witness<P::ScalarField>,
     num_pub_inputs: usize,
@@ -154,7 +181,7 @@ where
         ct0,
         ct1,
         ct2,
-        code,
+        voucher,
     )
     .await?;
     let job_id = res.job_id;
@@ -166,7 +193,7 @@ where
 pub async fn schedule_prove_job_shamir<P>(
     config: &Configuration,
     blueprint_id: Uuid,
-    code: Option<&str>,
+    voucher: Option<&str>,
     keys: &[PublicKey; 3],
     witness: Witness<P::ScalarField>,
     num_pub_inputs: usize,
@@ -204,7 +231,7 @@ where
         ct0,
         ct1,
         ct2,
-        code,
+        voucher,
     )
     .await?;
     let job_id = res.job_id;
