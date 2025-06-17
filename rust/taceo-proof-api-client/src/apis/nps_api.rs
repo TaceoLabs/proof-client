@@ -25,7 +25,7 @@ pub async fn list(
     configuration: &configuration::Configuration,
     cursor: Option<i32>,
     per_page: Option<i32>,
-) -> Result<models::PaginationResultNpsHeader, Error<ListError>> {
+) -> Result<models::PaginationResultNps, Error<ListError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_cursor = cursor;
     let p_per_page = per_page;
@@ -58,8 +58,8 @@ pub async fn list(
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::PaginationResultNpsHeader`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::PaginationResultNpsHeader`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::PaginationResultNps`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::PaginationResultNps`")))),
         }
     } else {
         let content = resp.text().await?;

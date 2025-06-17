@@ -15,9 +15,15 @@
 
 import * as runtime from '../runtime';
 import type {
+  ApiError,
+  BlueprintAccess,
   PaginationResultString,
 } from '../models/index';
 import {
+    ApiErrorFromJSON,
+    ApiErrorToJSON,
+    BlueprintAccessFromJSON,
+    BlueprintAccessToJSON,
     PaginationResultStringFromJSON,
     PaginationResultStringToJSON,
 } from '../models/index';
@@ -43,6 +49,18 @@ export interface RevokeNpsInvitationCodeRequest {
 
 export interface RevokeUserInvitationCodeRequest {
     code: string;
+}
+
+export interface UpdateBlueprintAccessRequest {
+    access: BlueprintAccess;
+    id: string;
+}
+
+export interface UpdateBlueprintNpsRequest {
+    id: string;
+    nps0: number;
+    nps1: number;
+    nps2: number;
 }
 
 /**
@@ -326,6 +344,152 @@ export class AdminApi extends runtime.BaseAPI {
      */
     async revokeUserInvitationCode(requestParameters: RevokeUserInvitationCodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.revokeUserInvitationCodeRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * update the blueprint access
+     */
+    async updateBlueprintAccessRaw(requestParameters: UpdateBlueprintAccessRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['access'] == null) {
+            throw new runtime.RequiredError(
+                'access',
+                'Required parameter "access" was null or undefined when calling updateBlueprintAccess().'
+            );
+        }
+
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling updateBlueprintAccess().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const consumes: runtime.Consume[] = [
+            { contentType: 'application/x-www-form-urlencoded' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['access'] != null) {
+            formParams.append('access', requestParameters['access'] as any);
+        }
+
+        if (requestParameters['id'] != null) {
+            formParams.append('id', requestParameters['id'] as any);
+        }
+
+        const response = await this.request({
+            path: `/admin/blueprint/update/access`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: formParams,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * update the blueprint access
+     */
+    async updateBlueprintAccess(requestParameters: UpdateBlueprintAccessRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.updateBlueprintAccessRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * update the blueprint nps
+     */
+    async updateBlueprintNpsRaw(requestParameters: UpdateBlueprintNpsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling updateBlueprintNps().'
+            );
+        }
+
+        if (requestParameters['nps0'] == null) {
+            throw new runtime.RequiredError(
+                'nps0',
+                'Required parameter "nps0" was null or undefined when calling updateBlueprintNps().'
+            );
+        }
+
+        if (requestParameters['nps1'] == null) {
+            throw new runtime.RequiredError(
+                'nps1',
+                'Required parameter "nps1" was null or undefined when calling updateBlueprintNps().'
+            );
+        }
+
+        if (requestParameters['nps2'] == null) {
+            throw new runtime.RequiredError(
+                'nps2',
+                'Required parameter "nps2" was null or undefined when calling updateBlueprintNps().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const consumes: runtime.Consume[] = [
+            { contentType: 'application/x-www-form-urlencoded' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['id'] != null) {
+            formParams.append('id', requestParameters['id'] as any);
+        }
+
+        if (requestParameters['nps0'] != null) {
+            formParams.append('nps0', requestParameters['nps0'] as any);
+        }
+
+        if (requestParameters['nps1'] != null) {
+            formParams.append('nps1', requestParameters['nps1'] as any);
+        }
+
+        if (requestParameters['nps2'] != null) {
+            formParams.append('nps2', requestParameters['nps2'] as any);
+        }
+
+        const response = await this.request({
+            path: `/admin/blueprint/update/nps`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: formParams,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * update the blueprint nps
+     */
+    async updateBlueprintNps(requestParameters: UpdateBlueprintNpsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.updateBlueprintNpsRaw(requestParameters, initOverrides);
     }
 
 }

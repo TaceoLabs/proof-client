@@ -1,12 +1,11 @@
-# NpsHeader
+# PaginationResultNps
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **i32** |  | 
-**name** | **String** |  | 
-**online** | **bool** |  | 
+**elements** | [**Vec<models::PaginationResultNpsElementsInner>**](PaginationResult_Nps_elements_inner.md) |  | 
+**total_amount** | Option<**i64**> |  | [optional]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

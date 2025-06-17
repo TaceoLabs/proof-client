@@ -1,4 +1,4 @@
-# PaginationResultNpsHeaderElementsInner
+# Nps
 
 ## Properties
 

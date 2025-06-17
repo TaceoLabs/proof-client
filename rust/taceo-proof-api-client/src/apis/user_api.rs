@@ -28,6 +28,14 @@ pub enum LogoutError {
     UnknownValue(serde_json::Value),
 }
 
+/// struct for typed errors of method [`register`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum RegisterError {
+    Status5XX(models::ApiError),
+    UnknownValue(serde_json::Value),
+}
+
 pub async fn login(
     configuration: &configuration::Configuration,
     password: &str,
@@ -95,6 +103,49 @@ pub async fn logout(
     } else {
         let content = resp.text().await?;
         let entity: Option<LogoutError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
+pub async fn register(
+    configuration: &configuration::Configuration,
+    invite_code: &str,
+    password: &str,
+    username: &str,
+) -> Result<(), Error<RegisterError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_invite_code = invite_code;
+    let p_password = password;
+    let p_username = username;
+
+    let uri_str = format!("{}/register", configuration.base_path);
+    let mut req_builder = configuration
+        .client
+        .request(reqwest::Method::POST, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+    let mut multipart_form_params = std::collections::HashMap::new();
+    multipart_form_params.insert("invite_code", p_invite_code.to_string());
+    multipart_form_params.insert("password", p_password.to_string());
+    multipart_form_params.insert("username", p_username.to_string());
+    req_builder = req_builder.form(&multipart_form_params);
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+
+    if !status.is_client_error() && !status.is_server_error() {
+        Ok(())
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<RegisterError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,

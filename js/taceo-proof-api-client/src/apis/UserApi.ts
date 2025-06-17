@@ -28,6 +28,12 @@ export interface LoginRequest {
     next?: string | null;
 }
 
+export interface RegisterRequest {
+    inviteCode: string;
+    password: string;
+    username: string;
+}
+
 /**
  * 
  */
@@ -118,6 +124,77 @@ export class UserApi extends runtime.BaseAPI {
      */
     async logout(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.logoutRaw(initOverrides);
+    }
+
+    /**
+     */
+    async registerRaw(requestParameters: RegisterRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['inviteCode'] == null) {
+            throw new runtime.RequiredError(
+                'inviteCode',
+                'Required parameter "inviteCode" was null or undefined when calling register().'
+            );
+        }
+
+        if (requestParameters['password'] == null) {
+            throw new runtime.RequiredError(
+                'password',
+                'Required parameter "password" was null or undefined when calling register().'
+            );
+        }
+
+        if (requestParameters['username'] == null) {
+            throw new runtime.RequiredError(
+                'username',
+                'Required parameter "username" was null or undefined when calling register().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const consumes: runtime.Consume[] = [
+            { contentType: 'application/x-www-form-urlencoded' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['inviteCode'] != null) {
+            formParams.append('invite_code', requestParameters['inviteCode'] as any);
+        }
+
+        if (requestParameters['password'] != null) {
+            formParams.append('password', requestParameters['password'] as any);
+        }
+
+        if (requestParameters['username'] != null) {
+            formParams.append('username', requestParameters['username'] as any);
+        }
+
+        const response = await this.request({
+            path: `/register`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: formParams,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async register(requestParameters: RegisterRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.registerRaw(requestParameters, initOverrides);
     }
 
 }

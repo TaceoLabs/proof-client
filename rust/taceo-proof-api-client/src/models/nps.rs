@@ -12,7 +12,7 @@ use crate::models;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
-pub struct NpsHeader {
+pub struct Nps {
     #[serde(rename = "id")]
     pub id: i32,
     #[serde(rename = "name")]
@@ -21,8 +21,8 @@ pub struct NpsHeader {
     pub online: bool,
 }
 
-impl NpsHeader {
-    pub fn new(id: i32, name: String, online: bool) -> NpsHeader {
-        NpsHeader { id, name, online }
+impl Nps {
+    pub fn new(id: i32, name: String, online: bool) -> Nps {
+        Nps { id, name, online }
     }
 }

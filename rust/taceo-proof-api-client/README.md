@@ -33,6 +33,8 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**paginate_user_invitations**](docs/AdminApi.md#paginate_user_invitations) | **GET** /admin/user/invitation/list | 
 *AdminApi* | [**revoke_nps_invitation_code**](docs/AdminApi.md#revoke_nps_invitation_code) | **POST** /admin/nps/invitation/revoke | 
 *AdminApi* | [**revoke_user_invitation_code**](docs/AdminApi.md#revoke_user_invitation_code) | **POST** /admin/user/invitation/revoke | 
+*AdminApi* | [**update_blueprint_access**](docs/AdminApi.md#update_blueprint_access) | **POST** /admin/blueprint/update/access | update the blueprint access
+*AdminApi* | [**update_blueprint_nps**](docs/AdminApi.md#update_blueprint_nps) | **POST** /admin/blueprint/update/nps | update the blueprint nps
 *BlueprintApi* | [**blueprint_key_material**](docs/BlueprintApi.md#blueprint_key_material) | **GET** /api/v1/blueprint/{id}/key-material | returns the key material of the NPSs associated with the blueprint
 *BlueprintApi* | [**blueprint_ready**](docs/BlueprintApi.md#blueprint_ready) | **GET** /api/v1/blueprint/{id}/ready | checks whether a blueprint is already ready
 *BlueprintApi* | [**create**](docs/BlueprintApi.md#create) | **POST** /api/v1/blueprint/create | create a new coSNARK blueprint
@@ -44,9 +46,10 @@ Class | Method | HTTP request | Description
 *HealthApi* | [**ready**](docs/HealthApi.md#ready) | **GET** /health/ready | 
 *JobApi* | [**get_results**](docs/JobApi.md#get_results) | **GET** /api/v1/jobs/job/{id} | get job results
 *JobApi* | [**schedule_job**](docs/JobApi.md#schedule_job) | **POST** /api/v1/jobs/schedule | create a new job
-*NpsApi* | [**list**](docs/NpsApi.md#list) | **GET** /api/v1/nps/list | get paginated node providers - used for blueprint creators to define clusters
+*NpsApi* | [**list**](docs/NpsApi.md#list) | **GET** /api/v1/nps/list | get paginated node providers
 *UserApi* | [**login**](docs/UserApi.md#login) | **POST** /login | 
 *UserApi* | [**logout**](docs/UserApi.md#logout) | **POST** /logout | 
+*UserApi* | [**register**](docs/UserApi.md#register) | **POST** /register | 
 
 
 ## Documentation For Models
@@ -62,10 +65,10 @@ Class | Method | HTTP request | Description
  - [JobResults](docs/JobResults.md)
  - [JobStatus](docs/JobStatus.md)
  - [JobType](docs/JobType.md)
- - [NpsHeader](docs/NpsHeader.md)
+ - [Nps](docs/Nps.md)
  - [NpsKeyMaterial](docs/NpsKeyMaterial.md)
- - [PaginationResultNpsHeader](docs/PaginationResultNpsHeader.md)
- - [PaginationResultNpsHeaderElementsInner](docs/PaginationResultNpsHeaderElementsInner.md)
+ - [PaginationResultNps](docs/PaginationResultNps.md)
+ - [PaginationResultNpsElementsInner](docs/PaginationResultNpsElementsInner.md)
  - [PaginationResultString](docs/PaginationResultString.md)
  - [ProofResult](docs/ProofResult.md)
  - [ScheduleJobResponse](docs/ScheduleJobResponse.md)

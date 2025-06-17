@@ -22,10 +22,10 @@ src/models/JobResult.ts
 src/models/JobResults.ts
 src/models/JobStatus.ts
 src/models/JobType.ts
-src/models/NpsHeader.ts
+src/models/Nps.ts
 src/models/NpsKeyMaterial.ts
-src/models/PaginationResultNpsHeader.ts
-src/models/PaginationResultNpsHeaderElementsInner.ts
+src/models/PaginationResultNps.ts
+src/models/PaginationResultNpsElementsInner.ts
 src/models/PaginationResultString.ts
 src/models/ProofResult.ts
 src/models/ScheduleJobResponse.ts

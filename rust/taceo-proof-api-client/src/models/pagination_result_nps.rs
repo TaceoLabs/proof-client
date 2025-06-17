@@ -12,9 +12,9 @@ use crate::models;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
-pub struct PaginationResultNpsHeader {
+pub struct PaginationResultNps {
     #[serde(rename = "elements")]
-    pub elements: Vec<models::PaginationResultNpsHeaderElementsInner>,
+    pub elements: Vec<models::PaginationResultNpsElementsInner>,
     #[serde(
         rename = "total_amount",
         default,
@@ -24,11 +24,9 @@ pub struct PaginationResultNpsHeader {
     pub total_amount: Option<Option<i64>>,
 }
 
-impl PaginationResultNpsHeader {
-    pub fn new(
-        elements: Vec<models::PaginationResultNpsHeaderElementsInner>,
-    ) -> PaginationResultNpsHeader {
-        PaginationResultNpsHeader {
+impl PaginationResultNps {
+    pub fn new(elements: Vec<models::PaginationResultNpsElementsInner>) -> PaginationResultNps {
+        PaginationResultNps {
             elements,
             total_amount: None,
         }

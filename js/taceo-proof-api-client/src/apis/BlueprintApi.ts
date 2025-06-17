@@ -55,9 +55,6 @@ export interface CreateRequest {
     access: BlueprintAccess;
     curve: BlueprintCurve;
     name: string;
-    nodeProvider0: number;
-    nodeProvider1: number;
-    nodeProvider2: number;
     typ: BlueprintType;
 }
 
@@ -172,27 +169,6 @@ export class BlueprintApi extends runtime.BaseAPI {
             );
         }
 
-        if (requestParameters['nodeProvider0'] == null) {
-            throw new runtime.RequiredError(
-                'nodeProvider0',
-                'Required parameter "nodeProvider0" was null or undefined when calling create().'
-            );
-        }
-
-        if (requestParameters['nodeProvider1'] == null) {
-            throw new runtime.RequiredError(
-                'nodeProvider1',
-                'Required parameter "nodeProvider1" was null or undefined when calling create().'
-            );
-        }
-
-        if (requestParameters['nodeProvider2'] == null) {
-            throw new runtime.RequiredError(
-                'nodeProvider2',
-                'Required parameter "nodeProvider2" was null or undefined when calling create().'
-            );
-        }
-
         if (requestParameters['typ'] == null) {
             throw new runtime.RequiredError(
                 'typ',
@@ -228,18 +204,6 @@ export class BlueprintApi extends runtime.BaseAPI {
 
         if (requestParameters['name'] != null) {
             formParams.append('name', requestParameters['name'] as any);
-        }
-
-        if (requestParameters['nodeProvider0'] != null) {
-            formParams.append('node_provider0', requestParameters['nodeProvider0'] as any);
-        }
-
-        if (requestParameters['nodeProvider1'] != null) {
-            formParams.append('node_provider1', requestParameters['nodeProvider1'] as any);
-        }
-
-        if (requestParameters['nodeProvider2'] != null) {
-            formParams.append('node_provider2', requestParameters['nodeProvider2'] as any);
         }
 
         if (requestParameters['typ'] != null) {

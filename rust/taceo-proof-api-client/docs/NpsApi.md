@@ -4,14 +4,14 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**list**](NpsApi.md#list) | **GET** /api/v1/nps/list | get paginated node providers - used for blueprint creators to define clusters
+[**list**](NpsApi.md#list) | **GET** /api/v1/nps/list | get paginated node providers
 
 
 
 ## list
 
-> models::PaginationResultNpsHeader list(cursor, per_page)
-get paginated node providers - used for blueprint creators to define clusters
+> models::PaginationResultNps list(cursor, per_page)
+get paginated node providers
 
 ### Parameters
 
@@ -23,7 +23,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**models::PaginationResultNpsHeader**](PaginationResult_NpsHeader.md)
+[**models::PaginationResultNps**](PaginationResult_Nps.md)
 
 ### Authorization
 

@@ -14,6 +14,90 @@
     "version": "1.0"
   },
   "paths": {
+    "/admin/blueprint/update/access": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "update the blueprint access",
+        "operationId": "update_blueprint_access",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBlueprintAccessRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Blueprint updated"
+          },
+          "403": {
+            "description": "You are not an admin"
+          },
+          "5XX": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "adminAuth": []
+          }
+        ]
+      }
+    },
+    "/admin/blueprint/update/nps": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "update the blueprint nps",
+        "operationId": "update_blueprint_nps",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBlueprintNpsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Blueprint updated"
+          },
+          "403": {
+            "description": "You are not an admin"
+          },
+          "5XX": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "adminAuth": []
+          }
+        ]
+      }
+    },
     "/admin/nps/invitation/create": {
       "post": {
         "tags": [
@@ -694,7 +778,7 @@
         "tags": [
           "NPS"
         ],
-        "summary": "get paginated node providers - used for blueprint creators to define clusters",
+        "summary": "get paginated node providers",
         "operationId": "list",
         "parameters": [
           {
@@ -730,7 +814,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PaginationResult_NpsHeader"
+                  "$ref": "#/components/schemas/PaginationResult_Nps"
                 }
               }
             }
@@ -862,6 +946,39 @@
           }
         }
       }
+    },
+    "/register": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "register",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Created new account and redirected to the dashboard"
+          },
+          "5XX": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -912,10 +1029,17 @@
       "BlueprintReadyProbe": {
         "type": "object",
         "required": [
-          "missing_aux_data"
+          "missing_aux_data",
+          "present_aux_data"
         ],
         "properties": {
           "missing_aux_data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuxiliaryType"
+            }
+          },
+          "present_aux_data": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/AuxiliaryType"
@@ -937,10 +1061,7 @@
           "name",
           "typ",
           "curve",
-          "access",
-          "node_provider0",
-          "node_provider1",
-          "node_provider2"
+          "access"
         ],
         "properties": {
           "access": {
@@ -951,18 +1072,6 @@
           },
           "name": {
             "type": "string"
-          },
-          "node_provider0": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "node_provider1": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "node_provider2": {
-            "type": "integer",
-            "format": "int32"
           },
           "typ": {
             "$ref": "#/components/schemas/BlueprintType"
@@ -1107,7 +1216,7 @@
           "ShamirProve"
         ]
       },
-      "NpsHeader": {
+      "Nps": {
         "type": "object",
         "required": [
           "id",
@@ -1146,7 +1255,7 @@
           }
         }
       },
-      "PaginationResult_NpsHeader": {
+      "PaginationResult_Nps": {
         "type": "object",
         "required": [
           "elements"
@@ -1222,6 +1331,25 @@
           }
         }
       },
+      "RegisterRequest": {
+        "type": "object",
+        "required": [
+          "username",
+          "password",
+          "invite_code"
+        ],
+        "properties": {
+          "invite_code": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        }
+      },
       "RevokeInvitationCode": {
         "type": "object",
         "required": [
@@ -1250,6 +1378,49 @@
             ],
             "format": "int32",
             "minimum": 0
+          }
+        }
+      },
+      "UpdateBlueprintAccessRequest": {
+        "type": "object",
+        "required": [
+          "id",
+          "access"
+        ],
+        "properties": {
+          "access": {
+            "$ref": "#/components/schemas/BlueprintAccess"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "UpdateBlueprintNpsRequest": {
+        "type": "object",
+        "required": [
+          "id",
+          "nps0",
+          "nps1",
+          "nps2"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "nps0": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nps1": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nps2": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       }

@@ -164,18 +164,12 @@ pub async fn create(
     access: models::BlueprintAccess,
     curve: models::BlueprintCurve,
     name: &str,
-    node_provider0: i32,
-    node_provider1: i32,
-    node_provider2: i32,
     typ: models::BlueprintType,
 ) -> Result<models::CreateBlueprintResponse, Error<CreateError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_access = access;
     let p_curve = curve;
     let p_name = name;
-    let p_node_provider0 = node_provider0;
-    let p_node_provider1 = node_provider1;
-    let p_node_provider2 = node_provider2;
     let p_typ = typ;
 
     let uri_str = format!("{}/api/v1/blueprint/create", configuration.base_path);
@@ -190,9 +184,6 @@ pub async fn create(
     multipart_form_params.insert("access", p_access.to_string());
     multipart_form_params.insert("curve", p_curve.to_string());
     multipart_form_params.insert("name", p_name.to_string());
-    multipart_form_params.insert("node_provider0", p_node_provider0.to_string());
-    multipart_form_params.insert("node_provider1", p_node_provider1.to_string());
-    multipart_form_params.insert("node_provider2", p_node_provider2.to_string());
     multipart_form_params.insert("typ", p_typ.to_string());
     req_builder = req_builder.form(&multipart_form_params);
 

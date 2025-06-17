@@ -11,6 +11,8 @@ Method | HTTP request | Description
 [**paginate_user_invitations**](AdminApi.md#paginate_user_invitations) | **GET** /admin/user/invitation/list | 
 [**revoke_nps_invitation_code**](AdminApi.md#revoke_nps_invitation_code) | **POST** /admin/nps/invitation/revoke | 
 [**revoke_user_invitation_code**](AdminApi.md#revoke_user_invitation_code) | **POST** /admin/user/invitation/revoke | 
+[**update_blueprint_access**](AdminApi.md#update_blueprint_access) | **POST** /admin/blueprint/update/access | update the blueprint access
+[**update_blueprint_nps**](AdminApi.md#update_blueprint_nps) | **POST** /admin/blueprint/update/nps | update the blueprint nps
 
 
 
@@ -203,6 +205,66 @@ No authorization required
 
 - **Content-Type**: application/x-www-form-urlencoded
 - **Accept**: Not defined
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
+## update_blueprint_access
+
+> update_blueprint_access(access, id)
+update the blueprint access
+
+### Parameters
+
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**access** | [**models::BlueprintAccess**](BlueprintAccess.md) |  | [required] |
+**id** | **uuid::Uuid** |  | [required] |
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/x-www-form-urlencoded
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
+## update_blueprint_nps
+
+> update_blueprint_nps(id, nps0, nps1, nps2)
+update the blueprint nps
+
+### Parameters
+
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**id** | **uuid::Uuid** |  | [required] |
+**nps0** | **i32** |  | [required] |
+**nps1** | **i32** |  | [required] |
+**nps2** | **i32** |  | [required] |
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/x-www-form-urlencoded
+- **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

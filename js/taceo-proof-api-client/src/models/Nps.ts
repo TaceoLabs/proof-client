@@ -16,44 +16,44 @@ import { mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface PaginationResultNpsHeaderElementsInner
+ * @interface Nps
  */
-export interface PaginationResultNpsHeaderElementsInner {
+export interface Nps {
     /**
      * 
      * @type {number}
-     * @memberof PaginationResultNpsHeaderElementsInner
+     * @memberof Nps
      */
     id: number;
     /**
      * 
      * @type {string}
-     * @memberof PaginationResultNpsHeaderElementsInner
+     * @memberof Nps
      */
     name: string;
     /**
      * 
      * @type {boolean}
-     * @memberof PaginationResultNpsHeaderElementsInner
+     * @memberof Nps
      */
     online: boolean;
 }
 
 /**
- * Check if a given object implements the PaginationResultNpsHeaderElementsInner interface.
+ * Check if a given object implements the Nps interface.
  */
-export function instanceOfPaginationResultNpsHeaderElementsInner(value: object): value is PaginationResultNpsHeaderElementsInner {
+export function instanceOfNps(value: object): value is Nps {
     if (!('id' in value) || value['id'] === undefined) return false;
     if (!('name' in value) || value['name'] === undefined) return false;
     if (!('online' in value) || value['online'] === undefined) return false;
     return true;
 }
 
-export function PaginationResultNpsHeaderElementsInnerFromJSON(json: any): PaginationResultNpsHeaderElementsInner {
-    return PaginationResultNpsHeaderElementsInnerFromJSONTyped(json, false);
+export function NpsFromJSON(json: any): Nps {
+    return NpsFromJSONTyped(json, false);
 }
 
-export function PaginationResultNpsHeaderElementsInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): PaginationResultNpsHeaderElementsInner {
+export function NpsFromJSONTyped(json: any, ignoreDiscriminator: boolean): Nps {
     if (json == null) {
         return json;
     }
@@ -65,11 +65,11 @@ export function PaginationResultNpsHeaderElementsInnerFromJSONTyped(json: any, i
     };
 }
 
-export function PaginationResultNpsHeaderElementsInnerToJSON(json: any): PaginationResultNpsHeaderElementsInner {
-    return PaginationResultNpsHeaderElementsInnerToJSONTyped(json, false);
+export function NpsToJSON(json: any): Nps {
+    return NpsToJSONTyped(json, false);
 }
 
-export function PaginationResultNpsHeaderElementsInnerToJSONTyped(value?: PaginationResultNpsHeaderElementsInner | null, ignoreDiscriminator: boolean = false): any {
+export function NpsToJSONTyped(value?: Nps | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

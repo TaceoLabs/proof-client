@@ -69,6 +69,24 @@ pub enum RevokeUserInvitationCodeError {
     UnknownValue(serde_json::Value),
 }
 
+/// struct for typed errors of method [`update_blueprint_access`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum UpdateBlueprintAccessError {
+    Status403(),
+    Status5XX(models::ApiError),
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`update_blueprint_nps`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum UpdateBlueprintNpsError {
+    Status403(),
+    Status5XX(models::ApiError),
+    UnknownValue(serde_json::Value),
+}
+
 pub async fn create_nps_invite_code(
     configuration: &configuration::Configuration,
 ) -> Result<String, Error<CreateNpsInviteCodeError>> {
@@ -359,6 +377,92 @@ pub async fn revoke_user_invitation_code(
     } else {
         let content = resp.text().await?;
         let entity: Option<RevokeUserInvitationCodeError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
+pub async fn update_blueprint_access(
+    configuration: &configuration::Configuration,
+    access: models::BlueprintAccess,
+    id: &str,
+) -> Result<(), Error<UpdateBlueprintAccessError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_access = access;
+    let p_id = id;
+
+    let uri_str = format!("{}/admin/blueprint/update/access", configuration.base_path);
+    let mut req_builder = configuration
+        .client
+        .request(reqwest::Method::POST, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+    let mut multipart_form_params = std::collections::HashMap::new();
+    multipart_form_params.insert("access", p_access.to_string());
+    multipart_form_params.insert("id", p_id.to_string());
+    req_builder = req_builder.form(&multipart_form_params);
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+
+    if !status.is_client_error() && !status.is_server_error() {
+        Ok(())
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<UpdateBlueprintAccessError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
+pub async fn update_blueprint_nps(
+    configuration: &configuration::Configuration,
+    id: &str,
+    nps0: i32,
+    nps1: i32,
+    nps2: i32,
+) -> Result<(), Error<UpdateBlueprintNpsError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_id = id;
+    let p_nps0 = nps0;
+    let p_nps1 = nps1;
+    let p_nps2 = nps2;
+
+    let uri_str = format!("{}/admin/blueprint/update/nps", configuration.base_path);
+    let mut req_builder = configuration
+        .client
+        .request(reqwest::Method::POST, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+    let mut multipart_form_params = std::collections::HashMap::new();
+    multipart_form_params.insert("id", p_id.to_string());
+    multipart_form_params.insert("nps0", p_nps0.to_string());
+    multipart_form_params.insert("nps1", p_nps1.to_string());
+    multipart_form_params.insert("nps2", p_nps2.to_string());
+    req_builder = req_builder.form(&multipart_form_params);
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+
+    if !status.is_client_error() && !status.is_server_error() {
+        Ok(())
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<UpdateBlueprintNpsError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,

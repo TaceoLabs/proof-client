@@ -23,6 +23,7 @@ generate-rust-api-client:
   sed -i 's|// TODO: support file upload for '\''input_party2'\'' parameter|multipart_form = multipart_form.part("input_party2", reqwest::multipart::Part::stream(p_input_party2));|' src/apis/job_api.rs && \
   sed -i 's/models::models/models/' src/apis/blueprint_api.rs && \
   sed -i 's/models::models/models/' src/apis/job_api.rs && \
+  sed -i 's/models::models/models/' src/apis/admin_api.rs && \
   sed -i 's/file: std::path::PathBuf,/file: impl Into<reqwest::Body>,/' src/apis/blueprint_api.rs && \
   sed -i 's/let mut multipart_form = reqwest::multipart::Form::new();/let multipart_form = reqwest::multipart::Form::new().part("file", reqwest::multipart::Part::stream(p_file));/' src/apis/blueprint_api.rs && \
   sed -i '/fn default() -> Self {/,/}/c\    fn default() -> Self {\n use reqwest::ClientBuilder;\n       let client = ClientBuilder::new()\n            .cookie_store(true)\n            .build()\n            .expect("can build reqwest client");\n        Configuration {\n            base_path: "http://localhost".to_owned(),\n            user_agent: Some("OpenAPI-Generator/1.0/rust".to_owned()),\n            client,\n            basic_auth: None,\n            oauth_access_token: None,\n            bearer_access_token: None,\n            api_key: None,\n        }\n    ' src/apis/configuration.rs && \

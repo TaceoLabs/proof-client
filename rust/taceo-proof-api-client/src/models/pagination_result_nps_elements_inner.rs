@@ -12,7 +12,7 @@ use crate::models;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
-pub struct PaginationResultNpsHeaderElementsInner {
+pub struct PaginationResultNpsElementsInner {
     #[serde(rename = "id")]
     pub id: i32,
     #[serde(rename = "name")]
@@ -21,8 +21,8 @@ pub struct PaginationResultNpsHeaderElementsInner {
     pub online: bool,
 }
 
-impl PaginationResultNpsHeaderElementsInner {
-    pub fn new(id: i32, name: String, online: bool) -> PaginationResultNpsHeaderElementsInner {
-        PaginationResultNpsHeaderElementsInner { id, name, online }
+impl PaginationResultNpsElementsInner {
+    pub fn new(id: i32, name: String, online: bool) -> PaginationResultNpsElementsInner {
+        PaginationResultNpsElementsInner { id, name, online }
     }
 }

@@ -33,6 +33,12 @@ export interface BlueprintReadyProbe {
      * @memberof BlueprintReadyProbe
      */
     missingAuxData: Array<AuxiliaryType>;
+    /**
+     * 
+     * @type {Array<AuxiliaryType>}
+     * @memberof BlueprintReadyProbe
+     */
+    presentAuxData: Array<AuxiliaryType>;
 }
 
 /**
@@ -40,6 +46,7 @@ export interface BlueprintReadyProbe {
  */
 export function instanceOfBlueprintReadyProbe(value: object): value is BlueprintReadyProbe {
     if (!('missingAuxData' in value) || value['missingAuxData'] === undefined) return false;
+    if (!('presentAuxData' in value) || value['presentAuxData'] === undefined) return false;
     return true;
 }
 
@@ -54,6 +61,7 @@ export function BlueprintReadyProbeFromJSONTyped(json: any, ignoreDiscriminator:
     return {
         
         'missingAuxData': ((json['missing_aux_data'] as Array<any>).map(AuxiliaryTypeFromJSON)),
+        'presentAuxData': ((json['present_aux_data'] as Array<any>).map(AuxiliaryTypeFromJSON)),
     };
 }
 
@@ -69,6 +77,7 @@ export function BlueprintReadyProbeToJSONTyped(value?: BlueprintReadyProbe | nul
     return {
         
         'missing_aux_data': ((value['missingAuxData'] as Array<any>).map(AuxiliaryTypeToJSON)),
+        'present_aux_data': ((value['presentAuxData'] as Array<any>).map(AuxiliaryTypeToJSON)),
     };
 }
 

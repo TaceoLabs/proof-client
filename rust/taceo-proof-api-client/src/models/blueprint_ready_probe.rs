@@ -15,10 +15,18 @@ use serde::{Deserialize, Serialize};
 pub struct BlueprintReadyProbe {
     #[serde(rename = "missing_aux_data")]
     pub missing_aux_data: Vec<models::AuxiliaryType>,
+    #[serde(rename = "present_aux_data")]
+    pub present_aux_data: Vec<models::AuxiliaryType>,
 }
 
 impl BlueprintReadyProbe {
-    pub fn new(missing_aux_data: Vec<models::AuxiliaryType>) -> BlueprintReadyProbe {
-        BlueprintReadyProbe { missing_aux_data }
+    pub fn new(
+        missing_aux_data: Vec<models::AuxiliaryType>,
+        present_aux_data: Vec<models::AuxiliaryType>,
+    ) -> BlueprintReadyProbe {
+        BlueprintReadyProbe {
+            missing_aux_data,
+            present_aux_data,
+        }
     }
 }

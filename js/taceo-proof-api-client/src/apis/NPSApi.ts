@@ -16,13 +16,13 @@
 import * as runtime from '../runtime';
 import type {
   ApiError,
-  PaginationResultNpsHeader,
+  PaginationResultNps,
 } from '../models/index';
 import {
     ApiErrorFromJSON,
     ApiErrorToJSON,
-    PaginationResultNpsHeaderFromJSON,
-    PaginationResultNpsHeaderToJSON,
+    PaginationResultNpsFromJSON,
+    PaginationResultNpsToJSON,
 } from '../models/index';
 
 export interface ListRequest {
@@ -36,9 +36,9 @@ export interface ListRequest {
 export class NPSApi extends runtime.BaseAPI {
 
     /**
-     * get paginated node providers - used for blueprint creators to define clusters
+     * get paginated node providers
      */
-    async listRaw(requestParameters: ListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginationResultNpsHeader>> {
+    async listRaw(requestParameters: ListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginationResultNps>> {
         const queryParameters: any = {};
 
         if (requestParameters['cursor'] != null) {
@@ -58,13 +58,13 @@ export class NPSApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => PaginationResultNpsHeaderFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => PaginationResultNpsFromJSON(jsonValue));
     }
 
     /**
-     * get paginated node providers - used for blueprint creators to define clusters
+     * get paginated node providers
      */
-    async list(requestParameters: ListRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginationResultNpsHeader> {
+    async list(requestParameters: ListRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginationResultNps> {
         const response = await this.listRaw(requestParameters, initOverrides);
         return await response.value();
     }
