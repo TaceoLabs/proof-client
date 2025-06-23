@@ -79,10 +79,10 @@ export default function Home() {
       } else {
         if (wtnsExt == "Browser") {
           input = JSON.parse(await selectedFile!.text());
-          witnessCalculator = await wc(await wasm!.bytes());
+          witnessCalculator = await wc(new Uint8Array(await wasm!.arrayBuffer()));
           witness = await witnessCalculator.calculateWTNSBin(input, 0);
         } else {
-          witness = await selectedFile!.bytes();
+          witness = new Uint8Array(await selectedFile!.arrayBuffer());
         }
         if (jobType == JobType.ShamirProve) {
           jobId = await scheduleProveJobShamir(jobInstance, blueprint, voucher, curve, keyMaterial, numInputs, witness);
