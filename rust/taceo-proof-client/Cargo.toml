@@ -11,13 +11,10 @@ publish = false
 readme = "./README.md"
 
 [dependencies]
-ark-groth16 = "0.5.0"
-ark-serialize = "0.5.0"
 ark-ec = "0.5.0"
 bincode = "1.3.3"
 crypto_box = { version = "0.9.1", features = ["std", "seal"] }
 co-circom-types = { git = "https://github.com/TaceoLabs/co-snarks", rev = "36d73df" }
-co-groth16 = { git = "https://github.com/TaceoLabs/co-snarks", rev = "36d73df", features = ["verifier"] }
 circom-types = { git = "https://github.com/TaceoLabs/co-snarks", rev = "36d73df", features = ["ark-bls12-377", "ark-bls12-381"] }
 taceo-proof-api-client = { path = "../taceo-proof-api-client" }
 base64ct = { version = "1.7.3", features = ["alloc"] }
@@ -35,4 +32,5 @@ tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 tokio = { version = "1.44.2", features = ["full"] }
 clap = { version = "4.5.37", features = ["derive", "env"] }
 serde_json = "1.0.140"
+num-traits = "0.2.19"
 

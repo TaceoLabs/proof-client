@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useRef, useState } from "react";
 import { BlueprintApi, BlueprintCurve, Configuration, ConfigurationParameters, JobApi, JobStatus, JobType, NpsKeyMaterial, ProofResult } from '@taceo/proof-api-client';
-import { scheduleFullJobRep3, scheduleProveJobShamir, scheduleProveJobRep3, verifyProofResultSignature} from '@taceo/proof-client-browser'
+import { scheduleFullJobRep3, scheduleProveJobShamir, scheduleProveJobRep3, verifyProofResultSignature } from '@taceo/proof-client-browser'
 import wc from "../witness-calculator.js"; // generated with circom
 
 type WitnessExtension = "Upload" | "Browser";
@@ -72,7 +72,7 @@ export default function Home() {
     setLoading(true);
 
     try {
-      const keyMaterial = await blueprintInstance.blueprintKeyMaterial({id: blueprint});
+      const keyMaterial = await blueprintInstance.blueprintKeyMaterial({ id: blueprint });
       if (jobType == JobType.Rep3Full) {
         input = JSON.parse(await selectedFile!.text());
         jobId = await scheduleFullJobRep3(jobInstance, blueprint, voucher, curve, keyMaterial, publicInputs, input);
@@ -204,7 +204,7 @@ export default function Home() {
               <button className="text-[14pt] text-black font-bold rounded-[5pt] bg-[#52ffc5] py-2 pl-3 pr-5 inline-flex items-center" type="submit" disabled={true}>
                 <svg className="mr-3 ml-1 size-6 animate-spin" viewBox="0 0 64 64">
                   <circle fill="none" strokeWidth="10" className="stroke-black opacity-40" cx="32" cy="32" r="24" />
-                  <circle fill="none" strokeWidth="10" className="stroke-black" strokeDasharray="250" strokeDashoffset="210" cx="32" cy="32" r="24"/>
+                  <circle fill="none" strokeWidth="10" className="stroke-black" strokeDasharray="250" strokeDashoffset="210" cx="32" cy="32" r="24" />
                 </svg>
                 Loading...
               </button>
@@ -214,12 +214,16 @@ export default function Home() {
               </button>
             }
           </div>
-          <div className="pt-5 mx-auto">
+          <div className="pt-5 mx-auto text-center">
             {error && <div className="text-[#ff0000]">{error}</div>}
             {result && (
               <div>
-                <a className="underline text-current" href={`data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(result))}`} download="result.json">
-                  Download Result
+                <a className="underline text-current" href={`data:text/json;charset=utf-8,${encodeURIComponent(result.proof)}`} download="proof.json">
+                  Download Proof
+                </a>
+                <br />
+                <a className="underline text-current" href={`data:text/json;charset=utf-8,${encodeURIComponent(result.publicInputs)}`} download="public.json">
+                  Download Public Inputs
                 </a>
               </div>
             )}

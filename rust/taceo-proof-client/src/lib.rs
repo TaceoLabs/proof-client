@@ -1,5 +1,4 @@
 use ark_ec::pairing::Pairing;
-use ark_serialize::CanonicalDeserialize;
 use base64ct::{Base64, Encoding};
 use circom_types::{
     Witness,
@@ -8,13 +7,12 @@ use circom_types::{
 use co_circom_types::{
     CompressedRep3SharedWitness, Compression, Input, ShamirSharedWitness, split_input,
 };
-use co_groth16::Proof;
 use crypto_box::{PublicKey, aead::OsRng};
 use ed25519_dalek::{Digest, Sha512, Signature, VerifyingKey};
 use eyre::Context;
 use taceo_proof_api_client::{
     apis::{blueprint_api, configuration::Configuration, job_api},
-    models::{JobStatus, JobType, ProofResult},
+    models::{JobType, ProofResult},
 };
 use uuid::Uuid;
 
@@ -89,15 +87,18 @@ pub fn verify_proof_result_signature(
     Ok(())
 }
 
-fn seal_shares(keys: &[PublicKey; 3], shares: [Vec<u8>; 3]) -> eyre::Result<[Vec<u8>; 3]> {
+fn seal_shares(keys: &[NpsKeyMaterial; 3], shares: [Vec<u8>; 3]) -> eyre::Result<[Vec<u8>; 3]> {
     tracing::debug!("sealing shares...");
     let ct0 = keys[0]
+        .enc_key
         .seal(&mut OsRng, &shares[0])
         .context("while sealing share")?;
     let ct1 = keys[1]
+        .enc_key
         .seal(&mut OsRng, &shares[1])
         .context("while sealing share")?;
     let ct2 = keys[2]
+        .enc_key
         .seal(&mut OsRng, &shares[2])
         .context("while sealing share")?;
     Ok([ct0, ct1, ct2])
@@ -108,7 +109,7 @@ pub async fn schedule_full_job_rep3<P>(
     config: &Configuration,
     blueprint_id: Uuid,
     voucher: Option<&str>,
-    keys: &[PublicKey; 3],
+    keys: &[NpsKeyMaterial; 3],
     input: Input,
     public_inputs: &[String],
 ) -> eyre::Result<Uuid>
@@ -148,7 +149,7 @@ pub async fn schedule_prove_job_rep3<P>(
     config: &Configuration,
     blueprint_id: Uuid,
     voucher: Option<&str>,
-    keys: &[PublicKey; 3],
+    keys: &[NpsKeyMaterial; 3],
     witness: Witness<P::ScalarField>,
     num_pub_inputs: usize,
 ) -> eyre::Result<Uuid>
@@ -194,7 +195,7 @@ pub async fn schedule_prove_job_shamir<P>(
     config: &Configuration,
     blueprint_id: Uuid,
     voucher: Option<&str>,
-    keys: &[PublicKey; 3],
+    keys: &[NpsKeyMaterial; 3],
     witness: Witness<P::ScalarField>,
     num_pub_inputs: usize,
 ) -> eyre::Result<Uuid>
@@ -237,37 +238,4 @@ where
     let job_id = res.job_id;
     tracing::debug!("job_id = {job_id}");
     Ok(job_id)
-}
-
-/// The result of a scheduled job, represents either a successful proof, a error, or the status of a still running job
-#[derive(Debug, Clone)]
-pub enum JobResult<P: Pairing> {
-    Ok((Proof<P>, Vec<P::ScalarField>)),
-    Running(JobStatus),
-    Err(String),
-}
-
-pub async fn get_job_result<P: Pairing>(
-    config: &Configuration,
-    id: Uuid,
-) -> eyre::Result<JobResult<P>> {
-    let results = job_api::get_results(config, &id.to_string()).await?;
-    tracing::debug!("result from api: {results:?}");
-    match results.result0.status {
-        JobStatus::Success => {
-            let proof_res = results.result0.ok.unwrap().unwrap();
-            tracing::debug!("deser proof...");
-            let proof = Proof::<P>::deserialize_uncompressed_unchecked(
-                Base64::decode_vec(&proof_res.proof)?.as_slice(),
-            )?;
-            tracing::debug!("deser public_inputs...");
-            let public_inputs = Vec::<P::ScalarField>::deserialize_uncompressed_unchecked(
-                Base64::decode_vec(&proof_res.public_inputs)?.as_slice(),
-            )?;
-            tracing::debug!("done");
-            Ok(JobResult::Ok((proof, public_inputs)))
-        }
-        JobStatus::Failed => Ok(JobResult::Err(results.result0.error.unwrap().unwrap())),
-        status => Ok(JobResult::Running(status)),
-    }
 }

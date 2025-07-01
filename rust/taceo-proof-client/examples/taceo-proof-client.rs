@@ -4,17 +4,15 @@ use ark_bls12_377::Bls12_377;
 use ark_bls12_381::Bls12_381;
 use ark_bn254::Bn254;
 use ark_ec::pairing::Pairing;
-use ark_groth16::VerifyingKey;
-use ark_serialize::CanonicalDeserialize;
 use circom_types::{
     R1CS, Witness,
-    groth16::JsonVerificationKey,
     traits::{CircomArkworksPairingBridge, CircomArkworksPrimeFieldBridge},
 };
 use clap::{ArgGroup, Parser, ValueEnum};
-use co_groth16::CoGroth16;
-use taceo_proof_api_client::apis::configuration::Configuration;
-use taceo_proof_client::JobResult;
+use taceo_proof_api_client::{
+    apis::{configuration::Configuration, job_api},
+    models::JobStatus,
+};
 use uuid::Uuid;
 
 #[derive(Debug, Clone, Copy, ValueEnum)]
@@ -73,9 +71,13 @@ struct Args {
     #[clap(long, env = "PROOF_PUBLIC_INPUTS", required_if_eq("job", "rep3-full"))]
     pub public_inputs: Option<Vec<String>>,
 
-    /// The path to verifying key
-    #[clap(long, env = "PROOF_VERIFYING_KEY")]
-    pub vk: Option<PathBuf>,
+    /// The output file where the final proof is written to
+    #[arg(long, env = "PROOF_OUT", default_value = "proof.json")]
+    pub out: PathBuf,
+
+    /// The output JSON file where the public inputs are written to
+    #[arg(long, env = "PROOF_OUT_PUBLIC_INPUTS", default_value = "public.json")]
+    pub out_public_inputs: PathBuf,
 }
 
 async fn run<P>(config: &Configuration, args: Args) -> eyre::Result<()>
@@ -92,10 +94,7 @@ where
     };
 
     let keys = taceo_proof_client::get_nps_key_material(config, args.blueprint).await?;
-    let enc_keys = keys.clone().map(|k| k.enc_key);
-    let _verify_keys = keys.clone().map(|k| k.verify_key);
 
-    // schedule job
     tracing::info!("scheduling job...");
     let job_id = match args.job {
         JobType::Rep3Full => {
@@ -104,7 +103,7 @@ where
                 config,
                 args.blueprint,
                 args.voucher.as_deref(),
-                &enc_keys,
+                &keys,
                 input,
                 &args
                     .public_inputs
@@ -118,7 +117,7 @@ where
                 config,
                 args.blueprint,
                 args.voucher.as_deref(),
-                &enc_keys,
+                &keys,
                 witness,
                 num_inputs,
             )
@@ -130,7 +129,7 @@ where
                 config,
                 args.blueprint,
                 args.voucher.as_deref(),
-                &enc_keys,
+                &keys,
                 witness,
                 num_inputs,
             )
@@ -138,33 +137,32 @@ where
         }
     };
 
-    // poll job status to get result
-    tracing::info!("waiting for result...");
-    loop {
-        match taceo_proof_client::get_job_result(config, job_id).await? {
-            JobResult::Ok((proof, public_inputs)) => {
-                tracing::info!("got proof");
-
-                if let Some(vk) = args.vk {
-                    let vk = if vk.extension().is_some_and(|ext| ext == "json") {
-                        JsonVerificationKey::from_reader(File::open(vk)?)?.into()
-                    } else {
-                        VerifyingKey::<P>::deserialize_uncompressed_unchecked(File::open(vk)?)?
-                    };
-                    tracing::info!("verifying proof...");
-                    CoGroth16::verify(&vk, &proof, &public_inputs)?;
-                }
-                break;
+    let (proof, public_inputs) = loop {
+        let results = job_api::get_results(config, &job_id.to_string()).await?;
+        tracing::debug!("result from api: {results:?}");
+        match results.result0.status {
+            JobStatus::Success => {
+                // contains the proof and public_inputs as JSON strings for a CircomGroth16 proof
+                // or as base64 encoded ark_serialize serialized bytes for a LibsnarkGroth16 proof
+                let proof_res = results.result0.ok.unwrap().unwrap();
+                break (proof_res.proof, proof_res.public_inputs);
             }
-            JobResult::Err(err) => {
-                tracing::error!("got error: {err}");
-                break;
-            }
-            JobResult::Running(_) => {
+            JobStatus::Failed => eyre::bail!(results.result0.error.unwrap().unwrap()),
+            _ => {
+                tracing::info!("waiting for result...");
                 std::thread::sleep(Duration::from_secs(1));
             }
         }
-    }
+    };
+
+    std::fs::write(&args.out, proof)?;
+    tracing::info!("Wrote proof to {}", args.out.display());
+
+    std::fs::write(&args.out_public_inputs, public_inputs)?;
+    tracing::info!(
+        "Wrote public inputs to {}",
+        args.out_public_inputs.display()
+    );
 
     Ok(())
 }

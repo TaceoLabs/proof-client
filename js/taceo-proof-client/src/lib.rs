@@ -44,8 +44,8 @@ pub fn seal_share(pk_b64: &str, share: Vec<u8>) -> Result<Vec<u8>, JsError> {
 #[wasm_bindgen]
 pub fn verify_proof_result_signature(
     job_id: &str,
-    proof_b64: &str,
-    public_inputs_b64: &str,
+    proof: &str,
+    public_inputs: &str,
     vk_b64: &str,
     signature_b64: &str,
 ) -> Result<(), JsError> {
@@ -64,13 +64,10 @@ pub fn verify_proof_result_signature(
             .try_into()
             .map_err(|_| JsError::new("invalid signature size"))?,
     );
-    let proof_bytes = Base64::decode_vec(proof_b64)?;
-    let public_inputs_bytes = Base64::decode_vec(public_inputs_b64)?;
-
     let mut digest = Sha512::new();
     digest.update(job_id.as_bytes());
-    digest.update(proof_bytes);
-    digest.update(public_inputs_bytes);
+    digest.update(proof);
+    digest.update(public_inputs);
 
     vk.verify_prehashed_strict(
         digest,
