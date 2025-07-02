@@ -652,52 +652,6 @@
         }
       }
     },
-    "/api/v1/jobs/job/{id}": {
-      "get": {
-        "tags": [
-          "Job"
-        ],
-        "summary": "get job results",
-        "operationId": "get_results",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "The uuid of the job",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Returns job status and if present the finished proof or error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/JobResults"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "No such job"
-          },
-          "5XX": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v1/jobs/schedule": {
       "post": {
         "tags": [
@@ -1145,69 +1099,6 @@
           }
         }
       },
-      "JobResult": {
-        "type": "object",
-        "required": [
-          "status"
-        ],
-        "properties": {
-          "error": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "ok": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "$ref": "#/components/schemas/ProofResult"
-              }
-            ]
-          },
-          "signature": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "status": {
-            "$ref": "#/components/schemas/JobStatus"
-          }
-        }
-      },
-      "JobResults": {
-        "type": "object",
-        "required": [
-          "result0",
-          "result1",
-          "result2"
-        ],
-        "properties": {
-          "result0": {
-            "$ref": "#/components/schemas/JobResult"
-          },
-          "result1": {
-            "$ref": "#/components/schemas/JobResult"
-          },
-          "result2": {
-            "$ref": "#/components/schemas/JobResult"
-          }
-        }
-      },
-      "JobStatus": {
-        "type": "string",
-        "enum": [
-          "Pending",
-          "InNpsQueue",
-          "InCseQueue",
-          "Running",
-          "Failed",
-          "Success"
-        ]
-      },
       "JobType": {
         "type": "string",
         "enum": [
@@ -1313,21 +1204,6 @@
             ],
             "format": "int64",
             "minimum": 0
-          }
-        }
-      },
-      "ProofResult": {
-        "type": "object",
-        "required": [
-          "proof",
-          "public_inputs"
-        ],
-        "properties": {
-          "proof": {
-            "type": "string"
-          },
-          "public_inputs": {
-            "type": "string"
           }
         }
       },

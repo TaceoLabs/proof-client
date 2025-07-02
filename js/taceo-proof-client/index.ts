@@ -1,5 +1,5 @@
 import { seal_share, split_input_rep3_bls12_381, split_input_rep3_bn254, split_witness_rep3_bls12_381, split_witness_rep3_bn254, split_witness_shamir_bls12_381, split_witness_shamir_bn254, split_input_rep3_bls12_377, split_witness_rep3_bls12_377, split_witness_shamir_bls12_377, verify_proof_result_signature } from "./pkg/taceo_proof_wasm.js";
-import { BlueprintCurve, JobApi, JobType, NpsKeyMaterial, ProofResult } from '@taceo/proof-api-client';
+import { BlueprintCurve, JobApi, JobType, NpsKeyMaterial } from '@taceo/proof-api-client';
 
 
 async function scheduleJob(
@@ -29,9 +29,9 @@ async function scheduleJob(
 /**
  * Verify the signature of a proof result. Throws an error if the signature cannot be verified.
  */
-export function verifyProofResultSignature(jobId: string, proofResult: ProofResult, signature: string,
+export function verifyProofResultSignature(jobId: string, proof: string, publicInputs: string, signature: string,
   npsKeyMaterial: NpsKeyMaterial) {
-  verify_proof_result_signature(jobId, proofResult.proof, proofResult.publicInputs, npsKeyMaterial.verifyKey, signature)
+  verify_proof_result_signature(jobId, proof, publicInputs, npsKeyMaterial.verifyKey, signature)
 }
 
 /**
@@ -117,3 +117,77 @@ export async function scheduleProveJobShamir(apiInstance: JobApi,
   return await scheduleJob(apiInstance, blueprintId, JobType.ShamirProve, code, shares, keyMaterial);
 }
 
+export type StopStrategy = "First" | "All" | "Majority";
+
+export interface SubscribeExecutionRequest {
+  execution_id: string;
+  stop_on_finished_reports: StopStrategy;
+  with_status_updates?: boolean;
+}
+
+export type JobStatus =
+  | "Pending"
+  | "InNpsQueue"
+  | "InCseQueue"
+  | "Running"
+  | "Failed"
+  | "Success";
+
+export interface NpsStatusUpdate {
+  nps: number;
+  status: JobStatus;
+}
+
+export interface SignedResults {
+  signatures: { [key: number]: string };
+  proof: string;
+  public_inputs: string;
+}
+
+export interface FailedReason {
+  nps: number;
+  error: string;
+  signature: string;
+}
+
+export type WebSocketMessage =
+  | { Success: SignedResults }
+  | { Update: NpsStatusUpdate[] }
+  | { Failed: FailedReason }
+  | { Err: string };
+
+/**
+ * Fetch the result for the given jobId via a WebSocket connection.
+ */
+export function fetchJobResult(
+  url: string,
+  jobId: string,
+  stopStrategy?: StopStrategy,
+): Promise<SignedResults> {
+  return new Promise((resolve, reject) => {
+    const socket = new WebSocket(url);
+    socket.onopen = () => {
+      const request: SubscribeExecutionRequest = {
+        execution_id: jobId,
+        stop_on_finished_reports: stopStrategy ? stopStrategy! : "First",
+        with_status_updates: false,
+      };
+      socket.send(JSON.stringify(request));
+    };
+    socket.onmessage = (event) => {
+      const msg: WebSocketMessage = JSON.parse(event.data);
+      if ("Success" in msg) {
+        resolve(msg.Success);
+      } else if ("Failed" in msg) {
+        reject(new Error(msg.Failed.error))
+      } else if ("Err" in msg) {
+        reject(new Error(msg.Err))
+      }
+      socket.close();
+    };
+    socket.onerror = (event) => {
+      reject(new Error(`ws error: ${event}`))
+      socket.close();
+    };
+  });
+}

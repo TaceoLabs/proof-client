@@ -14,9 +14,6 @@ docs/BlueprintType.md
 docs/CreateBlueprintResponse.md
 docs/HealthApi.md
 docs/JobApi.md
-docs/JobResult.md
-docs/JobResults.md
-docs/JobStatus.md
 docs/JobType.md
 docs/Nps.md
 docs/NpsApi.md
@@ -24,7 +21,6 @@ docs/NpsKeyMaterial.md
 docs/PaginationResultNps.md
 docs/PaginationResultNpsElementsInner.md
 docs/PaginationResultString.md
-docs/ProofResult.md
 docs/ScheduleJobResponse.md
 docs/UserApi.md
 git_push.sh
@@ -44,9 +40,6 @@ src/models/blueprint_curve.rs
 src/models/blueprint_ready_probe.rs
 src/models/blueprint_type.rs
 src/models/create_blueprint_response.rs
-src/models/job_result.rs
-src/models/job_results.rs
-src/models/job_status.rs
 src/models/job_type.rs
 src/models/mod.rs
 src/models/nps.rs
@@ -54,5 +47,4 @@ src/models/nps_key_material.rs
 src/models/pagination_result_nps.rs
 src/models/pagination_result_nps_elements_inner.rs
 src/models/pagination_result_string.rs
-src/models/proof_result.rs
 src/models/schedule_job_response.rs

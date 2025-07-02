@@ -44,7 +44,6 @@ Class | Method | HTTP request | Description
 *HealthApi* | [**health**](docs/HealthApi.md#health) | **GET** /health | 
 *HealthApi* | [**live**](docs/HealthApi.md#live) | **GET** /health/live | 
 *HealthApi* | [**ready**](docs/HealthApi.md#ready) | **GET** /health/ready | 
-*JobApi* | [**get_results**](docs/JobApi.md#get_results) | **GET** /api/v1/jobs/job/{id} | get job results
 *JobApi* | [**schedule_job**](docs/JobApi.md#schedule_job) | **POST** /api/v1/jobs/schedule | create a new job
 *NpsApi* | [**list**](docs/NpsApi.md#list) | **GET** /api/v1/nps/list | get paginated node providers
 *UserApi* | [**login**](docs/UserApi.md#login) | **POST** /login | 
@@ -61,16 +60,12 @@ Class | Method | HTTP request | Description
  - [BlueprintReadyProbe](docs/BlueprintReadyProbe.md)
  - [BlueprintType](docs/BlueprintType.md)
  - [CreateBlueprintResponse](docs/CreateBlueprintResponse.md)
- - [JobResult](docs/JobResult.md)
- - [JobResults](docs/JobResults.md)
- - [JobStatus](docs/JobStatus.md)
  - [JobType](docs/JobType.md)
  - [Nps](docs/Nps.md)
  - [NpsKeyMaterial](docs/NpsKeyMaterial.md)
  - [PaginationResultNps](docs/PaginationResultNps.md)
  - [PaginationResultNpsElementsInner](docs/PaginationResultNpsElementsInner.md)
  - [PaginationResultString](docs/PaginationResultString.md)
- - [ProofResult](docs/ProofResult.md)
  - [ScheduleJobResponse](docs/ScheduleJobResponse.md)
 
 

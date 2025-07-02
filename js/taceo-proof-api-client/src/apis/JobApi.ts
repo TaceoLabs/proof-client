@@ -16,24 +16,17 @@
 import * as runtime from '../runtime';
 import type {
   ApiError,
-  JobResults,
   JobType,
   ScheduleJobResponse,
 } from '../models/index';
 import {
     ApiErrorFromJSON,
     ApiErrorToJSON,
-    JobResultsFromJSON,
-    JobResultsToJSON,
     JobTypeFromJSON,
     JobTypeToJSON,
     ScheduleJobResponseFromJSON,
     ScheduleJobResponseToJSON,
 } from '../models/index';
-
-export interface GetResultsRequest {
-    id: string;
-}
 
 export interface ScheduleJobRequest {
     aBlueprintId: string;
@@ -48,39 +41,6 @@ export interface ScheduleJobRequest {
  * 
  */
 export class JobApi extends runtime.BaseAPI {
-
-    /**
-     * get job results
-     */
-    async getResultsRaw(requestParameters: GetResultsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<JobResults>> {
-        if (requestParameters['id'] == null) {
-            throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling getResults().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/v1/jobs/job/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => JobResultsFromJSON(jsonValue));
-    }
-
-    /**
-     * get job results
-     */
-    async getResults(requestParameters: GetResultsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<JobResults> {
-        const response = await this.getResultsRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
 
     /**
      * create a new job

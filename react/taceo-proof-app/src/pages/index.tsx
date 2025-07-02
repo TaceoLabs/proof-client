@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useRef, useState } from "react";
-import { BlueprintApi, BlueprintCurve, Configuration, ConfigurationParameters, JobApi, JobStatus, JobType, NpsKeyMaterial, ProofResult } from '@taceo/proof-api-client';
-import { scheduleFullJobRep3, scheduleProveJobShamir, scheduleProveJobRep3, verifyProofResultSignature } from '@taceo/proof-client-browser'
+import { BlueprintApi, BlueprintCurve, Configuration, ConfigurationParameters, JobApi, JobType } from '@taceo/proof-api-client';
+import { scheduleFullJobRep3, scheduleProveJobShamir, scheduleProveJobRep3, fetchJobResult, verifyProofResultSignature } from '@taceo/proof-client-browser'
 import wc from "../witness-calculator.js"; // generated with circom
 
 type WitnessExtension = "Upload" | "Browser";
@@ -16,7 +16,8 @@ export default function Home() {
   const [voucher, setVoucher] = useState<string | null>(null);
   const [blueprint, setBlueprint] = useState<string>("");
   const [curve, setCurve] = useState<BlueprintCurve>(BlueprintCurve.Bn254);
-  const [result, setResult] = useState<ProofResult | null>(null);
+  const [proof, setProof] = useState<string | null>(null);
+  const [publicInputsOut, setPublicInputsOut] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [jobType, setJobType] = useState<JobType>(JobType.ShamirProve);
@@ -28,31 +29,12 @@ export default function Home() {
   const wasmRef = useRef<HTMLInputElement>(null);
   const [wtnsExt, setWtnsExt] = useState<WitnessExtension>("Upload");
 
-  const pollProofResult = async (jobId: string, keyMaterial: NpsKeyMaterial[]): Promise<ProofResult | null> => {
-    while (true) {
-      try {
-        const jobResults = await jobInstance.getResults({ id: jobId });
-        if (jobResults.result0.status == JobStatus.Success && jobResults.result0.signature != null) {
-          const proofResult = jobResults.result0.ok!;
-          verifyProofResultSignature(jobId, proofResult, jobResults.result0.signature, keyMaterial[0]);
-          return proofResult;
-        } else if (jobResults.result0.status == JobStatus.Failed) {
-          setError(jobResults.result0.error ?? "something went wrong");
-          return null;
-        }
-      } catch (error) {
-        console.error('error:', error);
-        return null;
-      }
-      await new Promise(resolve => setTimeout(resolve, 1000));
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     setError(null);
-    setResult(null);
+    setProof(null);
+    setPublicInputsOut(null);
 
     if (selectedFile == null) {
       setError("input file missing");
@@ -90,11 +72,14 @@ export default function Home() {
           jobId = await scheduleProveJobRep3(jobInstance, blueprint, voucher, curve, keyMaterial, numInputs, witness);
         }
       }
-      const result = await pollProofResult(jobId, keyMaterial);
-      setResult(result);
+      const jobResult = await fetchJobResult("ws://localhost:1234/api/v1/reports/subs", jobId);
+      // TODO
+      // verifyProofResultSignature(jobId, jobResult.proof, jobResult.public_inputs, ...)
+      setProof(jobResult.proof);
+      setPublicInputsOut(jobResult.public_inputs);
+      setLoading(false);
     } catch (error: any) {
       setError(error.message);
-    } finally {
       setLoading(false);
     }
   };
@@ -191,7 +176,7 @@ export default function Home() {
           {jobType == JobType.Rep3Full ?
             <div>
               <h2 className="text-[14pt] font-bold pb-1">Public Inputs</h2>
-              <input required className="rounded-[5pt] shadow-xl border border-current p-2 w-full" type="text" onChange={(e) => setPublicInputs(e.target.value.split(','))} />
+              <input className="rounded-[5pt] shadow-xl border border-current p-2 w-full" type="text" onChange={(e) => setPublicInputs(e.target.value.split(','))} />
             </div>
             :
             <div>
@@ -216,13 +201,13 @@ export default function Home() {
           </div>
           <div className="pt-5 mx-auto text-center">
             {error && <div className="text-[#ff0000]">{error}</div>}
-            {result && (
+            {proof && (
               <div>
-                <a className="underline text-current" href={`data:text/json;charset=utf-8,${encodeURIComponent(result.proof)}`} download="proof.json">
+                <a className="underline text-current" href={`data:text/json;charset=utf-8,${encodeURIComponent(proof!)}`} download="proof.json">
                   Download Proof
                 </a>
                 <br />
-                <a className="underline text-current" href={`data:text/json;charset=utf-8,${encodeURIComponent(result.publicInputs)}`} download="public.json">
+                <a className="underline text-current" href={`data:text/json;charset=utf-8,${encodeURIComponent(publicInputsOut!)}`} download="public.json">
                   Download Public Inputs
                 </a>
               </div>

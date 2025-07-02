@@ -1,7 +1,7 @@
 generate-js-api-client:
   (rm -r js/taceo-proof-api-client || true) && docker run --rm \
     -u $(id -u ${USER}):$(id -g ${USER}) \
-    -v ${PWD}:/local openapitools/openapi-generator-cli:v7.12.0 generate \
+    -v ${PWD}:/local:z openapitools/openapi-generator-cli:v7.12.0 generate \
     -i /local/v1-openapi.json \
     -g typescript-fetch \
     -o /local/js/taceo-proof-api-client \
@@ -10,7 +10,7 @@ generate-js-api-client:
 generate-rust-api-client:
   (rm -r rust/taceo-proof-api-client || true) && docker run --rm \
     -u $(id -u ${USER}):$(id -g ${USER}) \
-    -v ${PWD}:/local openapitools/openapi-generator-cli:v7.12.0 generate \
+    -v ${PWD}:/local:z openapitools/openapi-generator-cli:v7.12.0 generate \
     -i /local/v1-openapi.json \
     -g rust \
     -o /local/rust/taceo-proof-api-client \

@@ -4,37 +4,8 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**get_results**](JobApi.md#get_results) | **GET** /api/v1/jobs/job/{id} | get job results
 [**schedule_job**](JobApi.md#schedule_job) | **POST** /api/v1/jobs/schedule | create a new job
 
-
-
-## get_results
-
-> models::JobResults get_results(id)
-get job results
-
-### Parameters
-
-
-Name | Type | Description  | Required | Notes
-------------- | ------------- | ------------- | ------------- | -------------
-**id** | **uuid::Uuid** | The uuid of the job | [required] |
-
-### Return type
-
-[**models::JobResults**](JobResults.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 
 ## schedule_job

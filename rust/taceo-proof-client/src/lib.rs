@@ -1,3 +1,5 @@
+use std::fmt;
+
 use ark_ec::pairing::Pairing;
 use base64ct::{Base64, Encoding};
 use circom_types::{
@@ -10,10 +12,14 @@ use co_circom_types::{
 use crypto_box::{PublicKey, aead::OsRng};
 use ed25519_dalek::{Digest, Sha512, Signature, VerifyingKey};
 use eyre::Context;
+use futures::{SinkExt as _, StreamExt as _};
+use intmap::IntMap;
+use serde::{Deserialize, Serialize};
 use taceo_proof_api_client::{
     apis::{blueprint_api, configuration::Configuration, job_api},
-    models::{JobType, ProofResult},
+    models::JobType,
 };
+use tokio_tungstenite::tungstenite::{self, Message};
 use uuid::Uuid;
 
 /// The encryption and verification keys for a NPS
@@ -63,18 +69,17 @@ pub async fn get_nps_key_material(
 /// Verify the signature of a proof result.
 pub fn verify_proof_result_signature(
     job_id: Uuid,
-    result: &ProofResult,
+    proof: &str,
+    public_inputs: &str,
     signature: Signature,
     vk: VerifyingKey,
 ) -> eyre::Result<()> {
     tracing::debug!("verify result for job {job_id}");
-    let proof_bytes = Base64::decode_vec(&result.proof)?;
-    let public_inputs_bytes = Base64::decode_vec(&result.public_inputs)?;
 
     let mut digest = Sha512::new();
     digest.update(job_id.as_bytes());
-    digest.update(proof_bytes);
-    digest.update(public_inputs_bytes);
+    digest.update(proof);
+    digest.update(public_inputs);
 
     vk.verify_prehashed_strict(
         digest,
@@ -238,4 +243,117 @@ where
     let job_id = res.job_id;
     tracing::debug!("job_id = {job_id}");
     Ok(job_id)
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum JobStatus {
+    Pending,
+    InNpsQueue,
+    InCseQueue,
+    Running,
+    Failed,
+    Success,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct NpsStatusUpdate {
+    pub nps: i32,
+    pub status: JobStatus,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct SignedResults {
+    pub signatures: IntMap<i32, String>,
+    pub proof: String,
+    pub public_inputs: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct FailedReason {
+    pub nps: i32,
+    pub error: String,
+    pub signature: String,
+}
+
+impl fmt::Debug for SignedResults {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let nps = self
+            .signatures
+            .keys()
+            .map(|k| k.to_string())
+            .collect::<Vec<_>>();
+        f.write_fmt(format_args!("Result from: {nps:?}"))
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub enum WebSocketMessage {
+    Success(SignedResults),
+    Update(Vec<NpsStatusUpdate>),
+    Failed(FailedReason),
+    Err(String),
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, Default)]
+pub enum StopStrategy {
+    #[default]
+    First,
+    Majority,
+    All,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SubscribeExecutionRequest {
+    pub execution_id: Uuid,
+    pub stop_on_finished_reports: StopStrategy,
+    pub with_status_updates: Option<bool>,
+}
+
+pub async fn fetch_job_result(
+    url: &str,
+    job_id: Uuid,
+    stop_strategy: StopStrategy,
+) -> eyre::Result<SignedResults> {
+    // subscribe with ws to get job updates
+    let (mut ws_stream, _) = tokio_tungstenite::connect_async(url)
+        .await
+        .context("while connecting to endpoint")?;
+    ws_stream
+        .send(tungstenite::Message::text(
+            serde_json::to_string(&SubscribeExecutionRequest {
+                execution_id: job_id,
+                stop_on_finished_reports: stop_strategy,
+                with_status_updates: Some(false),
+            })
+            .expect("can serialize"),
+        ))
+        .await
+        .context("while sending subscribe request")?;
+    if let Some(msg) = ws_stream.next().await {
+        match msg {
+            Ok(Message::Text(text)) => {
+                let msg: WebSocketMessage =
+                    serde_json::from_str(&text).context("invalid data from server")?;
+                match msg {
+                    WebSocketMessage::Success(signed_results) => Ok(signed_results),
+                    WebSocketMessage::Failed(FailedReason {
+                        nps,
+                        error,
+                        signature: _,
+                    }) => eyre::bail!("nps {nps} error: {error:?}"),
+                    WebSocketMessage::Err(err) => eyre::bail!(err),
+                    WebSocketMessage::Update(_) => eyre::bail!("unexpected update"),
+                }
+            }
+            Ok(Message::Close(_)) => {
+                eyre::bail!("server closed stream");
+            }
+            Ok(_) => {
+                eyre::bail!("server sent invalid data");
+            }
+            Err(err) => Err(err.into()),
+        }
+    } else {
+        eyre::bail!("server closed stream");
+    }
 }

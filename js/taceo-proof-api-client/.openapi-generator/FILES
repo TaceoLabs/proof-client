@@ -18,16 +18,12 @@ src/models/BlueprintCurve.ts
 src/models/BlueprintReadyProbe.ts
 src/models/BlueprintType.ts
 src/models/CreateBlueprintResponse.ts
-src/models/JobResult.ts
-src/models/JobResults.ts
-src/models/JobStatus.ts
 src/models/JobType.ts
 src/models/Nps.ts
 src/models/NpsKeyMaterial.ts
 src/models/PaginationResultNps.ts
 src/models/PaginationResultNpsElementsInner.ts
 src/models/PaginationResultString.ts
-src/models/ProofResult.ts
 src/models/ScheduleJobResponse.ts
 src/models/index.ts
 src/runtime.ts

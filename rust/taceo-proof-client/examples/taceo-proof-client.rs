@@ -1,4 +1,4 @@
-use std::{fs::File, path::PathBuf, time::Duration};
+use std::{fs::File, path::PathBuf};
 
 use ark_bls12_377::Bls12_377;
 use ark_bls12_381::Bls12_381;
@@ -9,10 +9,8 @@ use circom_types::{
     traits::{CircomArkworksPairingBridge, CircomArkworksPrimeFieldBridge},
 };
 use clap::{ArgGroup, Parser, ValueEnum};
-use taceo_proof_api_client::{
-    apis::{configuration::Configuration, job_api},
-    models::JobStatus,
-};
+use taceo_proof_api_client::apis::configuration::Configuration;
+use taceo_proof_client::{SignedResults, StopStrategy};
 use uuid::Uuid;
 
 #[derive(Debug, Clone, Copy, ValueEnum)]
@@ -137,23 +135,15 @@ where
         }
     };
 
-    let (proof, public_inputs) = loop {
-        let results = job_api::get_results(config, &job_id.to_string()).await?;
-        tracing::debug!("result from api: {results:?}");
-        match results.result0.status {
-            JobStatus::Success => {
-                // contains the proof and public_inputs as JSON strings for a CircomGroth16 proof
-                // or as base64 encoded ark_serialize serialized bytes for a LibsnarkGroth16 proof
-                let proof_res = results.result0.ok.unwrap().unwrap();
-                break (proof_res.proof, proof_res.public_inputs);
-            }
-            JobStatus::Failed => eyre::bail!(results.result0.error.unwrap().unwrap()),
-            _ => {
-                tracing::info!("waiting for result...");
-                std::thread::sleep(Duration::from_secs(1));
-            }
-        }
-    };
+    let ws_url =
+        args.api_url.replace("http", "ws").replace("https", "wss") + "/api/v1/reports/subs";
+    // contains the proof and public_inputs as JSON strings for a CircomGroth16 proof
+    // or as base64 encoded ark_serialize serialized bytes for a LibsnarkGroth16 proof
+    let SignedResults {
+        signatures: _,
+        proof,
+        public_inputs,
+    } = taceo_proof_client::fetch_job_result(&ws_url, job_id, StopStrategy::default()).await?;
 
     std::fs::write(&args.out, proof)?;
     tracing::info!("Wrote proof to {}", args.out.display());
