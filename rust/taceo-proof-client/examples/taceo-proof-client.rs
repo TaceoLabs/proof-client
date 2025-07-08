@@ -1,4 +1,4 @@
-use std::{fs::File, path::PathBuf};
+use std::{fs::File, path::PathBuf, time::Instant};
 
 use ark_bls12_377::Bls12_377;
 use ark_bls12_381::Bls12_381;
@@ -93,7 +93,7 @@ where
 
     let keys = taceo_proof_client::get_nps_key_material(config, args.blueprint).await?;
 
-    tracing::info!("scheduling job...");
+    let start = Instant::now();
     let job_id = match args.job {
         JobType::Rep3Full => {
             let input = serde_json::from_reader(File::open(args.input)?)?;
@@ -134,6 +134,7 @@ where
             .await?
         }
     };
+    tracing::info!("scheduled job {job_id}");
 
     let ws_url =
         args.api_url.replace("http", "ws").replace("https", "wss") + "/api/v1/reports/subs";
@@ -144,13 +145,14 @@ where
         proof,
         public_inputs,
     } = taceo_proof_client::fetch_job_result(&ws_url, job_id, StopStrategy::default()).await?;
+    tracing::info!("job took {}s", start.elapsed().as_secs_f64());
 
     std::fs::write(&args.out, proof)?;
-    tracing::info!("Wrote proof to {}", args.out.display());
+    tracing::info!("wrote proof to {}", args.out.display());
 
     std::fs::write(&args.out_public_inputs, public_inputs)?;
     tracing::info!(
-        "Wrote public inputs to {}",
+        "wrote public inputs to {}",
         args.out_public_inputs.display()
     );
 
