@@ -91,7 +91,7 @@ where
         args.num_inputs.expect("must be present if r1cs is not")
     };
 
-    let keys = taceo_proof_client::get_nps_key_material(config, args.blueprint).await?;
+    let nodes = taceo_proof_client::get_random_node_providers(config).await?;
 
     let start = Instant::now();
     let job_id = match args.job {
@@ -99,9 +99,9 @@ where
             let input = serde_json::from_reader(File::open(args.input)?)?;
             taceo_proof_client::schedule_full_job_rep3::<P>(
                 config,
+                &nodes,
                 args.blueprint,
                 args.voucher.as_deref(),
-                &keys,
                 input,
                 &args
                     .public_inputs
@@ -113,9 +113,9 @@ where
             let witness = Witness::from_reader(File::open(args.input)?)?;
             taceo_proof_client::schedule_prove_job_rep3::<P>(
                 config,
+                &nodes,
                 args.blueprint,
                 args.voucher.as_deref(),
-                &keys,
                 witness,
                 num_inputs,
             )
@@ -125,9 +125,9 @@ where
             let witness = Witness::from_reader(File::open(args.input)?)?;
             taceo_proof_client::schedule_prove_job_shamir::<P>(
                 config,
+                &nodes,
                 args.blueprint,
                 args.voucher.as_deref(),
-                &keys,
                 witness,
                 num_inputs,
             )

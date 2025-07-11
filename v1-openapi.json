@@ -56,54 +56,12 @@
         ]
       }
     },
-    "/admin/blueprint/update/nps": {
+    "/admin/node/invitation/create": {
       "post": {
         "tags": [
           "Admin"
         ],
-        "summary": "update the blueprint nps",
-        "operationId": "update_blueprint_nps",
-        "requestBody": {
-          "content": {
-            "application/x-www-form-urlencoded": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateBlueprintNpsRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Blueprint updated"
-          },
-          "403": {
-            "description": "You are not an admin"
-          },
-          "5XX": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "adminAuth": []
-          }
-        ]
-      }
-    },
-    "/admin/nps/invitation/create": {
-      "post": {
-        "tags": [
-          "Admin"
-        ],
-        "operationId": "create_nps_invite_code",
+        "operationId": "create_node_invite_code",
         "responses": {
           "200": {
             "description": "Generated a new invitation code and returns it",
@@ -126,12 +84,12 @@
         ]
       }
     },
-    "/admin/nps/invitation/list": {
+    "/admin/node/invitation/list": {
       "get": {
         "tags": [
           "Admin"
         ],
-        "operationId": "paginate_nps_invitations",
+        "operationId": "paginate_node_invitations",
         "parameters": [
           {
             "name": "cursor",
@@ -182,12 +140,12 @@
         ]
       }
     },
-    "/admin/nps/invitation/revoke": {
+    "/admin/node/invitation/revoke": {
       "post": {
         "tags": [
           "Admin"
         ],
-        "operationId": "revoke_nps_invitation_code",
+        "operationId": "revoke_node_invitation_code",
         "requestBody": {
           "content": {
             "application/x-www-form-urlencoded": {
@@ -527,52 +485,6 @@
         ]
       }
     },
-    "/api/v1/blueprint/{id}/key-material": {
-      "get": {
-        "tags": [
-          "blueprint"
-        ],
-        "summary": "returns the key material of the NPSs associated with the blueprint",
-        "operationId": "blueprint_key_material",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "The id of the blueprint",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The key material of the NPSs that are used to encrypt shared inputs",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/NpsKeyMaterial"
-                  }
-                }
-              }
-            }
-          },
-          "5XX": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v1/blueprint/{id}/ready": {
       "get": {
         "tags": [
@@ -667,6 +579,9 @@
                 "required": [
                   "a_blueprint_id",
                   "b_job_type",
+                  "c_node0",
+                  "c_node1",
+                  "c_node2",
                   "input_party0",
                   "input_party1",
                   "input_party2"
@@ -679,7 +594,19 @@
                   "b_job_type": {
                     "$ref": "#/components/schemas/JobType"
                   },
-                  "c_code": {
+                  "c_node0": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "c_node1": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "c_node2": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "d_code": {
                     "type": [
                       "string",
                       "null"
@@ -727,12 +654,12 @@
         }
       }
     },
-    "/api/v1/nps/list": {
+    "/api/v1/node/list": {
       "get": {
         "tags": [
-          "NPS"
+          "node"
         ],
-        "summary": "get paginated node providers",
+        "summary": "get node providers",
         "operationId": "list",
         "parameters": [
           {
@@ -764,11 +691,87 @@
         ],
         "responses": {
           "200": {
-            "description": "A paginated list of NPS",
+            "description": "All online node providers",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PaginationResult_Nps"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NodeProvider"
+                  }
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/node/random-nodes": {
+      "get": {
+        "tags": [
+          "node"
+        ],
+        "summary": "returns 3 randomly chosen node providers",
+        "operationId": "random_node_providers",
+        "responses": {
+          "200": {
+            "description": "The 3 randomly chosen nodes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeProviders"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/node/{id}": {
+      "get": {
+        "tags": [
+          "node"
+        ],
+        "summary": "returns the node for the given id",
+        "operationId": "node_provider",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The node provider for the given id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeProvider"
                 }
               }
             }
@@ -1107,14 +1110,19 @@
           "ShamirProve"
         ]
       },
-      "Nps": {
+      "NodeProvider": {
         "type": "object",
         "required": [
           "id",
           "name",
+          "enc_key",
+          "verify_key",
           "online"
         ],
         "properties": {
+          "enc_key": {
+            "type": "string"
+          },
           "id": {
             "type": "integer",
             "format": "int32"
@@ -1124,64 +1132,28 @@
           },
           "online": {
             "type": "boolean"
-          }
-        }
-      },
-      "NpsKeyMaterial": {
-        "type": "object",
-        "required": [
-          "name",
-          "enc_key",
-          "verify_key"
-        ],
-        "properties": {
-          "enc_key": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
           },
           "verify_key": {
             "type": "string"
           }
         }
       },
-      "PaginationResult_Nps": {
+      "NodeProviders": {
         "type": "object",
         "required": [
-          "elements"
+          "node0",
+          "node1",
+          "node2"
         ],
         "properties": {
-          "elements": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "required": [
-                "id",
-                "name",
-                "online"
-              ],
-              "properties": {
-                "id": {
-                  "type": "integer",
-                  "format": "int32"
-                },
-                "name": {
-                  "type": "string"
-                },
-                "online": {
-                  "type": "boolean"
-                }
-              }
-            }
+          "node0": {
+            "$ref": "#/components/schemas/NodeProvider"
           },
-          "total_amount": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int64",
-            "minimum": 0
+          "node1": {
+            "$ref": "#/components/schemas/NodeProvider"
+          },
+          "node2": {
+            "$ref": "#/components/schemas/NodeProvider"
           }
         }
       },
@@ -1270,33 +1242,6 @@
           "id": {
             "type": "string",
             "format": "uuid"
-          }
-        }
-      },
-      "UpdateBlueprintNpsRequest": {
-        "type": "object",
-        "required": [
-          "id",
-          "nps0",
-          "nps1",
-          "nps2"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "nps0": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "nps1": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "nps2": {
-            "type": "integer",
-            "format": "int32"
           }
         }
       }

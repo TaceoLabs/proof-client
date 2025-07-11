@@ -26,16 +26,14 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*AdminApi* | [**create_nps_invite_code**](docs/AdminApi.md#create_nps_invite_code) | **POST** /admin/nps/invitation/create | 
+*AdminApi* | [**create_node_invite_code**](docs/AdminApi.md#create_node_invite_code) | **POST** /admin/node/invitation/create | 
 *AdminApi* | [**create_user**](docs/AdminApi.md#create_user) | **POST** /admin/user/create | 
 *AdminApi* | [**create_user_invite_code**](docs/AdminApi.md#create_user_invite_code) | **POST** /admin/user/invitation/create | 
-*AdminApi* | [**paginate_nps_invitations**](docs/AdminApi.md#paginate_nps_invitations) | **GET** /admin/nps/invitation/list | 
+*AdminApi* | [**paginate_node_invitations**](docs/AdminApi.md#paginate_node_invitations) | **GET** /admin/node/invitation/list | 
 *AdminApi* | [**paginate_user_invitations**](docs/AdminApi.md#paginate_user_invitations) | **GET** /admin/user/invitation/list | 
-*AdminApi* | [**revoke_nps_invitation_code**](docs/AdminApi.md#revoke_nps_invitation_code) | **POST** /admin/nps/invitation/revoke | 
+*AdminApi* | [**revoke_node_invitation_code**](docs/AdminApi.md#revoke_node_invitation_code) | **POST** /admin/node/invitation/revoke | 
 *AdminApi* | [**revoke_user_invitation_code**](docs/AdminApi.md#revoke_user_invitation_code) | **POST** /admin/user/invitation/revoke | 
 *AdminApi* | [**update_blueprint_access**](docs/AdminApi.md#update_blueprint_access) | **POST** /admin/blueprint/update/access | update the blueprint access
-*AdminApi* | [**update_blueprint_nps**](docs/AdminApi.md#update_blueprint_nps) | **POST** /admin/blueprint/update/nps | update the blueprint nps
-*BlueprintApi* | [**blueprint_key_material**](docs/BlueprintApi.md#blueprint_key_material) | **GET** /api/v1/blueprint/{id}/key-material | returns the key material of the NPSs associated with the blueprint
 *BlueprintApi* | [**blueprint_ready**](docs/BlueprintApi.md#blueprint_ready) | **GET** /api/v1/blueprint/{id}/ready | checks whether a blueprint is already ready
 *BlueprintApi* | [**create**](docs/BlueprintApi.md#create) | **POST** /api/v1/blueprint/create | create a new coSNARK blueprint
 *BlueprintApi* | [**issue_cosnark_code**](docs/BlueprintApi.md#issue_cosnark_code) | **POST** /api/v1/blueprint/code | create a new job
@@ -45,7 +43,9 @@ Class | Method | HTTP request | Description
 *HealthApi* | [**live**](docs/HealthApi.md#live) | **GET** /health/live | 
 *HealthApi* | [**ready**](docs/HealthApi.md#ready) | **GET** /health/ready | 
 *JobApi* | [**schedule_job**](docs/JobApi.md#schedule_job) | **POST** /api/v1/jobs/schedule | create a new job
-*NpsApi* | [**list**](docs/NpsApi.md#list) | **GET** /api/v1/nps/list | get paginated node providers
+*NodeApi* | [**list**](docs/NodeApi.md#list) | **GET** /api/v1/node/list | get node providers
+*NodeApi* | [**node_provider**](docs/NodeApi.md#node_provider) | **GET** /api/v1/node/{id} | returns the node for the given id
+*NodeApi* | [**random_node_providers**](docs/NodeApi.md#random_node_providers) | **GET** /api/v1/node/random-nodes | returns 3 randomly chosen node providers
 *UserApi* | [**login**](docs/UserApi.md#login) | **POST** /login | 
 *UserApi* | [**logout**](docs/UserApi.md#logout) | **POST** /logout | 
 *UserApi* | [**register**](docs/UserApi.md#register) | **POST** /register | 
@@ -61,10 +61,8 @@ Class | Method | HTTP request | Description
  - [BlueprintType](docs/BlueprintType.md)
  - [CreateBlueprintResponse](docs/CreateBlueprintResponse.md)
  - [JobType](docs/JobType.md)
- - [Nps](docs/Nps.md)
- - [NpsKeyMaterial](docs/NpsKeyMaterial.md)
- - [PaginationResultNps](docs/PaginationResultNps.md)
- - [PaginationResultNpsElementsInner](docs/PaginationResultNpsElementsInner.md)
+ - [NodeProvider](docs/NodeProvider.md)
+ - [NodeProviders](docs/NodeProviders.md)
  - [PaginationResultString](docs/PaginationResultString.md)
  - [ScheduleJobResponse](docs/ScheduleJobResponse.md)
 

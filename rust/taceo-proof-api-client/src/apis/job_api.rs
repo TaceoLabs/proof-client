@@ -25,18 +25,24 @@ pub async fn schedule_job(
     configuration: &configuration::Configuration,
     a_blueprint_id: &str,
     b_job_type: models::JobType,
+    c_node0: i32,
+    c_node1: i32,
+    c_node2: i32,
     input_party0: impl Into<reqwest::Body>,
     input_party1: impl Into<reqwest::Body>,
     input_party2: impl Into<reqwest::Body>,
-    c_code: Option<&str>,
+    d_code: Option<&str>,
 ) -> Result<models::ScheduleJobResponse, Error<ScheduleJobError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_a_blueprint_id = a_blueprint_id;
     let p_b_job_type = b_job_type;
+    let p_c_node0 = c_node0;
+    let p_c_node1 = c_node1;
+    let p_c_node2 = c_node2;
     let p_input_party0 = input_party0;
     let p_input_party1 = input_party1;
     let p_input_party2 = input_party2;
-    let p_c_code = c_code;
+    let p_d_code = d_code;
 
     let uri_str = format!("{}/api/v1/jobs/schedule", configuration.base_path);
     let mut req_builder = configuration
@@ -49,8 +55,11 @@ pub async fn schedule_job(
     let mut multipart_form = reqwest::multipart::Form::new();
     multipart_form = multipart_form.text("a_blueprint_id", p_a_blueprint_id.to_string());
     multipart_form = multipart_form.text("b_job_type", p_b_job_type.to_string());
-    if let Some(param_value) = p_c_code {
-        multipart_form = multipart_form.text("c_code", param_value.to_string());
+    multipart_form = multipart_form.text("c_node0", p_c_node0.to_string());
+    multipart_form = multipart_form.text("c_node1", p_c_node1.to_string());
+    multipart_form = multipart_form.text("c_node2", p_c_node2.to_string());
+    if let Some(param_value) = p_d_code {
+        multipart_form = multipart_form.text("d_code", param_value.to_string());
     }
     multipart_form = multipart_form.part(
         "input_party0",

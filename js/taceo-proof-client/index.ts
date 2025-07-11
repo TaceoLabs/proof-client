@@ -1,23 +1,25 @@
 import { seal_share, split_input_rep3_bls12_381, split_input_rep3_bn254, split_witness_rep3_bls12_381, split_witness_rep3_bn254, split_witness_shamir_bls12_381, split_witness_shamir_bn254, split_input_rep3_bls12_377, split_witness_rep3_bls12_377, split_witness_shamir_bls12_377, verify_proof_result_signature } from "./pkg/taceo_proof_wasm.js";
-import { BlueprintCurve, JobApi, JobType, NpsKeyMaterial } from '@taceo/proof-api-client';
-
+import { BlueprintCurve, JobApi, JobType, NodeProviders } from '@taceo/proof-api-client';
 
 async function scheduleJob(
   apiInstance: JobApi,
+  nodes: NodeProviders,
   blueprintId: string,
   jobType: JobType,
   code: string | null,
   shares: Uint8Array[],
-  keyMaterial: NpsKeyMaterial[],
 ): Promise<string> {
-  const share0Ciphertext = seal_share(keyMaterial[0].encKey, shares[0]);
-  const share1Ciphertext = seal_share(keyMaterial[1].encKey, shares[1]);
-  const share2Ciphertext = seal_share(keyMaterial[2].encKey, shares[2]);
+  const share0Ciphertext = seal_share(nodes.node0.encKey, shares[0]);
+  const share1Ciphertext = seal_share(nodes.node1.encKey, shares[1]);
+  const share2Ciphertext = seal_share(nodes.node2.encKey, shares[2]);
 
   const scheduleJobResponse = await apiInstance.scheduleJob({
     aBlueprintId: blueprintId,
     bJobType: jobType,
-    cCode: code,
+    cNode0: nodes.node0.id,
+    cNode1: nodes.node1.id,
+    cNode2: nodes.node2.id,
+    dCode: code,
     inputParty0: new Blob([share0Ciphertext]),
     inputParty1: new Blob([share1Ciphertext]),
     inputParty2: new Blob([share2Ciphertext])
@@ -30,8 +32,8 @@ async function scheduleJob(
  * Verify the signature of a proof result. Throws an error if the signature cannot be verified.
  */
 export function verifyProofResultSignature(jobId: string, proof: string, publicInputs: string, signature: string,
-  npsKeyMaterial: NpsKeyMaterial) {
-  verify_proof_result_signature(jobId, proof, publicInputs, npsKeyMaterial.verifyKey, signature)
+  verifyKey: string) {
+  verify_proof_result_signature(jobId, proof, publicInputs, verifyKey, signature)
 }
 
 /**
@@ -39,10 +41,10 @@ export function verifyProofResultSignature(jobId: string, proof: string, publicI
  */
 export async function scheduleFullJobRep3(
   apiInstance: JobApi,
+  nodes: NodeProviders,
   blueprintId: string,
   code: string | null,
   curve: BlueprintCurve,
-  keyMaterial: NpsKeyMaterial[],
   public_inputs: string[],
   input: any
 ): Promise<string> {
@@ -59,7 +61,7 @@ export async function scheduleFullJobRep3(
       break;
   }
   const shares = [sharedInput.shares0, sharedInput.shares1, sharedInput.shares2];
-  return await scheduleJob(apiInstance, blueprintId, JobType.Rep3Full, code, shares, keyMaterial);
+  return await scheduleJob(apiInstance, nodes, blueprintId, JobType.Rep3Full, code, shares);
 }
 
 /**
@@ -67,10 +69,10 @@ export async function scheduleFullJobRep3(
  */
 export async function scheduleProveJobRep3(
   apiInstance: JobApi,
+  nodes: NodeProviders,
   blueprintId: string,
   code: string | null,
   curve: BlueprintCurve,
-  keyMaterial: NpsKeyMaterial[],
   num_pub_inputs: number,
   witness: Uint8Array
 ): Promise<string> {
@@ -87,17 +89,18 @@ export async function scheduleProveJobRep3(
       break;
   }
   const shares = [sharedInput.shares0, sharedInput.shares1, sharedInput.shares2];
-  return await scheduleJob(apiInstance, blueprintId, JobType.Rep3Prove, code, shares, keyMaterial);
+  return await scheduleJob(apiInstance, nodes, blueprintId, JobType.Rep3Prove, code, shares);
 }
 
 /**
  * Schedule a Shamir prove job. The retuned job id can be used to query the job status.
  */
-export async function scheduleProveJobShamir(apiInstance: JobApi,
+export async function scheduleProveJobShamir(
+  apiInstance: JobApi,
+  nodes: NodeProviders,
   blueprintId: string,
   code: string | null,
   curve: BlueprintCurve,
-  keyMaterial: NpsKeyMaterial[],
   num_pub_inputs: number,
   witness: Uint8Array
 ): Promise<string> {
@@ -114,7 +117,7 @@ export async function scheduleProveJobShamir(apiInstance: JobApi,
       break;
   }
   const shares = [sharedInput.shares0, sharedInput.shares1, sharedInput.shares2];
-  return await scheduleJob(apiInstance, blueprintId, JobType.ShamirProve, code, shares, keyMaterial);
+  return await scheduleJob(apiInstance, nodes, blueprintId, JobType.ShamirProve, code, shares);
 }
 
 export type StopStrategy = "First" | "All" | "Majority";
@@ -127,16 +130,9 @@ export interface SubscribeExecutionRequest {
 
 export type JobStatus =
   | "Pending"
-  | "InNpsQueue"
-  | "InCseQueue"
   | "Running"
-  | "Failed"
-  | "Success";
-
-export interface NpsStatusUpdate {
-  nps: number;
-  status: JobStatus;
-}
+  | "Finished"
+  | "Cancelled";
 
 export interface SignedResults {
   signatures: { [key: number]: string };
@@ -145,15 +141,16 @@ export interface SignedResults {
 }
 
 export interface FailedReason {
-  nps: number;
+  node_provider: number;
   error: string;
   signature: string;
 }
 
 export type WebSocketMessage =
   | { Success: SignedResults }
-  | { Update: NpsStatusUpdate[] }
+  | { Update: JobStatus }
   | { Failed: FailedReason }
+  | { Cancelled: null }
   | { Err: string };
 
 /**
@@ -180,6 +177,8 @@ export function fetchJobResult(
         resolve(msg.Success);
       } else if ("Failed" in msg) {
         reject(new Error(msg.Failed.error))
+      } else if ("Cancelled" in msg) {
+        reject(new Error("job was cancelled!"))
       } else if ("Err" in msg) {
         reject(new Error(msg.Err))
       }

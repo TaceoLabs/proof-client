@@ -33,7 +33,7 @@ export interface CreateUserRequest {
     username: string;
 }
 
-export interface PaginateNpsInvitationsRequest {
+export interface PaginateNodeInvitationsRequest {
     cursor?: number | null;
     perPage?: number | null;
 }
@@ -43,7 +43,7 @@ export interface PaginateUserInvitationsRequest {
     perPage?: number | null;
 }
 
-export interface RevokeNpsInvitationCodeRequest {
+export interface RevokeNodeInvitationCodeRequest {
     code: string;
 }
 
@@ -56,13 +56,6 @@ export interface UpdateBlueprintAccessRequest {
     id: string;
 }
 
-export interface UpdateBlueprintNpsRequest {
-    id: string;
-    nps0: number;
-    nps1: number;
-    nps2: number;
-}
-
 /**
  * 
  */
@@ -70,13 +63,13 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async createNpsInviteCodeRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
+    async createNodeInviteCodeRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/admin/nps/invitation/create`,
+            path: `/admin/node/invitation/create`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -91,8 +84,8 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async createNpsInviteCode(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
-        const response = await this.createNpsInviteCodeRaw(initOverrides);
+    async createNodeInviteCode(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
+        const response = await this.createNodeInviteCodeRaw(initOverrides);
         return await response.value();
     }
 
@@ -186,7 +179,7 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async paginateNpsInvitationsRaw(requestParameters: PaginateNpsInvitationsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginationResultString>> {
+    async paginateNodeInvitationsRaw(requestParameters: PaginateNodeInvitationsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginationResultString>> {
         const queryParameters: any = {};
 
         if (requestParameters['cursor'] != null) {
@@ -200,7 +193,7 @@ export class AdminApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/admin/nps/invitation/list`,
+            path: `/admin/node/invitation/list`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -211,8 +204,8 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async paginateNpsInvitations(requestParameters: PaginateNpsInvitationsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginationResultString> {
-        const response = await this.paginateNpsInvitationsRaw(requestParameters, initOverrides);
+    async paginateNodeInvitations(requestParameters: PaginateNodeInvitationsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginationResultString> {
+        const response = await this.paginateNodeInvitationsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -250,11 +243,11 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async revokeNpsInvitationCodeRaw(requestParameters: RevokeNpsInvitationCodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async revokeNodeInvitationCodeRaw(requestParameters: RevokeNodeInvitationCodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['code'] == null) {
             throw new runtime.RequiredError(
                 'code',
-                'Required parameter "code" was null or undefined when calling revokeNpsInvitationCode().'
+                'Required parameter "code" was null or undefined when calling revokeNodeInvitationCode().'
             );
         }
 
@@ -281,7 +274,7 @@ export class AdminApi extends runtime.BaseAPI {
         }
 
         const response = await this.request({
-            path: `/admin/nps/invitation/revoke`,
+            path: `/admin/node/invitation/revoke`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -293,8 +286,8 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async revokeNpsInvitationCode(requestParameters: RevokeNpsInvitationCodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.revokeNpsInvitationCodeRaw(requestParameters, initOverrides);
+    async revokeNodeInvitationCode(requestParameters: RevokeNodeInvitationCodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.revokeNodeInvitationCodeRaw(requestParameters, initOverrides);
     }
 
     /**
@@ -406,90 +399,6 @@ export class AdminApi extends runtime.BaseAPI {
      */
     async updateBlueprintAccess(requestParameters: UpdateBlueprintAccessRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.updateBlueprintAccessRaw(requestParameters, initOverrides);
-    }
-
-    /**
-     * update the blueprint nps
-     */
-    async updateBlueprintNpsRaw(requestParameters: UpdateBlueprintNpsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters['id'] == null) {
-            throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling updateBlueprintNps().'
-            );
-        }
-
-        if (requestParameters['nps0'] == null) {
-            throw new runtime.RequiredError(
-                'nps0',
-                'Required parameter "nps0" was null or undefined when calling updateBlueprintNps().'
-            );
-        }
-
-        if (requestParameters['nps1'] == null) {
-            throw new runtime.RequiredError(
-                'nps1',
-                'Required parameter "nps1" was null or undefined when calling updateBlueprintNps().'
-            );
-        }
-
-        if (requestParameters['nps2'] == null) {
-            throw new runtime.RequiredError(
-                'nps2',
-                'Required parameter "nps2" was null or undefined when calling updateBlueprintNps().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const consumes: runtime.Consume[] = [
-            { contentType: 'application/x-www-form-urlencoded' },
-        ];
-        // @ts-ignore: canConsumeForm may be unused
-        const canConsumeForm = runtime.canConsumeForm(consumes);
-
-        let formParams: { append(param: string, value: any): any };
-        let useForm = false;
-        if (useForm) {
-            formParams = new FormData();
-        } else {
-            formParams = new URLSearchParams();
-        }
-
-        if (requestParameters['id'] != null) {
-            formParams.append('id', requestParameters['id'] as any);
-        }
-
-        if (requestParameters['nps0'] != null) {
-            formParams.append('nps0', requestParameters['nps0'] as any);
-        }
-
-        if (requestParameters['nps1'] != null) {
-            formParams.append('nps1', requestParameters['nps1'] as any);
-        }
-
-        if (requestParameters['nps2'] != null) {
-            formParams.append('nps2', requestParameters['nps2'] as any);
-        }
-
-        const response = await this.request({
-            path: `/admin/blueprint/update/nps`,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: formParams,
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     * update the blueprint nps
-     */
-    async updateBlueprintNps(requestParameters: UpdateBlueprintNpsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.updateBlueprintNpsRaw(requestParameters, initOverrides);
     }
 
 }

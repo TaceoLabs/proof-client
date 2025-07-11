@@ -16,69 +16,87 @@ import { mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface PaginationResultNpsElementsInner
+ * @interface NodeProvider
  */
-export interface PaginationResultNpsElementsInner {
+export interface NodeProvider {
+    /**
+     * 
+     * @type {string}
+     * @memberof NodeProvider
+     */
+    encKey: string;
     /**
      * 
      * @type {number}
-     * @memberof PaginationResultNpsElementsInner
+     * @memberof NodeProvider
      */
     id: number;
     /**
      * 
      * @type {string}
-     * @memberof PaginationResultNpsElementsInner
+     * @memberof NodeProvider
      */
     name: string;
     /**
      * 
      * @type {boolean}
-     * @memberof PaginationResultNpsElementsInner
+     * @memberof NodeProvider
      */
     online: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof NodeProvider
+     */
+    verifyKey: string;
 }
 
 /**
- * Check if a given object implements the PaginationResultNpsElementsInner interface.
+ * Check if a given object implements the NodeProvider interface.
  */
-export function instanceOfPaginationResultNpsElementsInner(value: object): value is PaginationResultNpsElementsInner {
+export function instanceOfNodeProvider(value: object): value is NodeProvider {
+    if (!('encKey' in value) || value['encKey'] === undefined) return false;
     if (!('id' in value) || value['id'] === undefined) return false;
     if (!('name' in value) || value['name'] === undefined) return false;
     if (!('online' in value) || value['online'] === undefined) return false;
+    if (!('verifyKey' in value) || value['verifyKey'] === undefined) return false;
     return true;
 }
 
-export function PaginationResultNpsElementsInnerFromJSON(json: any): PaginationResultNpsElementsInner {
-    return PaginationResultNpsElementsInnerFromJSONTyped(json, false);
+export function NodeProviderFromJSON(json: any): NodeProvider {
+    return NodeProviderFromJSONTyped(json, false);
 }
 
-export function PaginationResultNpsElementsInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): PaginationResultNpsElementsInner {
+export function NodeProviderFromJSONTyped(json: any, ignoreDiscriminator: boolean): NodeProvider {
     if (json == null) {
         return json;
     }
     return {
         
+        'encKey': json['enc_key'],
         'id': json['id'],
         'name': json['name'],
         'online': json['online'],
+        'verifyKey': json['verify_key'],
     };
 }
 
-export function PaginationResultNpsElementsInnerToJSON(json: any): PaginationResultNpsElementsInner {
-    return PaginationResultNpsElementsInnerToJSONTyped(json, false);
+export function NodeProviderToJSON(json: any): NodeProvider {
+    return NodeProviderToJSONTyped(json, false);
 }
 
-export function PaginationResultNpsElementsInnerToJSONTyped(value?: PaginationResultNpsElementsInner | null, ignoreDiscriminator: boolean = false): any {
+export function NodeProviderToJSONTyped(value?: NodeProvider | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
+        'enc_key': value['encKey'],
         'id': value['id'],
         'name': value['name'],
         'online': value['online'],
+        'verify_key': value['verifyKey'],
     };
 }
 

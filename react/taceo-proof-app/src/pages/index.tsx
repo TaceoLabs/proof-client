@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useRef, useState } from "react";
-import { BlueprintApi, BlueprintCurve, Configuration, ConfigurationParameters, JobApi, JobType } from '@taceo/proof-api-client';
+import { BlueprintCurve, Configuration, ConfigurationParameters, JobApi, JobType, NodeApi } from '@taceo/proof-api-client';
 import { scheduleFullJobRep3, scheduleProveJobShamir, scheduleProveJobRep3, fetchJobResult, verifyProofResultSignature } from '@taceo/proof-client-browser'
 import wc from "../witness-calculator.js"; // generated with circom
 
@@ -10,7 +10,7 @@ const configParams: ConfigurationParameters = {
 }
 const congiuration = new Configuration(configParams)
 const jobInstance = new JobApi(congiuration);
-const blueprintInstance = new BlueprintApi(congiuration);
+const nodeInstance = new NodeApi(congiuration);
 
 export default function Home() {
   const [voucher, setVoucher] = useState<string | null>(null);
@@ -54,10 +54,10 @@ export default function Home() {
     setLoading(true);
 
     try {
-      const keyMaterial = await blueprintInstance.blueprintKeyMaterial({ id: blueprint });
+      const nodes = await nodeInstance.randomNodeProviders();
       if (jobType == JobType.Rep3Full) {
         input = JSON.parse(await selectedFile!.text());
-        jobId = await scheduleFullJobRep3(jobInstance, blueprint, voucher, curve, keyMaterial, publicInputs, input);
+        jobId = await scheduleFullJobRep3(jobInstance, nodes, blueprint, voucher, curve, publicInputs, input);
       } else {
         if (wtnsExt == "Browser") {
           input = JSON.parse(await selectedFile!.text());
@@ -67,9 +67,9 @@ export default function Home() {
           witness = new Uint8Array(await selectedFile!.arrayBuffer());
         }
         if (jobType == JobType.ShamirProve) {
-          jobId = await scheduleProveJobShamir(jobInstance, blueprint, voucher, curve, keyMaterial, numInputs, witness);
+          jobId = await scheduleProveJobShamir(jobInstance, nodes, blueprint, voucher, curve,  numInputs, witness);
         } else {
-          jobId = await scheduleProveJobRep3(jobInstance, blueprint, voucher, curve, keyMaterial, numInputs, witness);
+          jobId = await scheduleProveJobRep3(jobInstance, nodes, blueprint, voucher, curve,  numInputs, witness);
         }
       }
       const jobResult = await fetchJobResult("ws://localhost:1234/api/v1/reports/subs", jobId);
