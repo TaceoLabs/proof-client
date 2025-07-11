@@ -22,7 +22,6 @@ import type {
   BlueprintReadyProbe,
   BlueprintType,
   CreateBlueprintResponse,
-  NpsKeyMaterial,
 } from '../models/index';
 import {
     ApiErrorFromJSON,
@@ -39,13 +38,7 @@ import {
     BlueprintTypeToJSON,
     CreateBlueprintResponseFromJSON,
     CreateBlueprintResponseToJSON,
-    NpsKeyMaterialFromJSON,
-    NpsKeyMaterialToJSON,
 } from '../models/index';
-
-export interface BlueprintKeyMaterialRequest {
-    id: string;
-}
 
 export interface BlueprintReadyRequest {
     id: string;
@@ -77,39 +70,6 @@ export interface UploadAuxDataRequest {
  * 
  */
 export class BlueprintApi extends runtime.BaseAPI {
-
-    /**
-     * returns the key material of the NPSs associated with the blueprint
-     */
-    async blueprintKeyMaterialRaw(requestParameters: BlueprintKeyMaterialRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<NpsKeyMaterial>>> {
-        if (requestParameters['id'] == null) {
-            throw new runtime.RequiredError(
-                'id',
-                'Required parameter "id" was null or undefined when calling blueprintKeyMaterial().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/v1/blueprint/{id}/key-material`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(NpsKeyMaterialFromJSON));
-    }
-
-    /**
-     * returns the key material of the NPSs associated with the blueprint
-     */
-    async blueprintKeyMaterial(requestParameters: BlueprintKeyMaterialRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<NpsKeyMaterial>> {
-        const response = await this.blueprintKeyMaterialRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
 
     /**
      * checks whether a blueprint is already ready

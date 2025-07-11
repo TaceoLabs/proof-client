@@ -4,41 +4,12 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**blueprint_key_material**](BlueprintApi.md#blueprint_key_material) | **GET** /api/v1/blueprint/{id}/key-material | returns the key material of the NPSs associated with the blueprint
 [**blueprint_ready**](BlueprintApi.md#blueprint_ready) | **GET** /api/v1/blueprint/{id}/ready | checks whether a blueprint is already ready
 [**create**](BlueprintApi.md#create) | **POST** /api/v1/blueprint/create | create a new coSNARK blueprint
 [**issue_cosnark_code**](BlueprintApi.md#issue_cosnark_code) | **POST** /api/v1/blueprint/code | create a new job
 [**revoke**](BlueprintApi.md#revoke) | **POST** /api/v1/blueprint/{id}/revoke | Revokes the blueprint identified by ID if the logged in user has the correct access rights.
 [**upload_aux_data**](BlueprintApi.md#upload_aux_data) | **POST** /api/v1/blueprint/{id}/aux/{aux_type} | add proving key to blueprint
 
-
-
-## blueprint_key_material
-
-> Vec<models::NpsKeyMaterial> blueprint_key_material(id)
-returns the key material of the NPSs associated with the blueprint
-
-### Parameters
-
-
-Name | Type | Description  | Required | Notes
-------------- | ------------- | ------------- | ------------- | -------------
-**id** | **uuid::Uuid** | The id of the blueprint | [required] |
-
-### Return type
-
-[**Vec<models::NpsKeyMaterial>**](NpsKeyMaterial.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 
 ## blueprint_ready

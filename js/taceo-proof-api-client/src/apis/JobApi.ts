@@ -31,10 +31,13 @@ import {
 export interface ScheduleJobRequest {
     aBlueprintId: string;
     bJobType: JobType;
+    cNode0: number;
+    cNode1: number;
+    cNode2: number;
     inputParty0: Blob;
     inputParty1: Blob;
     inputParty2: Blob;
-    cCode?: string | null;
+    dCode?: string | null;
 }
 
 /**
@@ -57,6 +60,27 @@ export class JobApi extends runtime.BaseAPI {
             throw new runtime.RequiredError(
                 'bJobType',
                 'Required parameter "bJobType" was null or undefined when calling scheduleJob().'
+            );
+        }
+
+        if (requestParameters['cNode0'] == null) {
+            throw new runtime.RequiredError(
+                'cNode0',
+                'Required parameter "cNode0" was null or undefined when calling scheduleJob().'
+            );
+        }
+
+        if (requestParameters['cNode1'] == null) {
+            throw new runtime.RequiredError(
+                'cNode1',
+                'Required parameter "cNode1" was null or undefined when calling scheduleJob().'
+            );
+        }
+
+        if (requestParameters['cNode2'] == null) {
+            throw new runtime.RequiredError(
+                'cNode2',
+                'Required parameter "cNode2" was null or undefined when calling scheduleJob().'
             );
         }
 
@@ -113,8 +137,20 @@ export class JobApi extends runtime.BaseAPI {
             formParams.append('b_job_type', requestParameters['bJobType'] as any);
         }
 
-        if (requestParameters['cCode'] != null) {
-            formParams.append('c_code', requestParameters['cCode'] as any);
+        if (requestParameters['cNode0'] != null) {
+            formParams.append('c_node0', requestParameters['cNode0'] as any);
+        }
+
+        if (requestParameters['cNode1'] != null) {
+            formParams.append('c_node1', requestParameters['cNode1'] as any);
+        }
+
+        if (requestParameters['cNode2'] != null) {
+            formParams.append('c_node2', requestParameters['cNode2'] as any);
+        }
+
+        if (requestParameters['dCode'] != null) {
+            formParams.append('d_code', requestParameters['dCode'] as any);
         }
 
         if (requestParameters['inputParty0'] != null) {

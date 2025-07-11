@@ -15,11 +15,9 @@ docs/CreateBlueprintResponse.md
 docs/HealthApi.md
 docs/JobApi.md
 docs/JobType.md
-docs/Nps.md
-docs/NpsApi.md
-docs/NpsKeyMaterial.md
-docs/PaginationResultNps.md
-docs/PaginationResultNpsElementsInner.md
+docs/NodeApi.md
+docs/NodeProvider.md
+docs/NodeProviders.md
 docs/PaginationResultString.md
 docs/ScheduleJobResponse.md
 docs/UserApi.md
@@ -30,7 +28,7 @@ src/apis/configuration.rs
 src/apis/health_api.rs
 src/apis/job_api.rs
 src/apis/mod.rs
-src/apis/nps_api.rs
+src/apis/node_api.rs
 src/apis/user_api.rs
 src/lib.rs
 src/models/api_error.rs
@@ -42,9 +40,7 @@ src/models/blueprint_type.rs
 src/models/create_blueprint_response.rs
 src/models/job_type.rs
 src/models/mod.rs
-src/models/nps.rs
-src/models/nps_key_material.rs
-src/models/pagination_result_nps.rs
-src/models/pagination_result_nps_elements_inner.rs
+src/models/node_provider.rs
+src/models/node_providers.rs
 src/models/pagination_result_string.rs
 src/models/schedule_job_response.rs

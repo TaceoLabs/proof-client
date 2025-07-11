@@ -117,7 +117,7 @@ pub mod admin_api;
 pub mod blueprint_api;
 pub mod health_api;
 pub mod job_api;
-pub mod nps_api;
+pub mod node_api;
 pub mod user_api;
 
 pub mod configuration;

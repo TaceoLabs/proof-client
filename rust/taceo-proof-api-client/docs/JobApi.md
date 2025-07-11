@@ -10,7 +10,7 @@ Method | HTTP request | Description
 
 ## schedule_job
 
-> models::ScheduleJobResponse schedule_job(a_blueprint_id, b_job_type, input_party0, input_party1, input_party2, c_code)
+> models::ScheduleJobResponse schedule_job(a_blueprint_id, b_job_type, c_node0, c_node1, c_node2, input_party0, input_party1, input_party2, d_code)
 create a new job
 
 ### Parameters
@@ -20,10 +20,13 @@ Name | Type | Description  | Required | Notes
 ------------- | ------------- | ------------- | ------------- | -------------
 **a_blueprint_id** | **uuid::Uuid** |  | [required] |
 **b_job_type** | [**models::JobType**](JobType.md) |  | [required] |
+**c_node0** | **i32** |  | [required] |
+**c_node1** | **i32** |  | [required] |
+**c_node2** | **i32** |  | [required] |
 **input_party0** | **std::path::PathBuf** |  | [required] |
 **input_party1** | **std::path::PathBuf** |  | [required] |
 **input_party2** | **std::path::PathBuf** |  | [required] |
-**c_code** | Option<**String**> |  |  |
+**d_code** | Option<**String**> |  |  |
 
 ### Return type
 

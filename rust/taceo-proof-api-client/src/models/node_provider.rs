@@ -12,17 +12,33 @@ use crate::models;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
-pub struct PaginationResultNpsElementsInner {
+pub struct NodeProvider {
+    #[serde(rename = "enc_key")]
+    pub enc_key: String,
     #[serde(rename = "id")]
     pub id: i32,
     #[serde(rename = "name")]
     pub name: String,
     #[serde(rename = "online")]
     pub online: bool,
+    #[serde(rename = "verify_key")]
+    pub verify_key: String,
 }
 
-impl PaginationResultNpsElementsInner {
-    pub fn new(id: i32, name: String, online: bool) -> PaginationResultNpsElementsInner {
-        PaginationResultNpsElementsInner { id, name, online }
+impl NodeProvider {
+    pub fn new(
+        enc_key: String,
+        id: i32,
+        name: String,
+        online: bool,
+        verify_key: String,
+    ) -> NodeProvider {
+        NodeProvider {
+            enc_key,
+            id,
+            name,
+            online,
+            verify_key,
+        }
     }
 }

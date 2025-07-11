@@ -16,54 +16,68 @@ use futures::{SinkExt as _, StreamExt as _};
 use intmap::IntMap;
 use serde::{Deserialize, Serialize};
 use taceo_proof_api_client::{
-    apis::{blueprint_api, configuration::Configuration, job_api},
+    apis::{configuration::Configuration, job_api, node_api},
     models::JobType,
 };
 use tokio_tungstenite::tungstenite::{self, Message};
 use uuid::Uuid;
 
-/// The encryption and verification keys for a NPS
 #[derive(Debug, Clone)]
-pub struct NpsKeyMaterial {
-    pub enc_key: PublicKey,
-    pub verify_key: VerifyingKey,
+pub struct NodeProviders {
+    node0: NodeProvider,
+    node1: NodeProvider,
+    node2: NodeProvider,
 }
 
-/// Download the encryption and verify keys for the 3 nodes that will run the job.
-pub async fn get_nps_key_material(
-    config: &Configuration,
-    blueprint_id: Uuid,
-) -> eyre::Result<[NpsKeyMaterial; 3]> {
-    tracing::debug!("fetching key material for blueprint {blueprint_id}");
-    let key_material =
-        blueprint_api::blueprint_key_material(config, &blueprint_id.to_string()).await?;
-    if key_material.len() != 3 {
-        eyre::bail!("got wrong number of key_material");
-    }
-    // we checked len above, we can unwrap here
-    Ok(key_material
-        .iter()
-        .map(|nps| {
-            tracing::debug!("decode pub key");
-            let enc_key = PublicKey::from_bytes(
-                Base64::decode_vec(&nps.enc_key)?
-                    .try_into()
-                    .expect("correct len"),
-            );
-            let verify_key = VerifyingKey::from_bytes(
-                &Base64::decode_vec(&nps.verify_key)?
-                    .try_into()
-                    .expect("correct len"),
-            )?;
-
-            Ok(NpsKeyMaterial {
-                enc_key,
-                verify_key,
-            })
+impl TryFrom<taceo_proof_api_client::models::NodeProviders> for NodeProviders {
+    type Error = eyre::Report;
+    fn try_from(value: taceo_proof_api_client::models::NodeProviders) -> Result<Self, Self::Error> {
+        Ok(Self {
+            node0: (*value.node0).try_into()?,
+            node1: (*value.node1).try_into()?,
+            node2: (*value.node2).try_into()?,
         })
-        .collect::<eyre::Result<Vec<NpsKeyMaterial>>>()?
-        .try_into()
-        .unwrap())
+    }
+}
+
+#[derive(Debug, Clone)]
+#[allow(dead_code)]
+pub struct NodeProvider {
+    pub(crate) id: i32,
+    pub(crate) name: String,
+    pub(crate) enc_key: PublicKey,
+    pub(crate) verify_key: VerifyingKey,
+    pub(crate) online: bool,
+}
+
+impl TryFrom<taceo_proof_api_client::models::NodeProvider> for NodeProvider {
+    type Error = eyre::Report;
+    fn try_from(value: taceo_proof_api_client::models::NodeProvider) -> Result<Self, Self::Error> {
+        Ok(NodeProvider {
+            id: value.id,
+            name: value.name,
+            enc_key: PublicKey::from_bytes(
+                Base64::decode_vec(&value.enc_key)
+                    .context("invalid base64")?
+                    .try_into()
+                    .map_err(|_| eyre::eyre!("wrong len for PublicKey"))?,
+            ),
+            verify_key: VerifyingKey::from_bytes(
+                &Base64::decode_vec(&value.verify_key)
+                    .context("invalid base64")?
+                    .try_into()
+                    .map_err(|_| eyre::eyre!("wrong len for VerifyingKey"))?,
+            )
+            .context("failed to parse VerifyingKey")?,
+            online: value.online,
+        })
+    }
+}
+
+/// Get 3 random nodes that can be used to run a job.
+pub async fn get_random_node_providers(config: &Configuration) -> eyre::Result<NodeProviders> {
+    let nodes = node_api::random_node_providers(config).await?;
+    nodes.try_into()
 }
 
 /// Verify the signature of a proof result.
@@ -92,17 +106,20 @@ pub fn verify_proof_result_signature(
     Ok(())
 }
 
-fn seal_shares(keys: &[NpsKeyMaterial; 3], shares: [Vec<u8>; 3]) -> eyre::Result<[Vec<u8>; 3]> {
+fn seal_shares(nodes: &NodeProviders, shares: [Vec<u8>; 3]) -> eyre::Result<[Vec<u8>; 3]> {
     tracing::debug!("sealing shares...");
-    let ct0 = keys[0]
+    let ct0 = nodes
+        .node0
         .enc_key
         .seal(&mut OsRng, &shares[0])
         .context("while sealing share")?;
-    let ct1 = keys[1]
+    let ct1 = nodes
+        .node1
         .enc_key
         .seal(&mut OsRng, &shares[1])
         .context("while sealing share")?;
-    let ct2 = keys[2]
+    let ct2 = nodes
+        .node2
         .enc_key
         .seal(&mut OsRng, &shares[2])
         .context("while sealing share")?;
@@ -112,9 +129,9 @@ fn seal_shares(keys: &[NpsKeyMaterial; 3], shares: [Vec<u8>; 3]) -> eyre::Result
 /// Schedule a full REP3 job including witness extension.
 pub async fn schedule_full_job_rep3<P>(
     config: &Configuration,
+    nodes: &NodeProviders,
     blueprint_id: Uuid,
     voucher: Option<&str>,
-    keys: &[NpsKeyMaterial; 3],
     input: Input,
     public_inputs: &[String],
 ) -> eyre::Result<Uuid>
@@ -132,12 +149,15 @@ where
         bincode::serialize(&share2)?,
     ];
     tracing::debug!("sealing shares...");
-    let [ct0, ct1, ct2] = seal_shares(keys, shares)?;
+    let [ct0, ct1, ct2] = seal_shares(nodes, shares)?;
     tracing::debug!("scheduling job...");
     let res = job_api::schedule_job(
         config,
         &blueprint_id.to_string(),
         JobType::Rep3Full,
+        nodes.node0.id,
+        nodes.node1.id,
+        nodes.node2.id,
         ct0,
         ct1,
         ct2,
@@ -152,9 +172,9 @@ where
 /// Schedule a REP3 prove job.
 pub async fn schedule_prove_job_rep3<P>(
     config: &Configuration,
+    nodes: &NodeProviders,
     blueprint_id: Uuid,
     voucher: Option<&str>,
-    keys: &[NpsKeyMaterial; 3],
     witness: Witness<P::ScalarField>,
     num_pub_inputs: usize,
 ) -> eyre::Result<Uuid>
@@ -178,12 +198,15 @@ where
         bincode::serialize(&share2)?,
     ];
     tracing::debug!("sealing shares...");
-    let [ct0, ct1, ct2] = seal_shares(keys, shares)?;
+    let [ct0, ct1, ct2] = seal_shares(nodes, shares)?;
     tracing::debug!("scheduling job...");
     let res = job_api::schedule_job(
         config,
         &blueprint_id.to_string(),
         JobType::Rep3Prove,
+        nodes.node0.id,
+        nodes.node1.id,
+        nodes.node2.id,
         ct0,
         ct1,
         ct2,
@@ -198,9 +221,9 @@ where
 /// Schedule a Shamir prove job.
 pub async fn schedule_prove_job_shamir<P>(
     config: &Configuration,
+    nodes: &NodeProviders,
     blueprint_id: Uuid,
     voucher: Option<&str>,
-    keys: &[NpsKeyMaterial; 3],
     witness: Witness<P::ScalarField>,
     num_pub_inputs: usize,
 ) -> eyre::Result<Uuid>
@@ -228,12 +251,15 @@ where
         bincode::serialize(&share2)?,
     ];
     tracing::debug!("sealing shares...");
-    let [ct0, ct1, ct2] = seal_shares(keys, shares)?;
+    let [ct0, ct1, ct2] = seal_shares(nodes, shares)?;
     tracing::debug!("scheduling job...");
     let res = job_api::schedule_job(
         config,
         &blueprint_id.to_string(),
         JobType::ShamirProve,
+        nodes.node0.id,
+        nodes.node1.id,
+        nodes.node2.id,
         ct0,
         ct1,
         ct2,
@@ -248,17 +274,9 @@ where
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum JobStatus {
     Pending,
-    InNpsQueue,
-    InCseQueue,
     Running,
-    Failed,
-    Success,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct NpsStatusUpdate {
-    pub nps: i32,
-    pub status: JobStatus,
+    Finished,
+    Cancelled,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -270,27 +288,28 @@ pub struct SignedResults {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct FailedReason {
-    pub nps: i32,
+    pub node_provider: i32,
     pub error: String,
     pub signature: String,
 }
 
 impl fmt::Debug for SignedResults {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let nps = self
+        let node_providers = self
             .signatures
             .keys()
             .map(|k| k.to_string())
             .collect::<Vec<_>>();
-        f.write_fmt(format_args!("Result from: {nps:?}"))
+        f.write_fmt(format_args!("Result from: {node_providers:?}"))
     }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub enum WebSocketMessage {
     Success(SignedResults),
-    Update(Vec<NpsStatusUpdate>),
+    Update(JobStatus),
     Failed(FailedReason),
+    Cancelled,
     Err(String),
 }
 
@@ -337,10 +356,11 @@ pub async fn fetch_job_result(
                 match msg {
                     WebSocketMessage::Success(signed_results) => Ok(signed_results),
                     WebSocketMessage::Failed(FailedReason {
-                        nps,
+                        node_provider,
                         error,
                         signature: _,
-                    }) => eyre::bail!("nps {nps} error: {error:?}"),
+                    }) => eyre::bail!("node {node_provider} error: {error:?}"),
+                    WebSocketMessage::Cancelled => eyre::bail!("job was cancelled"),
                     WebSocketMessage::Err(err) => eyre::bail!(err),
                     WebSocketMessage::Update(_) => eyre::bail!("unexpected update"),
                 }
