@@ -22,10 +22,23 @@ use taceo_proof_api_client::{
 use tokio_tungstenite::tungstenite::{self, Message};
 use uuid::Uuid;
 
+pub use ark_ec;
+pub use circom_types;
+pub use ed25519_dalek;
+pub use taceo_proof_api_client::{apis, models};
+pub use uuid;
+
+/// A collection of three `NodeProvider`s used to schedule jobs.
+///
+/// The `NodeProviders` struct is used to represent a group of three node providers
+/// in a Multi-Party Computation (MPC) system.
 #[derive(Debug, Clone)]
 pub struct NodeProviders {
+    /// The first node provider.
     node0: NodeProvider,
+    /// The second node provider.
     node1: NodeProvider,
+    /// The third node provider.
     node2: NodeProvider,
 }
 
@@ -40,14 +53,24 @@ impl TryFrom<taceo_proof_api_client::models::NodeProviders> for NodeProviders {
     }
 }
 
+/// Represents a node provider in the network.
+///
+/// A `NodeProvider` contains information about a node, including its unique identifier,
+/// name, encryption key, verification key, and online status. This struct is used to
+/// interact with and manage the nodes participating in Multi-Party Computation (MPC).
 #[derive(Debug, Clone)]
 #[allow(dead_code)]
 pub struct NodeProvider {
-    pub(crate) id: i32,
-    pub(crate) name: String,
-    pub(crate) enc_key: PublicKey,
-    pub(crate) verify_key: VerifyingKey,
-    pub(crate) online: bool,
+    /// A unique identifier for the node provider.
+    pub id: i32,
+    /// The name of the node provider.
+    pub name: String,
+    /// The public encryption key of the node provider, used for secure communication.
+    pub enc_key: PublicKey,
+    /// The verifying key of the node provider, used to verify digital signatures.
+    pub verify_key: VerifyingKey,
+    /// A boolean indicating whether the node provider is currently online.
+    pub online: bool,
 }
 
 impl TryFrom<taceo_proof_api_client::models::NodeProvider> for NodeProvider {
@@ -81,6 +104,29 @@ pub async fn get_random_node_providers(config: &Configuration) -> eyre::Result<N
 }
 
 /// Verify the signature of a proof result.
+///
+/// This function ensures the integrity and authenticity of a proof result by verifying
+/// its signature using the provided verifying key (`vk`). The signature is validated
+/// against a prehashed digest that includes the job ID, proof, and public inputs.
+///
+/// # Arguments
+///
+/// * `job_id` - The unique identifier of the job.
+/// * `proof` - The proof string to be verified.
+/// * `public_inputs` - The public inputs associated with the proof.
+/// * `signature` - The digital signature to be verified.
+/// * `vk` - The verifying key used to validate the signature.
+///
+/// # Returns
+///
+/// Returns `Ok(())` if the signature is valid. Otherwise, it returns an error indicating
+/// the reason for the failure.
+///
+/// # Errors
+///
+/// Returns an error if:
+/// - The signature is invalid.
+/// - The digest or signature verification process fails.
 pub fn verify_proof_result_signature(
     job_id: Uuid,
     proof: &str,
@@ -127,13 +173,63 @@ fn seal_shares(nodes: &NodeProviders, shares: [Vec<u8>; 3]) -> eyre::Result<[Vec
 }
 
 /// Schedule a full REP3 job including witness extension.
+///
+/// This function schedules a job using the Rep3 Secret Sharing scheme. It takes an input,
+/// splits it into shares using Rep3, encrypts the shares, and sends them to the respective
+/// nodes for execution. Instead of providing the extended witness, this job will compute
+/// witness extension first and then the proof afterwards.
+///
+/// # Arguments
+///
+/// * `config` - The configuration object for the API client.
+/// * `nodes` - A set of node providers that will execute the job.
+/// * `blueprint_id` - The unique identifier of the blueprint for the job.
+/// * `voucher` - An optional voucher for non-public blueprints.
+/// * `public_inputs` - A list of public input names for the blueprint's circuit.
+/// * `input` - The input data to be shared and used in the witness extension.
+///
+/// # Returns
+///
+/// Returns the id (`Uuid`) of the scheduled job on success.
+///
+/// # Errors
+///
+/// Returns an error if:
+/// - Input sharing fails.
+/// - Encryption of shares fails.
+/// - The job scheduling API call fails.
+///
+/// # Example
+/// ```no_run
+/// # use taceo_proof_client::apis::configuration::Configuration;
+/// # #[tokio::main]
+/// # async fn main() -> eyre::Result<()> {
+/// let config = Configuration {
+///     base_path: "https://taceo.proof.network".to_string(),
+///     ..Default::default()
+/// };
+/// let nodes = taceo_proof_client::get_random_node_providers(&config).await?;
+/// let input = serde_json::from_reader(std::fs::File::open("input.json")?)?;
+/// let blueprint_id = uuid::Uuid::parse_str("54f9ee38-0160-44e2-a1d8-08d1b6771cbf")?;
+/// let job_id = taceo_proof_client::schedule_full_job_rep3::<ark_bn254::Bn254>(
+///     &config,
+///     &nodes,
+///     blueprint_id,
+///     None,
+///     &["a_public_input_name".to_string()],
+///     input
+/// )
+/// .await?;
+/// # Ok(())
+/// # }
+/// ```
 pub async fn schedule_full_job_rep3<P>(
     config: &Configuration,
     nodes: &NodeProviders,
     blueprint_id: Uuid,
     voucher: Option<&str>,
-    input: Input,
     public_inputs: &[String],
+    input: Input,
 ) -> eyre::Result<Uuid>
 where
     P: Pairing + CircomArkworksPairingBridge,
@@ -170,13 +266,62 @@ where
 }
 
 /// Schedule a REP3 prove job.
+///
+/// This function schedules a proof job using the Rep3 Secret Sharing scheme.
+/// It takes a witness, splits it into shares using Rep3, encrypts the shares,
+/// and sends them to the respective nodes for execution.
+///
+/// # Arguments
+///
+/// * `config` - The configuration object for the API client.
+/// * `nodes` - A set of node providers that will execute the job.
+/// * `blueprint_id` - The unique identifier of the blueprint for the proof job.
+/// * `voucher` - An optional voucher for non-public blueprints.
+/// * `num_pub_inputs` - The number of public inputs for the blueprint's circuit.
+/// * `witness` - The witness data to be used in the proof.
+///
+/// # Returns
+///
+/// Returns the id (`Uuid`) of the scheduled job on success.
+///
+/// # Errors
+///
+/// Returns an error if:
+/// - Witness sharing fails.
+/// - Encryption of shares fails.
+/// - The job scheduling API call fails.
+///
+/// # Example
+/// ```no_run
+/// # use taceo_proof_client::apis::configuration::Configuration;
+/// # #[tokio::main]
+/// # async fn main() -> eyre::Result<()> {
+/// let config = Configuration {
+///     base_path: "https://taceo.proof.network".to_string(),
+///     ..Default::default()
+/// };
+/// let nodes = taceo_proof_client::get_random_node_providers(&config).await?;
+/// let blueprint_id = uuid::Uuid::parse_str("54f9ee38-0160-44e2-a1d8-08d1b6771cbf")?;
+/// let witness = circom_types::Witness::from_reader(std::fs::File::open("witness.wtns")?)?;
+/// let job_id = taceo_proof_client::schedule_prove_job_rep3::<ark_bn254::Bn254>(
+///     &config,
+///     &nodes,
+///     blueprint_id,
+///     None,
+///     2, // the number of public inputs
+///     witness,
+/// )
+/// .await?;
+/// # Ok(())
+/// # }
+/// ```
 pub async fn schedule_prove_job_rep3<P>(
     config: &Configuration,
     nodes: &NodeProviders,
     blueprint_id: Uuid,
     voucher: Option<&str>,
-    witness: Witness<P::ScalarField>,
     num_pub_inputs: usize,
+    witness: Witness<P::ScalarField>,
 ) -> eyre::Result<Uuid>
 where
     P: Pairing + CircomArkworksPairingBridge,
@@ -219,13 +364,62 @@ where
 }
 
 /// Schedule a Shamir prove job.
+///
+/// This function schedules a proof job using Shamir Secret Sharing scheme.
+/// It takes a witness, splits it into shares using Shamir scheme, encrypts the shares,
+/// and sends them to the respective nodes for execution.
+///
+/// # Arguments
+///
+/// * `config` - The configuration object for the API client.
+/// * `nodes` - A set of node providers that will execute the job.
+/// * `blueprint_id` - The unique identifier of the blueprint for the proof job.
+/// * `voucher` - An optional voucher for non-public blueprints.
+/// * `num_pub_inputs` - The number of public inputs for the blueprint's circuit.
+/// * `witness` - The witness data to be used in the proof.
+///
+/// # Returns
+///
+/// Returns the id (`Uuid`) of the scheduled job on success.
+///
+/// # Errors
+///
+/// Returns an error if:
+/// - Witness sharing fails.
+/// - Encryption of shares fails.
+/// - The job scheduling API call fails.
+///
+/// # Example
+/// ```no_run
+/// # use taceo_proof_client::apis::configuration::Configuration;
+/// # #[tokio::main]
+/// # async fn main() -> eyre::Result<()> {
+/// let config = Configuration {
+///     base_path: "https://taceo.proof.network".to_string(),
+///     ..Default::default()
+/// };
+/// let nodes = taceo_proof_client::get_random_node_providers(&config).await?;
+/// let blueprint_id = uuid::Uuid::parse_str("54f9ee38-0160-44e2-a1d8-08d1b6771cbf")?;
+/// let witness = circom_types::Witness::from_reader(std::fs::File::open("witness.wtns")?)?;
+/// let job_id = taceo_proof_client::schedule_prove_job_shamir::<ark_bn254::Bn254>(
+///     &config,
+///     &nodes,
+///     blueprint_id,
+///     None,
+///     2, // the number of public inputs
+///     witness,
+/// )
+/// .await?;
+/// # Ok(())
+/// # }
+/// ```
 pub async fn schedule_prove_job_shamir<P>(
     config: &Configuration,
     nodes: &NodeProviders,
     blueprint_id: Uuid,
     voucher: Option<&str>,
-    witness: Witness<P::ScalarField>,
     num_pub_inputs: usize,
+    witness: Witness<P::ScalarField>,
 ) -> eyre::Result<Uuid>
 where
     P: Pairing + CircomArkworksPairingBridge,
@@ -272,6 +466,7 @@ where
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+/// The status of a job.
 pub enum JobStatus {
     Pending,
     Running,
@@ -280,16 +475,24 @@ pub enum JobStatus {
 }
 
 #[derive(Serialize, Deserialize)]
+/// The result of a job, including signatures of the nodes that handled the job.
 pub struct SignedResults {
+    /// The signatures of each node used to compute the job (identified by their id).
     pub signatures: IntMap<i32, String>,
+    /// The proof as JSON (for CircomGroth16 proofs) or base64 encoded ark_serialized `ark_groth16::Proof` (for LibsnarkGroth16 proofs).
     pub proof: String,
+    /// The array of public inputs as JSON (for CircomGroth16 proofs) pr base64 encoded ark_serialized `Vec<P::ScalarField>` (for LibsnarkGroth16 proofs).
     pub public_inputs: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+/// A error result of a job.
 pub struct FailedReason {
+    /// The node provider that encountered the error.
     pub node_provider: i32,
+    /// The error string.
     pub error: String,
+    /// The signature of the error and the node provider.
     pub signature: String,
 }
 
@@ -305,6 +508,7 @@ impl fmt::Debug for SignedResults {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+/// The different messages we receive over the ws connection.
 pub enum WebSocketMessage {
     Success(SignedResults),
     Update(JobStatus),
@@ -314,20 +518,77 @@ pub enum WebSocketMessage {
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, Default)]
+/// The stop strategy when waiting for the job result.
 pub enum StopStrategy {
     #[default]
+    /// Stop if one node responded with a result.
     First,
+    /// Stop if the majority of nodes responded with a result.
     Majority,
+    /// Stop if the all nodes responded with a result.
     All,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+/// The ws subscribe request to wait for a job result.
 pub struct SubscribeExecutionRequest {
     pub execution_id: Uuid,
     pub stop_on_finished_reports: StopStrategy,
     pub with_status_updates: Option<bool>,
 }
 
+/// Fetches the result of a job execution using a WebSocket connection.
+///
+/// This function connects to the specified WebSocket `url` and subscribes to updates
+/// for the job identified by `job_id`. It listens for messages from the server and
+/// processes them based on the provided `stop_strategy`. The function returns the
+/// signed results of the job execution if successful, or an error if the job fails
+/// or the connection is closed unexpectedly.
+///
+/// # Arguments
+///
+/// * `url` - The WebSocket URL to connect to for job updates.
+/// * `job_id` - The id of the job whose results are being fetched.
+/// * `stop_strategy` - The strategy to determine when to stop waiting for job results.
+///
+/// # Returns
+///
+/// Returns a `SignedResults` struct containing the proof and public inputs, along
+/// with the signatures from the nodes that handled the job.
+///
+/// # Errors
+///
+/// This function returns an error if:
+/// - The WebSocket connection fails to establish.
+/// - The server sends invalid or unexpected data.
+/// - The job fails, is cancelled, or encounters an error on a node.
+/// - The server closes the WebSocket connection unexpectedly.
+///
+/// # Example
+///
+/// ```no_run
+/// # use ark_serialize::CanonicalDeserialize;
+/// # use base64ct::Encoding;
+/// # #[tokio::main]
+/// # async fn main() -> eyre::Result<()> {
+/// let ws_url = "wss://taceo.proof.network/api/v1/reports/subs".to_string();
+/// let job_id = uuid::Uuid::parse_str("9c2814d7-25d3-4de5-b61f-0a6e3bacbe99")?;
+/// let res = taceo_proof_client::fetch_job_result(&ws_url, job_id, taceo_proof_client::StopStrategy::default()).await?;
+///
+/// // CircomGroth16 proofs compatible with circom
+/// std::fs::write("proof.json", &res.proof)?;
+/// std::fs::write("public.json", &res.public_inputs)?;
+///
+/// // LibsnarkGroth16 proofs
+/// let proof = ark_groth16::Proof::<ark_bn254::Bn254>::deserialize_compressed(
+///     base64ct::Base64::decode_vec(&res.proof)?.as_slice(),
+/// );
+/// let public_inputs = Vec::<ark_bn254::Fr>::deserialize_compressed(
+///     base64ct::Base64::decode_vec(&res.public_inputs)?.as_slice(),
+/// );
+/// # Ok(())
+/// # }
+/// ```
 pub async fn fetch_job_result(
     url: &str,
     job_id: Uuid,

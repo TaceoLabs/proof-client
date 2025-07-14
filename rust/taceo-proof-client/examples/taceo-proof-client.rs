@@ -3,15 +3,17 @@ use std::{fs::File, path::PathBuf, time::Instant};
 use ark_bls12_377::Bls12_377;
 use ark_bls12_381::Bls12_381;
 use ark_bn254::Bn254;
-use ark_ec::pairing::Pairing;
-use circom_types::{
-    R1CS, Witness,
-    traits::{CircomArkworksPairingBridge, CircomArkworksPrimeFieldBridge},
-};
 use clap::{ArgGroup, Parser, ValueEnum};
-use taceo_proof_api_client::apis::configuration::Configuration;
-use taceo_proof_client::{SignedResults, StopStrategy};
-use uuid::Uuid;
+use taceo_proof_client::{
+    SignedResults, StopStrategy,
+    apis::configuration::Configuration,
+    ark_ec::pairing::Pairing,
+    circom_types::{
+        R1CS, Witness,
+        traits::{CircomArkworksPairingBridge, CircomArkworksPrimeFieldBridge},
+    },
+    uuid::Uuid,
+};
 
 #[derive(Debug, Clone, Copy, ValueEnum)]
 enum JobType {
@@ -102,10 +104,10 @@ where
                 &nodes,
                 args.blueprint,
                 args.voucher.as_deref(),
-                input,
                 &args
                     .public_inputs
                     .expect("must be present if job is Rep3Full"),
+                input,
             )
             .await?
         }
@@ -116,8 +118,8 @@ where
                 &nodes,
                 args.blueprint,
                 args.voucher.as_deref(),
-                witness,
                 num_inputs,
+                witness,
             )
             .await?
         }
@@ -128,8 +130,8 @@ where
                 &nodes,
                 args.blueprint,
                 args.voucher.as_deref(),
-                witness,
                 num_inputs,
+                witness,
             )
             .await?
         }
@@ -177,6 +179,10 @@ fn install_tracing() {
 #[tokio::main]
 async fn main() -> eyre::Result<()> {
     install_tracing();
+    rustls::crypto::aws_lc_rs::default_provider()
+        .install_default()
+        .unwrap();
+
     let args = Args::parse();
     let config = Configuration {
         base_path: args.api_url.clone(),

@@ -1,6 +1,5 @@
 import React, { ChangeEvent, useRef, useState } from "react";
-import { BlueprintCurve, Configuration, ConfigurationParameters, JobApi, JobType, NodeApi } from '@taceo/proof-api-client';
-import { scheduleFullJobRep3, scheduleProveJobShamir, scheduleProveJobRep3, fetchJobResult, verifyProofResultSignature } from '@taceo/proof-client-browser'
+import { scheduleFullJobRep3, scheduleProveJobShamir, scheduleProveJobRep3, fetchJobResult, verifyProofResultSignature, ConfigurationParameters, JobStatus, JobApi, NodeApi, Configuration, JobType, BlueprintCurve } from '@taceo/proof-client-browser'
 import wc from "../witness-calculator.js"; // generated with circom
 
 type WitnessExtension = "Upload" | "Browser";
