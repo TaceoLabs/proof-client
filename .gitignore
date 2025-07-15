@@ -2,3 +2,4 @@ node_modules/
 target/
 proof.json
 public.json
+.npmrc
