@@ -3,3 +3,5 @@ target/
 proof.json
 public.json
 .npmrc
+dist/
+*.tsbuildinfo
