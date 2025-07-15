@@ -35,11 +35,11 @@ pub use uuid;
 #[derive(Debug, Clone)]
 pub struct NodeProviders {
     /// The first node provider.
-    node0: NodeProvider,
+    pub node0: NodeProvider,
     /// The second node provider.
-    node1: NodeProvider,
+    pub node1: NodeProvider,
     /// The third node provider.
-    node2: NodeProvider,
+    pub node2: NodeProvider,
 }
 
 impl TryFrom<taceo_proof_api_client::models::NodeProviders> for NodeProviders {
