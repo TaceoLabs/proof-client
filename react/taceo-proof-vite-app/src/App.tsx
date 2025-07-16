@@ -1,5 +1,5 @@
 import React, { type ChangeEvent, useRef, useState } from "react";
-import { scheduleFullJobRep3, scheduleProveJobShamir, scheduleProveJobRep3, fetchJobResult, type ConfigurationParameters, JobApi, NodeApi, Configuration, JobType, BlueprintCurve } from '@taceo/proof-client-browser'
+import { scheduleFullJobRep3, scheduleProveJobShamir, scheduleProveJobRep3, fetchJobResult, type ConfigurationParameters, JobApi, NodeApi, Configuration, JobType, BlueprintCurve } from '@taceo/proof-client-bundler'
 import wc from "./witness_calculator.js"; // generated with circom
 
 type WitnessExtension = "Upload" | "Browser";

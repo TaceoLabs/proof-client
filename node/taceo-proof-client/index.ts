@@ -1,4 +1,4 @@
-import { BlueprintCurve, Configuration, ConfigurationParameters, fetchJobResult, JobApi, JobType, NodeApi, scheduleFullJobRep3, scheduleProveJobRep3, scheduleProveJobShamir } from "@taceo/proof-client";
+import { BlueprintCurve, Configuration, ConfigurationParameters, fetchJobResult, JobApi, JobType, NodeApi, scheduleFullJobRep3, scheduleProveJobRep3, scheduleProveJobShamir } from "@taceo/proof-client-node";
 import * as fs from 'fs';
 import { Command } from 'commander';
 

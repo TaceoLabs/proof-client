@@ -1,5 +1,5 @@
 {
-  "name": "@taceo/proof-client-browser",
+  "name": "@taceo/proof-client-node",
   "version": "0.0.0",
   "repository": {
     "type": "git",
@@ -9,7 +9,9 @@
   "types": "index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc"
+    "build:node": "wasm-pack build --target nodejs && sed -i '2s/proof-client-bundler/proof-client-node/' package.json && tsc",
+    "build:bundler": "wasm-pack build --target bundler && sed -i '2s/proof-client-node/proof-client-bundler/' package.json && tsc"
+
   },
   "files": [
     "index.ts",

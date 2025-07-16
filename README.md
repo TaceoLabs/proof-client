@@ -19,7 +19,7 @@ Currently we offer client libraries for the following languages:
     * We publish two versions of the client that correspond to the `nodejs` and `bundler` [targets](https://rustwasm.github.io/docs/wasm-pack/commands/build.html#target) of [wasm-pack](https://github.com/rustwasm/wasm-pack).
     * If you want to use nodejs:
         ```bash
-        npm install @taceo/proof-client
+        npm install @taceo/proof-client-node
         ```
     * If you want to use the client in a app that uses a bundler:
         ```bash
