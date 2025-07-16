@@ -1,73 +1,61 @@
 # TACEO:Proof Client
 > A client library for interacting with TACEO:Proof.
 
-## ⚠️ Disclaimer
-This project is currently a **work in progress.**
-Expect frequent changes, potential API updates, and evolving features.
-
-At this stage, all Node Providers are operated by the TACEO team.
-**Please do not use this system for live or production-critical data** until decentralization and security audits are complete.
-
 ## Overview
-This repository provides a simple and consistent client for communicating with **TACEO:Proof**. We offer multiple client implementations to best fit your environment and use case.
-
-TACEO:Proof distinguishes between two types of users: _Blueprint Creators_ and _End-Users_.
-Blueprint Creators upload circuits and provide cryptographic material (circuit blueprints), requiring authentication with TACEO:Proof. End-Users can then generate proofs based on these blueprints.
-
-In the primary use case, End-Users interact with services provided by Blueprint Creators and outsource proof generation to TACEO:Proof.
-
-This repository focuses on helping Blueprint Creators integrate a client for TACEO:Proof, demonstrating the full workflow — from authenticating to computing a proof using TACEO’s coSNARK-engine.
-
-It is designed to help you seamlessly integrate the API into your project and enable your users to leverage the power of outsourced proving.
+This repository provides multiple **TACEO:Proof** client implementations for communicating with the **TACEO:Proof** network.
+It is designed to help you seamlessly integrate the API into your project and enable you to leverage the power of outsourced proving.
 
 ## Getting Started
-### Installation
+Currently we offer client libraries for the following languages:
+- **Rust**
+    * Simply add the client as a git dependency to your `Cargo.toml`.
+        ```toml
+        taceo-proof-client = { git = "https://github.com/TaceoLabs/proof-client.git" }
+        ```
+    * Checkout the [example](./rust/taceo-proof-client/examples/taceo-proof-client.rs) to see how to use the client.
 
-## How It Works
-When interacting with **TACEO:Proof**, the process differs slightly for _Blueprint Creators_ and _End-Users_.
-
-### For Blueprint Creators
-(_These steps are typically performed through the web interface, not via this client library._)
-
-1) **Authenticate via password-based login**
-(_Note: This is subject to change. We plan to support OAuth in the future. Open an issue if you require a different authentication method._)
-2) **Create a new blueprint**
-    * Set a name for the blueprint.
-    * Define the proof type (currently supported: Circom-Groth16, Groth16 with Libsnark reduction).
-    * Receive a unique identifier for the blueprint. (_This ID is later used by End-Users to schedule coSNARKs._)
-    * Receive the public keys of the Node Providers responsible for generating coSNARKs.
-3) **Upload auxiliary data**
-    * Upload the proving key (ZKey), verification key, Circom files, and any other necessary data.
-
-Once these steps are complete, End-Users can begin scheduling coSNARK generation based on the uploaded blueprint.
-
-### For End-Users
-(_These steps are performed using this client library._)
-1) **Authenticate through your service**
-End-Users authenticate with your system (out-of-band from TACEO:Proof). (_Blueprint Creators are responsible for authenticating their users according to their own requirements._)
-2) **Issue a Voucher**
-If the End-User is eligible to request a coSNARK, your service issues a _Voucher_.
-    * Specify a time limit and a maximum usage count for the Voucher.
-3) **Request coSNARK generation**
-The End-User submits the blueprint ID and their Voucher to TACEO:Proof.
-    * In response, they receive a unique identifier for the coSNARK job.
-4) **Secret-share and encrypt inputs**
-The End-User secret-shares their private inputs, encrypts the shares using the Node Providers' public keys, and uploads the encrypted shares to TACEO:Proof.
-5) **Poll for completion**
-The End-User periodically polls TACEO:Proof to check the status of the coSNARK job.
-Once complete, they retrieve the proof and the corresponding public inputs for verification.
-
-Compared to generating the proof locally, the End-User simply:
-* Performs two HTTP requests,
-* Secret-shares their private input,
-* Encrypts the shares — and lets TACEO:Proof handle the proving process.
-
-## Supported Languages
-
-We currently offer official client libraries for:
-
-* Rust
-* JavaScript/TypeScript
+- **JavaScript/TypeScript**
+    * You can install the client using your favorite package manager.
+    * We publish two versions of the client that correspond to the `nodejs` and `bundler` [targets](https://rustwasm.github.io/docs/wasm-pack/commands/build.html#target) of [wasm-pack](https://github.com/rustwasm/wasm-pack).
+    * If you want to use nodejs:
+        ```bash
+        npm install @taceo/proof-client
+        ```
+    * If you want to use the client in a app that uses a bundler:
+        ```bash
+        npm install @taceo/proof-client-bundler
+        ```
+    * Checkout the nodejs [example](./node/taceo-proof-client) and the react + bundler [examples](./react).
 
 If you would like to see support for additional languages, please feel free to open an [issue](https://github.com/TaceoLabs/proof-client/issues) and let us know!
 We’re happy to prioritize new language bindings based on community demand.
+
+## How It Works
+1) **Request set of Node Providers**
+
+    The client gives you the ability to request a set of 3 distinct Node Providers of **TACEO:Proof**.
+    You receive the Node Providers with their ids, encryption keys and verification keys.
+    You are encouraged to request a new set of Node Providers for each coSNARK job or quick burst of multiple jobs.
+    We do not recommend to use the same Node Providers over a longer period of time.
+
+2) **Schedule a coSNARK Job on the TACEO:Proof Network**
+
+    You can schedule different coSNARK types
+    * Witness Extension + Prove
+    * Prove only
+
+    We and the community offer different coSNARK blueprints that are defined by their circuits and proving system.
+    To create your own blueprints just reach out to us!
+
+    To schedule a job you must provided the unique identifier of the blueprint that you want to use.
+    In the client, the private inputs (Extended Witness or Inputs to Witness Extension, depends on the job type) get secret-shared and encrypted using the Node Providers' public keys (encryption keys).
+    The client then schedules the coSNARK job and uploads the encrypted shares to **TACEO:Proof** where the job gets send to nodes that compute the proof with Multi-Party Computation (MPC).
+    In response you receive a unique identifier for this job.
+    All of this is handled by the client libraries, you just need to call the provided functions.
+
+3) **Fetch coSNARK Job Results**
+
+    Using the received unique identifier, you can subscribe to receive the results of a coSNARK job via a WebSocket connection.
+    By calling the provided functions you can wait for the results without needed to do any manual polling.
+    The returned results include the proofs which are signed by the Node Providers.
+    You can use the initially received verification keys to verify the signatures.
