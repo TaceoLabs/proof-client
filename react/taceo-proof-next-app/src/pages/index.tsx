@@ -7,9 +7,9 @@ type WitnessExtension = "Upload" | "Browser";
 const configParams: ConfigurationParameters = {
   basePath: "http://localhost:1234",
 }
-const congiuration = new Configuration(configParams)
-const jobInstance = new JobApi(congiuration);
-const nodeInstance = new NodeApi(congiuration);
+const configuration = new Configuration(configParams)
+const jobInstance = new JobApi(configuration);
+const nodeInstance = new NodeApi(configuration);
 
 export default function Home() {
   const [voucher, setVoucher] = useState<string | null>(null);

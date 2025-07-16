@@ -35,9 +35,9 @@ async function main() {
   const configParams: ConfigurationParameters = {
     basePath: apiUrl,
   }
-  const congiuration = new Configuration(configParams)
-  const jobInstance = new JobApi(congiuration);
-  const nodeInstance = new NodeApi(congiuration);
+  const configuration = new Configuration(configParams)
+  const jobInstance = new JobApi(configuration);
+  const nodeInstance = new NodeApi(configuration);
 
   const nodes = await nodeInstance.randomNodeProviders();
 
