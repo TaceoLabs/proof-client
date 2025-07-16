@@ -1,6 +1,10 @@
 {
   "name": "@taceo/proof-client-browser",
   "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TaceoLabs/proof-client"
+  },
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
