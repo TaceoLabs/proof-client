@@ -5,7 +5,7 @@ import wc from "./witness_calculator.js"; // generated with circom
 type WitnessExtension = "Upload" | "Browser";
 
 const configParams: ConfigurationParameters = {
-  basePath: "http://localhost:1234",
+  basePath: "https://proof.taceo.network",
 }
 const configuration = new Configuration(configParams)
 const jobInstance = new JobApi(configuration);
@@ -71,7 +71,7 @@ export default function Home() {
           jobId = await scheduleProveJobRep3(jobInstance, nodes, blueprint, voucher, curve,  numInputs, witness);
         }
       }
-      const jobResult = await fetchJobResult("ws://localhost:1234/api/v1/reports/subs", jobId);
+      const jobResult = await fetchJobResult("wss://proof.taceo.network/api/v1/reports/subs", jobId);
       // TODO
       // verifyProofResultSignature(jobId, jobResult.proof, jobResult.public_inputs, ...)
       setProof(jobResult.proof);

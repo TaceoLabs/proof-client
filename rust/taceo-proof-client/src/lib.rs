@@ -205,7 +205,7 @@ fn seal_shares(nodes: &NodeProviders, shares: [Vec<u8>; 3]) -> eyre::Result<[Vec
 /// # #[tokio::main]
 /// # async fn main() -> eyre::Result<()> {
 /// let config = Configuration {
-///     base_path: "https://taceo.proof.network".to_string(),
+///     base_path: "https://proof.taceo.network".to_string(),
 ///     ..Default::default()
 /// };
 /// let nodes = taceo_proof_client::get_random_node_providers(&config).await?;
@@ -297,7 +297,7 @@ where
 /// # #[tokio::main]
 /// # async fn main() -> eyre::Result<()> {
 /// let config = Configuration {
-///     base_path: "https://taceo.proof.network".to_string(),
+///     base_path: "https://proof.taceo.network".to_string(),
 ///     ..Default::default()
 /// };
 /// let nodes = taceo_proof_client::get_random_node_providers(&config).await?;
@@ -395,7 +395,7 @@ where
 /// # #[tokio::main]
 /// # async fn main() -> eyre::Result<()> {
 /// let config = Configuration {
-///     base_path: "https://taceo.proof.network".to_string(),
+///     base_path: "https://proof.taceo.network".to_string(),
 ///     ..Default::default()
 /// };
 /// let nodes = taceo_proof_client::get_random_node_providers(&config).await?;
@@ -571,7 +571,7 @@ pub struct SubscribeExecutionRequest {
 /// # use base64ct::Encoding;
 /// # #[tokio::main]
 /// # async fn main() -> eyre::Result<()> {
-/// let ws_url = "wss://taceo.proof.network/api/v1/reports/subs".to_string();
+/// let ws_url = "wss://proof.taceo.network/api/v1/reports/subs".to_string();
 /// let job_id = uuid::Uuid::parse_str("9c2814d7-25d3-4de5-b61f-0a6e3bacbe99")?;
 /// let res = taceo_proof_client::fetch_job_result(&ws_url, job_id, taceo_proof_client::StopStrategy::default()).await?;
 ///
@@ -580,10 +580,10 @@ pub struct SubscribeExecutionRequest {
 /// std::fs::write("public.json", &res.public_inputs)?;
 ///
 /// // LibsnarkGroth16 proofs
-/// let proof = ark_groth16::Proof::<ark_bn254::Bn254>::deserialize_compressed(
+/// let proof = ark_groth16::Proof::<ark_bn254::Bn254>::deserialize_uncompressed(
 ///     base64ct::Base64::decode_vec(&res.proof)?.as_slice(),
 /// );
-/// let public_inputs = Vec::<ark_bn254::Fr>::deserialize_compressed(
+/// let public_inputs = Vec::<ark_bn254::Fr>::deserialize_uncompressed(
 ///     base64ct::Base64::decode_vec(&res.public_inputs)?.as_slice(),
 /// );
 /// # Ok(())

@@ -6,7 +6,7 @@ async function main() {
   const program = new Command();
   program
     .argument('<type>', 'The job type')
-    .option('--api-url <url>', 'The API endpoint URL', 'http://localhost:1234')
+    .option('--api-url <url>', 'The API endpoint URL', 'https://proof.taceo.network')
     .requiredOption('--curve <curve>', 'The curve')
     .requiredOption('--input <path>', 'The path to the job input')
     .option('--voucher <voucher>', 'The voucher for a proof job')
@@ -56,7 +56,7 @@ async function main() {
 
   console.log("scheduled job %s", jobId);
 
-  const jobResult = await fetchJobResult("ws://localhost:1234/api/v1/reports/subs", jobId);
+  const jobResult = await fetchJobResult("wss://proof.taceo.network/api/v1/reports/subs", jobId);
 
   fs.writeFileSync(outPath, jobResult.proof);
   console.log("wrote proof to {%s}", outPath);
