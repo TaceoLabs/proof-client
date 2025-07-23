@@ -1,6 +1,13 @@
 # TACEO:Proof Client
 > A client library for interacting with TACEO:Proof.
 
+[![X (formerly Twitter) Follow](https://img.shields.io/badge/X-%23000000.svg?style=for-the-badge&logo=X&logoColor=white)](https://twitter.com/TACEO_IO)
+[![Telegram](https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/collaborativeSNARK)
+[![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/gWZW2TANpk)
+
+[![docs.io](https://img.shields.io/badge/TACEO:Proof-docs-green)](https://docs.taceo.io/)
+[![NPM](https://img.shields.io/badge/NPM-%23CB3837.svg?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/settings/taceo/packages)
+
 ## Overview
 This repository provides multiple **TACEO:Proof** client implementations for communicating with the **TACEO:Proof** network.
 It is designed to help you seamlessly integrate the API into your project and enable you to leverage the power of outsourced proving.
