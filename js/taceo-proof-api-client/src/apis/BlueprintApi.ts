@@ -51,6 +51,11 @@ export interface CreateRequest {
     typ: BlueprintType;
 }
 
+export interface DownloadAuxDataRequest {
+    id: string;
+    auxType: AuxiliaryType;
+}
+
 export interface IssueCosnarkCodeRequest {
     amount: number;
     validityInSeconds: number;
@@ -187,6 +192,43 @@ export class BlueprintApi extends runtime.BaseAPI {
     async create(requestParameters: CreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateBlueprintResponse> {
         const response = await this.createRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     */
+    async downloadAuxDataRaw(requestParameters: DownloadAuxDataRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling downloadAuxData().'
+            );
+        }
+
+        if (requestParameters['auxType'] == null) {
+            throw new runtime.RequiredError(
+                'auxType',
+                'Required parameter "auxType" was null or undefined when calling downloadAuxData().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/blueprint/{id}/aux/{aux_type}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"aux_type"}}`, encodeURIComponent(String(requestParameters['auxType']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async downloadAuxData(requestParameters: DownloadAuxDataRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.downloadAuxDataRaw(requestParameters, initOverrides);
     }
 
     /**

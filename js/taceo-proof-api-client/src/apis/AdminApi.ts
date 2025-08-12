@@ -17,30 +17,50 @@ import * as runtime from '../runtime';
 import type {
   ApiError,
   BlueprintAccess,
-  PaginationResultString,
+  PaginationResultInviteCode,
 } from '../models/index';
 import {
     ApiErrorFromJSON,
     ApiErrorToJSON,
     BlueprintAccessFromJSON,
     BlueprintAccessToJSON,
-    PaginationResultStringFromJSON,
-    PaginationResultStringToJSON,
+    PaginationResultInviteCodeFromJSON,
+    PaginationResultInviteCodeToJSON,
 } from '../models/index';
 
+export interface CreateNodeInviteCodeRequest {
+    distributionMethod?: string | null;
+}
+
+export interface CreateNodeInviteCodeBatchRequest {
+    batchSize: number;
+    distributionMethod?: string | null;
+}
+
 export interface CreateUserRequest {
+    email: string;
     password: string;
-    username: string;
 }
 
-export interface PaginateNodeInvitationsRequest {
-    cursor?: number | null;
-    perPage?: number | null;
+export interface CreateUserInviteCodeRequest {
+    distributionMethod?: string | null;
 }
 
-export interface PaginateUserInvitationsRequest {
+export interface CreateUserInviteCodeBatchRequest {
+    batchSize: number;
+    distributionMethod?: string | null;
+}
+
+export interface PaginateOpenNodeInvitationsRequest {
     cursor?: number | null;
     perPage?: number | null;
+    filter?: string | null;
+}
+
+export interface PaginateOpenUserInvitationsRequest {
+    cursor?: number | null;
+    perPage?: number | null;
+    filter?: string | null;
 }
 
 export interface RevokeNodeInvitationCodeRequest {
@@ -63,16 +83,35 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async createNodeInviteCodeRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
+    async createNodeInviteCodeRaw(requestParameters: CreateNodeInviteCodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
+
+        const consumes: runtime.Consume[] = [
+            { contentType: 'application/x-www-form-urlencoded' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['distributionMethod'] != null) {
+            formParams.append('distribution_method', requestParameters['distributionMethod'] as any);
+        }
 
         const response = await this.request({
             path: `/admin/node/invitation/create`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
+            body: formParams,
         }, initOverrides);
 
         if (this.isJsonMime(response.headers.get('content-type'))) {
@@ -84,25 +123,18 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async createNodeInviteCode(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
-        const response = await this.createNodeInviteCodeRaw(initOverrides);
+    async createNodeInviteCode(requestParameters: CreateNodeInviteCodeRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
+        const response = await this.createNodeInviteCodeRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
      */
-    async createUserRaw(requestParameters: CreateUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters['password'] == null) {
+    async createNodeInviteCodeBatchRaw(requestParameters: CreateNodeInviteCodeBatchRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['batchSize'] == null) {
             throw new runtime.RequiredError(
-                'password',
-                'Required parameter "password" was null or undefined when calling createUser().'
-            );
-        }
-
-        if (requestParameters['username'] == null) {
-            throw new runtime.RequiredError(
-                'username',
-                'Required parameter "username" was null or undefined when calling createUser().'
+                'batchSize',
+                'Required parameter "batchSize" was null or undefined when calling createNodeInviteCodeBatch().'
             );
         }
 
@@ -124,12 +156,72 @@ export class AdminApi extends runtime.BaseAPI {
             formParams = new URLSearchParams();
         }
 
-        if (requestParameters['password'] != null) {
-            formParams.append('password', requestParameters['password'] as any);
+        if (requestParameters['batchSize'] != null) {
+            formParams.append('batch_size', requestParameters['batchSize'] as any);
         }
 
-        if (requestParameters['username'] != null) {
-            formParams.append('username', requestParameters['username'] as any);
+        if (requestParameters['distributionMethod'] != null) {
+            formParams.append('distribution_method', requestParameters['distributionMethod'] as any);
+        }
+
+        const response = await this.request({
+            path: `/admin/node/invitation/batch_create`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: formParams,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async createNodeInviteCodeBatch(requestParameters: CreateNodeInviteCodeBatchRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.createNodeInviteCodeBatchRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async createUserRaw(requestParameters: CreateUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['email'] == null) {
+            throw new runtime.RequiredError(
+                'email',
+                'Required parameter "email" was null or undefined when calling createUser().'
+            );
+        }
+
+        if (requestParameters['password'] == null) {
+            throw new runtime.RequiredError(
+                'password',
+                'Required parameter "password" was null or undefined when calling createUser().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const consumes: runtime.Consume[] = [
+            { contentType: 'application/x-www-form-urlencoded' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['email'] != null) {
+            formParams.append('email', requestParameters['email'] as any);
+        }
+
+        if (requestParameters['password'] != null) {
+            formParams.append('password', requestParameters['password'] as any);
         }
 
         const response = await this.request({
@@ -151,16 +243,35 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async createUserInviteCodeRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
+    async createUserInviteCodeRaw(requestParameters: CreateUserInviteCodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<string>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
+
+        const consumes: runtime.Consume[] = [
+            { contentType: 'application/x-www-form-urlencoded' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['distributionMethod'] != null) {
+            formParams.append('distribution_method', requestParameters['distributionMethod'] as any);
+        }
 
         const response = await this.request({
             path: `/admin/user/invitation/create`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
+            body: formParams,
         }, initOverrides);
 
         if (this.isJsonMime(response.headers.get('content-type'))) {
@@ -172,14 +283,67 @@ export class AdminApi extends runtime.BaseAPI {
 
     /**
      */
-    async createUserInviteCode(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
-        const response = await this.createUserInviteCodeRaw(initOverrides);
+    async createUserInviteCode(requestParameters: CreateUserInviteCodeRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
+        const response = await this.createUserInviteCodeRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
      */
-    async paginateNodeInvitationsRaw(requestParameters: PaginateNodeInvitationsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginationResultString>> {
+    async createUserInviteCodeBatchRaw(requestParameters: CreateUserInviteCodeBatchRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['batchSize'] == null) {
+            throw new runtime.RequiredError(
+                'batchSize',
+                'Required parameter "batchSize" was null or undefined when calling createUserInviteCodeBatch().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const consumes: runtime.Consume[] = [
+            { contentType: 'application/x-www-form-urlencoded' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['batchSize'] != null) {
+            formParams.append('batch_size', requestParameters['batchSize'] as any);
+        }
+
+        if (requestParameters['distributionMethod'] != null) {
+            formParams.append('distribution_method', requestParameters['distributionMethod'] as any);
+        }
+
+        const response = await this.request({
+            path: `/admin/user/invitation/batch_create`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: formParams,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async createUserInviteCodeBatch(requestParameters: CreateUserInviteCodeBatchRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.createUserInviteCodeBatchRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async paginateOpenNodeInvitationsRaw(requestParameters: PaginateOpenNodeInvitationsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginationResultInviteCode>> {
         const queryParameters: any = {};
 
         if (requestParameters['cursor'] != null) {
@@ -188,6 +352,10 @@ export class AdminApi extends runtime.BaseAPI {
 
         if (requestParameters['perPage'] != null) {
             queryParameters['per_page'] = requestParameters['perPage'];
+        }
+
+        if (requestParameters['filter'] != null) {
+            queryParameters['filter'] = requestParameters['filter'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -199,19 +367,19 @@ export class AdminApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => PaginationResultStringFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => PaginationResultInviteCodeFromJSON(jsonValue));
     }
 
     /**
      */
-    async paginateNodeInvitations(requestParameters: PaginateNodeInvitationsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginationResultString> {
-        const response = await this.paginateNodeInvitationsRaw(requestParameters, initOverrides);
+    async paginateOpenNodeInvitations(requestParameters: PaginateOpenNodeInvitationsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginationResultInviteCode> {
+        const response = await this.paginateOpenNodeInvitationsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
      */
-    async paginateUserInvitationsRaw(requestParameters: PaginateUserInvitationsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginationResultString>> {
+    async paginateOpenUserInvitationsRaw(requestParameters: PaginateOpenUserInvitationsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginationResultInviteCode>> {
         const queryParameters: any = {};
 
         if (requestParameters['cursor'] != null) {
@@ -220,6 +388,10 @@ export class AdminApi extends runtime.BaseAPI {
 
         if (requestParameters['perPage'] != null) {
             queryParameters['per_page'] = requestParameters['perPage'];
+        }
+
+        if (requestParameters['filter'] != null) {
+            queryParameters['filter'] = requestParameters['filter'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -231,13 +403,13 @@ export class AdminApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => PaginationResultStringFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => PaginationResultInviteCodeFromJSON(jsonValue));
     }
 
     /**
      */
-    async paginateUserInvitations(requestParameters: PaginateUserInvitationsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginationResultString> {
-        const response = await this.paginateUserInvitationsRaw(requestParameters, initOverrides);
+    async paginateOpenUserInvitations(requestParameters: PaginateOpenUserInvitationsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginationResultInviteCode> {
+        const response = await this.paginateOpenUserInvitationsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
