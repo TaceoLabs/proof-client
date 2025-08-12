@@ -20,7 +20,8 @@
 export const BlueprintType = {
     CircomGroth16: 'CircomGroth16',
     LibsnarkGroth16: 'LibsnarkGroth16',
-    NoirUltrahonk: 'NoirUltrahonk'
+    NoirUltrahonkKeccak: 'NoirUltrahonkKeccak',
+    NoirUltrahonkPoseidon2: 'NoirUltrahonkPoseidon2'
 } as const;
 export type BlueprintType = typeof BlueprintType[keyof typeof BlueprintType];
 

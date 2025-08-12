@@ -14,8 +14,10 @@ readme = "./README.md"
 ark-ec = "0.5.0"
 bincode = "1.3.3"
 crypto_box = { version = "0.9.1", features = ["std", "seal"] }
-co-circom-types = { git = "https://github.com/TaceoLabs/co-snarks", rev = "09e65bc" }
-circom-types = { git = "https://github.com/TaceoLabs/co-snarks", rev = "09e65bc", features = ["ark-bls12-377", "ark-bls12-381"] }
+co-circom-types = { git = "https://github.com/TaceoLabs/co-snarks", rev = "5d8f254" }
+circom-types = { git = "https://github.com/TaceoLabs/co-snarks", rev = "5d8f254", features = ["ark-bls12-377", "ark-bls12-381"] }
+co-noir-types = { git = "https://github.com/TaceoLabs/co-snarks", rev = "5d8f254" }
+noir-types = { git = "https://github.com/TaceoLabs/co-snarks", rev = "5d8f254" }
 taceo-proof-api-client = { path = "../taceo-proof-api-client" }
 base64ct = { version = "1.7.3", features = ["alloc"] }
 rand = "0.8.5"
@@ -28,9 +30,9 @@ intmap = { version = "3.1.0", features = ["serde"] }
 tokio-tungstenite = { version = "0.27.0", features = ["rustls-tls-webpki-roots"] }
 serde_json = "1.0.140"
 futures = "0.3.31"
+ark-bn254 = { version = "0.5.0", default-features = false }
 
 [dev-dependencies]
-ark-bn254 = "0.5.0"
 ark-bls12-381 = "0.5.0"
 ark-bls12-377 = "0.5.0"
 ark-groth16 = "0.5.0"

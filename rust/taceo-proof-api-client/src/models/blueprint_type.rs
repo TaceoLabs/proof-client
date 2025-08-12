@@ -18,8 +18,10 @@ pub enum BlueprintType {
     CircomGroth16,
     #[serde(rename = "LibsnarkGroth16")]
     LibsnarkGroth16,
-    #[serde(rename = "NoirUltrahonk")]
-    NoirUltrahonk,
+    #[serde(rename = "NoirUltrahonkKeccak")]
+    NoirUltrahonkKeccak,
+    #[serde(rename = "NoirUltrahonkPoseidon2")]
+    NoirUltrahonkPoseidon2,
 }
 
 impl std::fmt::Display for BlueprintType {
@@ -27,7 +29,8 @@ impl std::fmt::Display for BlueprintType {
         match self {
             Self::CircomGroth16 => write!(f, "CircomGroth16"),
             Self::LibsnarkGroth16 => write!(f, "LibsnarkGroth16"),
-            Self::NoirUltrahonk => write!(f, "NoirUltrahonk"),
+            Self::NoirUltrahonkKeccak => write!(f, "NoirUltrahonkKeccak"),
+            Self::NoirUltrahonkPoseidon2 => write!(f, "NoirUltrahonkPoseidon2"),
         }
     }
 }

@@ -3,6 +3,7 @@ use std::{fs::File, path::PathBuf, time::Instant};
 use ark_bls12_377::Bls12_377;
 use ark_bls12_381::Bls12_381;
 use ark_bn254::Bn254;
+use base64ct::{Base64, Encoding};
 use clap::{ArgGroup, Parser, Subcommand, ValueEnum};
 use taceo_proof_client::{
     SignedResults, StopStrategy,
@@ -36,13 +37,9 @@ enum MpcProtocol {
 }
 
 #[derive(Parser, Debug, Clone)]
-struct FullProve {
+struct CoCircomFullProve {
     /// The API endpoint URL
-    #[clap(
-        long,
-        env = "TACEO_PROOF_API_URL",
-        default_value = "https://proof.taceo.network"
-    )]
+    #[clap(long, env = "PROOF_API_URL", default_value = "http://localhost:1234")]
     pub api_url: String,
 
     /// The curve
@@ -63,7 +60,7 @@ struct FullProve {
 
     /// The public inputs for witness extension
     #[clap(long, env = "PROOF_PUBLIC_INPUTS")]
-    pub public_inputs: Option<Vec<String>>,
+    pub public_inputs: Vec<String>,
 
     /// The output file where the final proof is written to
     #[arg(long, env = "PROOF_OUT", default_value = "proof.json")]
@@ -80,13 +77,9 @@ struct FullProve {
         .args(&["r1cs", "num_inputs"])
         .required(true)
 ))]
-struct Prove {
+struct CoCircomProve {
     /// The API endpoint URL
-    #[clap(
-        long,
-        env = "TACEO_PROOF_API_URL",
-        default_value = "https://proof.taceo.network"
-    )]
+    #[clap(long, env = "PROOF_API_URL", default_value = "http://localhost:1234")]
     pub api_url: String,
 
     /// The curve
@@ -126,40 +119,132 @@ struct Prove {
     pub out_public_inputs: PathBuf,
 }
 
+#[derive(Parser, Debug, Clone)]
+struct CoNoirFullProve {
+    /// The API endpoint URL
+    #[clap(long, env = "PROOF_API_URL", default_value = "http://localhost:1234")]
+    pub api_url: String,
+
+    /// The voucher for a proof job
+    #[clap(long, env = "PROOF_VOUCHER")]
+    pub voucher: Option<String>,
+
+    /// The job blueprint
+    #[clap(long, env = "PROOF_BLUEPRINT")]
+    pub blueprint: Uuid,
+
+    /// The path to the job input
+    #[clap(long, env = "PROOF_INPUT")]
+    pub input: PathBuf,
+
+    /// The path to abi.json of the circuit
+    #[clap(long, env = "PROOF_ABI")]
+    pub abi: PathBuf,
+
+    /// The public inputs for witness extension
+    #[clap(long, env = "PROOF_PUBLIC_INPUTS")]
+    pub public_inputs: Vec<u32>,
+
+    /// The output file where the final proof is written to
+    #[arg(long, env = "PROOF_OUT", default_value = "proof")]
+    pub out: PathBuf,
+
+    /// The output JSON file where the public inputs are written to
+    #[arg(long, env = "PROOF_OUT_PUBLIC_INPUTS", default_value = "public_inputs")]
+    pub out_public_inputs: PathBuf,
+}
+
+#[derive(Parser, Debug, Clone)]
+struct CoNoirProve {
+    /// The API endpoint URL
+    #[clap(long, env = "PROOF_API_URL", default_value = "http://localhost:1234")]
+    pub api_url: String,
+
+    /// The voucher for a proof job
+    #[clap(long, env = "PROOF_VOUCHER")]
+    pub voucher: Option<String>,
+
+    /// The job blueprint
+    #[clap(long, env = "PROOF_BLUEPRINT")]
+    pub blueprint: Uuid,
+
+    /// The MPC protocol
+    #[clap(long, env = "PROOF_MPC_PROTOCOL", default_value = "rep3")]
+    pub protocol: MpcProtocol,
+
+    /// The path to the witness file
+    #[clap(long, env = "PROOF_WITNESS")]
+    pub witness: PathBuf,
+
+    /// The public inputs for witness extension
+    #[clap(long, env = "PROOF_PUBLIC_INPUTS")]
+    pub public_inputs: Vec<u32>,
+
+    /// The output file where the final proof is written to
+    #[arg(long, env = "PROOF_OUT", default_value = "proof")]
+    pub out: PathBuf,
+
+    /// The output JSON file where the public inputs are written to
+    #[arg(long, env = "PROOF_OUT_PUBLIC_INPUTS", default_value = "public_inputs")]
+    pub out_public_inputs: PathBuf,
+}
+
 #[derive(Debug, Clone, Subcommand)]
+#[allow(clippy::enum_variant_names)]
 enum Commands {
-    /// Schedule a full coSNARK job including witness extension
-    FullProve(FullProve),
-    /// Schedule a prove coSNARK job
-    Prove(Prove),
+    /// Schedule a full coCircom job including witness extension
+    CoCircomFullProve(CoCircomFullProve),
+    /// Schedule a prove coCircom job
+    CoCircomProve(CoCircomProve),
+    /// Schedule a full coNoir job including witness extension
+    CoNoirFullProve(CoNoirFullProve),
+    /// Schedule a prove coNoir job
+    CoNoirProve(CoNoirProve),
 }
 
 impl Commands {
     pub fn curve(&self) -> Curve {
         match self {
-            Commands::FullProve(full_prove) => full_prove.curve,
-            Commands::Prove(prove) => prove.curve,
+            Commands::CoCircomFullProve(full_prove) => full_prove.curve,
+            Commands::CoCircomProve(prove) => prove.curve,
+            Commands::CoNoirFullProve(_) => Curve::Bn254,
+            Commands::CoNoirProve(_) => Curve::Bn254,
         }
     }
 
     pub fn api_url(&self) -> String {
         match self {
-            Commands::FullProve(full_prove) => full_prove.api_url.clone(),
-            Commands::Prove(prove) => prove.api_url.clone(),
+            Commands::CoCircomFullProve(full_prove) => full_prove.api_url.clone(),
+            Commands::CoCircomProve(prove) => prove.api_url.clone(),
+            Commands::CoNoirFullProve(full_prove) => full_prove.api_url.clone(),
+            Commands::CoNoirProve(prove) => prove.api_url.clone(),
         }
     }
 
     pub fn out(&self) -> PathBuf {
         match self {
-            Commands::FullProve(full_prove) => full_prove.out.clone(),
-            Commands::Prove(prove) => prove.out.clone(),
+            Commands::CoCircomFullProve(full_prove) => full_prove.out.clone(),
+            Commands::CoCircomProve(prove) => prove.out.clone(),
+            Commands::CoNoirFullProve(full_prove) => full_prove.out.clone(),
+            Commands::CoNoirProve(prove) => prove.out.clone(),
         }
     }
 
     pub fn out_public_inputs(&self) -> PathBuf {
         match self {
-            Commands::FullProve(full_prove) => full_prove.out_public_inputs.clone(),
-            Commands::Prove(prove) => prove.out_public_inputs.clone(),
+            Commands::CoCircomFullProve(full_prove) => full_prove.out_public_inputs.clone(),
+            Commands::CoCircomProve(prove) => prove.out_public_inputs.clone(),
+            Commands::CoNoirFullProve(full_prove) => full_prove.out_public_inputs.clone(),
+            Commands::CoNoirProve(prove) => prove.out_public_inputs.clone(),
+        }
+    }
+
+    pub fn is_base64(&self) -> bool {
+        match self {
+            Commands::CoCircomFullProve(_) => false,
+            Commands::CoCircomProve(_) => false,
+            Commands::CoNoirFullProve(_) => true,
+            Commands::CoNoirProve(_) => true,
         }
     }
 }
@@ -180,21 +265,19 @@ where
 
     let start = Instant::now();
     let job_id = match args.command.clone() {
-        Commands::FullProve(args) => {
+        Commands::CoCircomFullProve(args) => {
             let input = serde_json::from_reader(File::open(args.input)?)?;
-            taceo_proof_client::schedule_full_job_rep3::<P>(
+            taceo_proof_client::co_circom::schedule_full_job_rep3::<P>(
                 config,
                 &nodes,
                 args.blueprint,
                 args.voucher.as_deref(),
-                &args
-                    .public_inputs
-                    .expect("must be present if job is Rep3Full"),
+                &args.public_inputs,
                 input,
             )
             .await?
         }
-        Commands::Prove(args) => {
+        Commands::CoCircomProve(args) => {
             let num_inputs = if let Some(r1cs) = args.r1cs {
                 let r1cs = R1CS::<P>::from_reader(File::open(r1cs)?)?;
                 r1cs.num_inputs
@@ -204,7 +287,7 @@ where
             let witness = Witness::from_reader(File::open(args.witness)?)?;
             match args.protocol {
                 MpcProtocol::REP3 => {
-                    taceo_proof_client::schedule_prove_job_rep3::<P>(
+                    taceo_proof_client::co_circom::schedule_prove_job_rep3::<P>(
                         config,
                         &nodes,
                         args.blueprint,
@@ -215,12 +298,53 @@ where
                     .await?
                 }
                 MpcProtocol::Shamir => {
-                    taceo_proof_client::schedule_prove_job_shamir::<P>(
+                    taceo_proof_client::co_circom::schedule_prove_job_shamir::<P>(
                         config,
                         &nodes,
                         args.blueprint,
                         args.voucher.as_deref(),
                         num_inputs,
+                        witness,
+                    )
+                    .await?
+                }
+            }
+        }
+        Commands::CoNoirFullProve(args) => {
+            let abi = serde_json::from_reader(File::open(args.abi)?)?;
+            let input = File::open(args.input)?;
+            taceo_proof_client::co_noir::schedule_full_job_rep3(
+                config,
+                &nodes,
+                args.blueprint,
+                args.voucher.as_deref(),
+                &abi,
+                &args.public_inputs,
+                input,
+            )
+            .await?
+        }
+        Commands::CoNoirProve(args) => {
+            let witness = noir_types::witness_from_reader(File::open(args.witness)?)?;
+            match args.protocol {
+                MpcProtocol::REP3 => {
+                    taceo_proof_client::co_noir::schedule_prove_job_rep3(
+                        config,
+                        &nodes,
+                        args.blueprint,
+                        args.voucher.as_deref(),
+                        &args.public_inputs,
+                        witness,
+                    )
+                    .await?
+                }
+                MpcProtocol::Shamir => {
+                    taceo_proof_client::co_noir::schedule_prove_job_shamir(
+                        config,
+                        &nodes,
+                        args.blueprint,
+                        args.voucher.as_deref(),
+                        &args.public_inputs,
                         witness,
                     )
                     .await?
@@ -247,6 +371,17 @@ where
 
     let out = args.command.out();
     let out_public_inputs = args.command.out_public_inputs();
+
+    let proof = if args.command.is_base64() {
+        &Base64::decode_vec(&proof)?
+    } else {
+        proof.as_bytes()
+    };
+    let public_inputs = if args.command.is_base64() {
+        &Base64::decode_vec(&public_inputs)?
+    } else {
+        public_inputs.as_bytes()
+    };
 
     std::fs::write(&out, proof)?;
     tracing::info!("wrote proof to {}", out.display());

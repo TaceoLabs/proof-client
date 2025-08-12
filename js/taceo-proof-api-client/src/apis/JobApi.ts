@@ -28,6 +28,18 @@ import {
     ScheduleJobResponseToJSON,
 } from '../models/index';
 
+export interface DownloadProofRequest {
+    id: string;
+}
+
+export interface DownloadPublicInputsRequest {
+    id: string;
+}
+
+export interface DownloadSignatureRequest {
+    id: string;
+}
+
 export interface ScheduleJobRequest {
     aBlueprintId: string;
     bJobType: JobType;
@@ -44,6 +56,96 @@ export interface ScheduleJobRequest {
  * 
  */
 export class JobApi extends runtime.BaseAPI {
+
+    /**
+     */
+    async downloadProofRaw(requestParameters: DownloadProofRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling downloadProof().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/jobs/{id}/proof`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async downloadProof(requestParameters: DownloadProofRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.downloadProofRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async downloadPublicInputsRaw(requestParameters: DownloadPublicInputsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling downloadPublicInputs().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/jobs/{id}/public_inputs`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async downloadPublicInputs(requestParameters: DownloadPublicInputsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.downloadPublicInputsRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async downloadSignatureRaw(requestParameters: DownloadSignatureRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling downloadSignature().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/jobs/{id}/signature`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async downloadSignature(requestParameters: DownloadSignatureRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.downloadSignatureRaw(requestParameters, initOverrides);
+    }
 
     /**
      * create a new job

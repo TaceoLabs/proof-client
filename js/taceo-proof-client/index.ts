@@ -1,4 +1,4 @@
-import { seal_share, split_input_rep3_bls12_381, split_input_rep3_bn254, split_witness_rep3_bls12_381, split_witness_rep3_bn254, split_witness_shamir_bls12_381, split_witness_shamir_bn254, split_input_rep3_bls12_377, split_witness_rep3_bls12_377, split_witness_shamir_bls12_377, verify_proof_result_signature } from "./pkg/taceo_proof_wasm.js";
+import { seal_share, co_circom_split_input_rep3_bls12_381, co_circom_split_input_rep3_bn254, co_circom_split_witness_rep3_bls12_381, co_circom_split_witness_rep3_bn254, co_circom_split_witness_shamir_bls12_381, co_circom_split_witness_shamir_bn254, co_circom_split_input_rep3_bls12_377, co_circom_split_witness_rep3_bls12_377, co_circom_split_witness_shamir_bls12_377, verify_proof_result_signature, co_noir_split_input_rep3_bn254, co_noir_split_witness_rep3_bn254, co_noir_split_witness_shamir_bn254 } from "./pkg/taceo_proof_wasm.js";
 import { BlueprintCurve, JobApi, JobType, NodeProviders } from '@taceo/proof-api-client';
 
 export { JobApi, JobType, NodeApi, NodeProviders, NodeProvider, BlueprintCurve, Configuration, ConfigurationParameters } from '@taceo/proof-api-client';
@@ -8,7 +8,7 @@ async function scheduleJob(
   nodes: NodeProviders,
   blueprintId: string,
   jobType: JobType,
-  code: string | null,
+  voucher: string | null,
   shares: Uint8Array[],
 ): Promise<string> {
   const share0Ciphertext = seal_share(nodes.node0.encKey, shares[0]);
@@ -21,7 +21,7 @@ async function scheduleJob(
     cNode0: nodes.node0.id,
     cNode1: nodes.node1.id,
     cNode2: nodes.node2.id,
-    dCode: code,
+    dCode: voucher,
     inputParty0: new Blob([share0Ciphertext]),
     inputParty1: new Blob([share1Ciphertext]),
     inputParty2: new Blob([share2Ciphertext])
@@ -61,6 +61,7 @@ export function verifyProofResultSignature(jobId: string, proof: string, publicI
  * @param nodes - A set of node providers that will execute the job.
  * @param blueprintId - The unique identifier of the blueprint for the job.
  * @param voucher - An optional voucher for non-public blueprints.
+ * @param curve - The curve of the blueprint.
  * @param publicInputs - A list of public input names for the blueprint's circuit.
  * @param input - The input data to be shared and used in the witness extension.
  * 
@@ -71,11 +72,11 @@ export function verifyProofResultSignature(jobId: string, proof: string, publicI
  * - Encryption of shares fails.
  * - The job scheduling API call fails.
  */
-export async function scheduleFullJobRep3(
+export async function scheduleCoCircomFullJobRep3(
   apiInstance: JobApi,
   nodes: NodeProviders,
   blueprintId: string,
-  code: string | null,
+  voucher: string | null,
   curve: BlueprintCurve,
   publicInputs: string[],
   input: any
@@ -83,17 +84,17 @@ export async function scheduleFullJobRep3(
   let sharedInput;
   switch (curve) {
     case BlueprintCurve.Bn254:
-      sharedInput = split_input_rep3_bn254(input, publicInputs);
+      sharedInput = co_circom_split_input_rep3_bn254(input, publicInputs);
       break;
     case BlueprintCurve.Bls381:
-      sharedInput = split_input_rep3_bls12_381(input, publicInputs);
+      sharedInput = co_circom_split_input_rep3_bls12_381(input, publicInputs);
       break;
     case BlueprintCurve.Bls377:
-      sharedInput = split_input_rep3_bls12_377(input, publicInputs);
+      sharedInput = co_circom_split_input_rep3_bls12_377(input, publicInputs);
       break;
   }
-  const shares = [sharedInput.shares0, sharedInput.shares1, sharedInput.shares2];
-  return await scheduleJob(apiInstance, nodes, blueprintId, JobType.Rep3Full, code, shares);
+  const shares = [sharedInput.share0, sharedInput.share1, sharedInput.share2];
+  return await scheduleJob(apiInstance, nodes, blueprintId, JobType.Rep3Full, voucher, shares);
 }
 
 /**
@@ -107,6 +108,7 @@ export async function scheduleFullJobRep3(
  * @param nodes - A set of node providers that will execute the job.
  * @param blueprintId - The unique identifier of the blueprint for the proof job.
  * @param voucher - An optional voucher for non-public blueprints.
+ * @param curve - The curve of the blueprint.
  * @param numPubInputs - The number of public inputs for the blueprint's circuit.
  * @param witness - The witness data to be used in the proof.
  * 
@@ -117,11 +119,11 @@ export async function scheduleFullJobRep3(
  * - Encryption of shares fails.
  * - The job scheduling API call fails.
  */
-export async function scheduleProveJobRep3(
+export async function scheduleCoCircomProveJobRep3(
   apiInstance: JobApi,
   nodes: NodeProviders,
   blueprintId: string,
-  code: string | null,
+  voucher: string | null,
   curve: BlueprintCurve,
   numPubInputs: number,
   witness: Uint8Array
@@ -129,17 +131,17 @@ export async function scheduleProveJobRep3(
   let sharedInput;
   switch (curve) {
     case BlueprintCurve.Bn254:
-      sharedInput = split_witness_rep3_bn254(witness, numPubInputs);
+      sharedInput = co_circom_split_witness_rep3_bn254(witness, numPubInputs);
       break;
     case BlueprintCurve.Bls381:
-      sharedInput = split_witness_rep3_bls12_381(witness, numPubInputs);
+      sharedInput = co_circom_split_witness_rep3_bls12_381(witness, numPubInputs);
       break;
     case BlueprintCurve.Bls377:
-      sharedInput = split_witness_rep3_bls12_377(witness, numPubInputs);
+      sharedInput = co_circom_split_witness_rep3_bls12_377(witness, numPubInputs);
       break;
   }
-  const shares = [sharedInput.shares0, sharedInput.shares1, sharedInput.shares2];
-  return await scheduleJob(apiInstance, nodes, blueprintId, JobType.Rep3Prove, code, shares);
+  const shares = [sharedInput.share0, sharedInput.share1, sharedInput.share2];
+  return await scheduleJob(apiInstance, nodes, blueprintId, JobType.Rep3Prove, voucher, shares);
 }
 
 /**
@@ -153,6 +155,7 @@ export async function scheduleProveJobRep3(
  * @param nodes - A set of node providers that will execute the job.
  * @param blueprintId - The unique identifier of the blueprint for the proof job.
  * @param voucher - An optional voucher for non-public blueprints.
+ * @param curve - The curve of the blueprint.
  * @param numPubInputs - The number of public inputs for the blueprint's circuit.
  * @param witness - The witness data to be used in the proof.
  * 
@@ -163,11 +166,11 @@ export async function scheduleProveJobRep3(
  * - Encryption of shares fails.
  * - The job scheduling API call fails.
  */
-export async function scheduleProveJobShamir(
+export async function scheduleCoCircomProveJobShamir(
   apiInstance: JobApi,
   nodes: NodeProviders,
   blueprintId: string,
-  code: string | null,
+  voucher: string | null,
   curve: BlueprintCurve,
   numPubInputs: number,
   witness: Uint8Array
@@ -175,17 +178,119 @@ export async function scheduleProveJobShamir(
   let sharedInput;
   switch (curve) {
     case BlueprintCurve.Bn254:
-      sharedInput = split_witness_shamir_bn254(witness, numPubInputs);
+      sharedInput = co_circom_split_witness_shamir_bn254(witness, numPubInputs);
       break;
     case BlueprintCurve.Bls381:
-      sharedInput = split_witness_shamir_bls12_381(witness, numPubInputs);
+      sharedInput = co_circom_split_witness_shamir_bls12_381(witness, numPubInputs);
       break;
     case BlueprintCurve.Bls377:
-      sharedInput = split_witness_shamir_bls12_377(witness, numPubInputs);
+      sharedInput = co_circom_split_witness_shamir_bls12_377(witness, numPubInputs);
       break;
   }
-  const shares = [sharedInput.shares0, sharedInput.shares1, sharedInput.shares2];
-  return await scheduleJob(apiInstance, nodes, blueprintId, JobType.ShamirProve, code, shares);
+  const shares = [sharedInput.share0, sharedInput.share1, sharedInput.share2];
+  return await scheduleJob(apiInstance, nodes, blueprintId, JobType.ShamirProve, voucher, shares);
+}
+
+/**
+ * Schedule a full REP3 job including witness extension.
+ *
+ * This function schedules a job using the Rep3 Secret Sharing scheme. It takes an input,
+ * splits it into shares using Rep3, encrypts the shares, and sends them to the respective
+ * nodes for execution. Instead of providing the extended witness, this job will compute
+ * witness extension first and then the proof afterwards.
+ *
+ * @param config - The configuration object for the API client.
+ * @param nodes - A set of node providers that will execute the job.
+ * @param blueprintId - The unique identifier of the blueprint for the job.
+ * @param voucher - An optional voucher for non-public blueprints.
+ * @param abi - The ABI for the Noir program.
+ * @param input - The input data to be shared and used in the witness extension.
+ * 
+ * @returns The id (`Uuid`) of the scheduled job on success.
+ * 
+ * @throws Will throw an error if:
+ * - Input sharing fails.
+ * - Encryption of shares fails.
+ * - The job scheduling API call fails.
+ */
+export async function scheduleCoNoirFullJobRep3(
+  apiInstance: JobApi,
+  nodes: NodeProviders,
+  blueprintId: string,
+  voucher: string | null,
+  abi: any,
+  publicInputs: Uint32Array,
+  input: any
+): Promise<string> {
+  const sharedInput = co_noir_split_input_rep3_bn254(input, abi, publicInputs);
+  const shares = [sharedInput.share0, sharedInput.share1, sharedInput.share2];
+  return await scheduleJob(apiInstance, nodes, blueprintId, JobType.Rep3Full, voucher, shares);
+}
+
+/**
+ * Schedule a Rep3 prove job.
+ *
+ * This function schedules a proof job using the Rep3 Secret Sharing scheme.
+ * It takes a witness, splits it into shares using Rep3, encrypts the shares,
+ * and sends them to the respective nodes for execution.
+ *
+ * @param config - The configuration object for the API client.
+ * @param nodes - A set of node providers that will execute the job.
+ * @param blueprintId - The unique identifier of the blueprint for the proof job.
+ * @param voucher - An optional voucher for non-public blueprints.
+ * @param witness - The witness data to be used in the proof.
+ * 
+ * @returns The id (`Uuid`) of the scheduled job on success.
+ * 
+ * @throws Will throw an error if:
+ * - Witness sharing fails.
+ * - Encryption of shares fails.
+ * - The job scheduling API call fails.
+ */
+export async function scheduleCoNoirProveJobRep3(
+  apiInstance: JobApi,
+  nodes: NodeProviders,
+  blueprintId: string,
+  voucher: string | null,
+  publicInputs: Uint32Array,
+  witness: Uint8Array
+): Promise<string> {
+  const sharedInput = co_noir_split_witness_rep3_bn254(witness, publicInputs);
+  const shares = [sharedInput.share0, sharedInput.share1, sharedInput.share2];
+  return await scheduleJob(apiInstance, nodes, blueprintId, JobType.Rep3Prove, voucher, shares);
+}
+
+/**
+ * Schedule a Shamir prove job.
+ *
+ * This function schedules a proof job using Shamir Secret Sharing scheme.
+ * It takes a witness, splits it into shares using Shamir, encrypts the shares,
+ * and sends them to the respective nodes for execution.
+ *
+ * @param config - The configuration object for the API client.
+ * @param nodes - A set of node providers that will execute the job.
+ * @param blueprintId - The unique identifier of the blueprint for the proof job.
+ * @param voucher - An optional voucher for non-public blueprints.
+ * @param witness - The witness data to be used in the proof.
+ * 
+ * @returns The id (`Uuid`) of the scheduled job on success.
+ * 
+ * @throws Will throw an error if:
+ * - Witness sharing fails.
+ * - Encryption of shares fails.
+ * - The job scheduling API call fails.
+ */
+export async function scheduleCoNoirProveJobShamir(
+  apiInstance: JobApi,
+  nodes: NodeProviders,
+  blueprintId: string,
+  voucher: string | null,
+  publicInputs: Uint32Array,
+  witness: Uint8Array
+): Promise<string> {
+  const sharedInput = co_noir_split_witness_shamir_bn254(witness, publicInputs);
+  const shares = [sharedInput.share0, sharedInput.share1, sharedInput.share2];
+  return await scheduleJob(apiInstance, nodes, blueprintId, JobType.ShamirProve, voucher, shares);
 }
 
 /**

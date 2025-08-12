@@ -1,0 +1,22 @@
+{
+  "parameters": [
+    {
+      "name": "plains",
+      "type": {
+        "kind": "array",
+        "length": 8,
+        "type": {
+          "kind": "field"
+        }
+      },
+      "visibility": "private"
+    }
+  ],
+  "return_type": {
+    "abi_type": {
+      "kind": "field"
+    },
+    "visibility": "public"
+  },
+  "error_types": {}
+}

@@ -23,15 +23,15 @@ import {
 } from '../models/index';
 
 export interface LoginRequest {
+    email: string;
     password: string;
-    username: string;
     next?: string | null;
 }
 
 export interface RegisterRequest {
+    email: string;
     inviteCode: string;
     password: string;
-    username: string;
 }
 
 /**
@@ -42,17 +42,17 @@ export class UserApi extends runtime.BaseAPI {
     /**
      */
     async loginRaw(requestParameters: LoginRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['email'] == null) {
+            throw new runtime.RequiredError(
+                'email',
+                'Required parameter "email" was null or undefined when calling login().'
+            );
+        }
+
         if (requestParameters['password'] == null) {
             throw new runtime.RequiredError(
                 'password',
                 'Required parameter "password" was null or undefined when calling login().'
-            );
-        }
-
-        if (requestParameters['username'] == null) {
-            throw new runtime.RequiredError(
-                'username',
-                'Required parameter "username" was null or undefined when calling login().'
             );
         }
 
@@ -74,16 +74,16 @@ export class UserApi extends runtime.BaseAPI {
             formParams = new URLSearchParams();
         }
 
+        if (requestParameters['email'] != null) {
+            formParams.append('email', requestParameters['email'] as any);
+        }
+
         if (requestParameters['next'] != null) {
             formParams.append('next', requestParameters['next'] as any);
         }
 
         if (requestParameters['password'] != null) {
             formParams.append('password', requestParameters['password'] as any);
-        }
-
-        if (requestParameters['username'] != null) {
-            formParams.append('username', requestParameters['username'] as any);
         }
 
         const response = await this.request({
@@ -129,6 +129,13 @@ export class UserApi extends runtime.BaseAPI {
     /**
      */
     async registerRaw(requestParameters: RegisterRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['email'] == null) {
+            throw new runtime.RequiredError(
+                'email',
+                'Required parameter "email" was null or undefined when calling register().'
+            );
+        }
+
         if (requestParameters['inviteCode'] == null) {
             throw new runtime.RequiredError(
                 'inviteCode',
@@ -140,13 +147,6 @@ export class UserApi extends runtime.BaseAPI {
             throw new runtime.RequiredError(
                 'password',
                 'Required parameter "password" was null or undefined when calling register().'
-            );
-        }
-
-        if (requestParameters['username'] == null) {
-            throw new runtime.RequiredError(
-                'username',
-                'Required parameter "username" was null or undefined when calling register().'
             );
         }
 
@@ -168,16 +168,16 @@ export class UserApi extends runtime.BaseAPI {
             formParams = new URLSearchParams();
         }
 
+        if (requestParameters['email'] != null) {
+            formParams.append('email', requestParameters['email'] as any);
+        }
+
         if (requestParameters['inviteCode'] != null) {
             formParams.append('invite_code', requestParameters['inviteCode'] as any);
         }
 
         if (requestParameters['password'] != null) {
             formParams.append('password', requestParameters['password'] as any);
-        }
-
-        if (requestParameters['username'] != null) {
-            formParams.append('username', requestParameters['username'] as any);
         }
 
         const response = await this.request({

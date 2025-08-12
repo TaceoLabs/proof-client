@@ -1268,7 +1268,8 @@
         "enum": [
           "CircomGroth16",
           "LibsnarkGroth16",
-          "NoirUltrahonk"
+          "NoirUltrahonkKeccak",
+          "NoirUltrahonkPoseidon2"
         ]
       },
       "CreateBatchInviteCodes": {
