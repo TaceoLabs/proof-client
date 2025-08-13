@@ -27,21 +27,27 @@ All URIs are relative to *http://localhost*
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *AdminApi* | [**create_node_invite_code**](docs/AdminApi.md#create_node_invite_code) | **POST** /admin/node/invitation/create | 
+*AdminApi* | [**create_node_invite_code_batch**](docs/AdminApi.md#create_node_invite_code_batch) | **POST** /admin/node/invitation/batch_create | 
 *AdminApi* | [**create_user**](docs/AdminApi.md#create_user) | **POST** /admin/user/create | 
 *AdminApi* | [**create_user_invite_code**](docs/AdminApi.md#create_user_invite_code) | **POST** /admin/user/invitation/create | 
-*AdminApi* | [**paginate_node_invitations**](docs/AdminApi.md#paginate_node_invitations) | **GET** /admin/node/invitation/list | 
-*AdminApi* | [**paginate_user_invitations**](docs/AdminApi.md#paginate_user_invitations) | **GET** /admin/user/invitation/list | 
+*AdminApi* | [**create_user_invite_code_batch**](docs/AdminApi.md#create_user_invite_code_batch) | **POST** /admin/user/invitation/batch_create | 
+*AdminApi* | [**paginate_open_node_invitations**](docs/AdminApi.md#paginate_open_node_invitations) | **GET** /admin/node/invitation/list | 
+*AdminApi* | [**paginate_open_user_invitations**](docs/AdminApi.md#paginate_open_user_invitations) | **GET** /admin/user/invitation/list | 
 *AdminApi* | [**revoke_node_invitation_code**](docs/AdminApi.md#revoke_node_invitation_code) | **POST** /admin/node/invitation/revoke | 
 *AdminApi* | [**revoke_user_invitation_code**](docs/AdminApi.md#revoke_user_invitation_code) | **POST** /admin/user/invitation/revoke | 
 *AdminApi* | [**update_blueprint_access**](docs/AdminApi.md#update_blueprint_access) | **POST** /admin/blueprint/update/access | update the blueprint access
 *BlueprintApi* | [**blueprint_ready**](docs/BlueprintApi.md#blueprint_ready) | **GET** /api/v1/blueprint/{id}/ready | checks whether a blueprint is already ready
 *BlueprintApi* | [**create**](docs/BlueprintApi.md#create) | **POST** /api/v1/blueprint/create | create a new coSNARK blueprint
+*BlueprintApi* | [**download_aux_data**](docs/BlueprintApi.md#download_aux_data) | **GET** /api/v1/blueprint/{id}/aux/{aux_type} | 
 *BlueprintApi* | [**issue_cosnark_code**](docs/BlueprintApi.md#issue_cosnark_code) | **POST** /api/v1/blueprint/code | create a new job
 *BlueprintApi* | [**revoke**](docs/BlueprintApi.md#revoke) | **POST** /api/v1/blueprint/{id}/revoke | Revokes the blueprint identified by ID if the logged in user has the correct access rights.
 *BlueprintApi* | [**upload_aux_data**](docs/BlueprintApi.md#upload_aux_data) | **POST** /api/v1/blueprint/{id}/aux/{aux_type} | add proving key to blueprint
 *HealthApi* | [**health**](docs/HealthApi.md#health) | **GET** /health | 
 *HealthApi* | [**live**](docs/HealthApi.md#live) | **GET** /health/live | 
 *HealthApi* | [**ready**](docs/HealthApi.md#ready) | **GET** /health/ready | 
+*JobApi* | [**download_proof**](docs/JobApi.md#download_proof) | **GET** /api/v1/jobs/{id}/proof | 
+*JobApi* | [**download_public_inputs**](docs/JobApi.md#download_public_inputs) | **GET** /api/v1/jobs/{id}/public_inputs | 
+*JobApi* | [**download_signature**](docs/JobApi.md#download_signature) | **GET** /api/v1/jobs/{id}/signature | 
 *JobApi* | [**schedule_job**](docs/JobApi.md#schedule_job) | **POST** /api/v1/jobs/schedule | create a new job
 *NodeApi* | [**list**](docs/NodeApi.md#list) | **GET** /api/v1/node/list | get node providers
 *NodeApi* | [**node_provider**](docs/NodeApi.md#node_provider) | **GET** /api/v1/node/{id} | returns the node for the given id
@@ -60,10 +66,12 @@ Class | Method | HTTP request | Description
  - [BlueprintReadyProbe](docs/BlueprintReadyProbe.md)
  - [BlueprintType](docs/BlueprintType.md)
  - [CreateBlueprintResponse](docs/CreateBlueprintResponse.md)
+ - [InviteCode](docs/InviteCode.md)
  - [JobType](docs/JobType.md)
  - [NodeProvider](docs/NodeProvider.md)
  - [NodeProviders](docs/NodeProviders.md)
- - [PaginationResultString](docs/PaginationResultString.md)
+ - [PaginationResultInviteCode](docs/PaginationResultInviteCode.md)
+ - [PaginationResultInviteCodeElementsInner](docs/PaginationResultInviteCodeElementsInner.md)
  - [ScheduleJobResponse](docs/ScheduleJobResponse.md)
 
 

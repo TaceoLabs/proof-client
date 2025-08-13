@@ -12,7 +12,7 @@ Method | HTTP request | Description
 
 ## login
 
-> login(password, username, next)
+> login(email, password, next)
 
 
 ### Parameters
@@ -20,8 +20,8 @@ Method | HTTP request | Description
 
 Name | Type | Description  | Required | Notes
 ------------- | ------------- | ------------- | ------------- | -------------
+**email** | **String** |  | [required] |
 **password** | **String** |  | [required] |
-**username** | **String** |  | [required] |
 **next** | Option<**String**> |  |  |
 
 ### Return type
@@ -67,7 +67,7 @@ No authorization required
 
 ## register
 
-> register(invite_code, password, username)
+> register(email, invite_code, password)
 
 
 ### Parameters
@@ -75,9 +75,9 @@ No authorization required
 
 Name | Type | Description  | Required | Notes
 ------------- | ------------- | ------------- | ------------- | -------------
+**email** | **String** |  | [required] |
 **invite_code** | **String** |  | [required] |
 **password** | **String** |  | [required] |
-**username** | **String** |  | [required] |
 
 ### Return type
 

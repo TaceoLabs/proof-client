@@ -56,12 +56,53 @@
         ]
       }
     },
+    "/admin/node/invitation/batch_create": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "create_node_invite_code_batch",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBatchInviteCodes"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Generated the batch of invitation codes"
+          },
+          "403": {
+            "description": "You are not an admin"
+          }
+        },
+        "security": [
+          {
+            "adminAuth": []
+          }
+        ]
+      }
+    },
     "/admin/node/invitation/create": {
       "post": {
         "tags": [
           "Admin"
         ],
         "operationId": "create_node_invite_code",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateInviteCode"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "Generated a new invitation code and returns it",
@@ -89,7 +130,7 @@
         "tags": [
           "Admin"
         ],
-        "operationId": "paginate_node_invitations",
+        "operationId": "paginate_open_node_invitations",
         "parameters": [
           {
             "name": "cursor",
@@ -116,6 +157,17 @@
               "format": "int32",
               "minimum": 0
             }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
           }
         ],
         "responses": {
@@ -124,7 +176,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PaginationResult_String"
+                  "$ref": "#/components/schemas/PaginationResult_InviteCode"
                 }
               }
             }
@@ -202,12 +254,53 @@
         ]
       }
     },
+    "/admin/user/invitation/batch_create": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "create_user_invite_code_batch",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBatchInviteCodes"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Generated the batch of invitation codes"
+          },
+          "403": {
+            "description": "You are not an admin"
+          }
+        },
+        "security": [
+          {
+            "adminAuth": []
+          }
+        ]
+      }
+    },
     "/admin/user/invitation/create": {
       "post": {
         "tags": [
           "Admin"
         ],
         "operationId": "create_user_invite_code",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateInviteCode"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "Generated a new invitation code and returns it",
@@ -220,7 +313,7 @@
             }
           },
           "403": {
-            "description": "Not an admin"
+            "description": "You are not an admin"
           }
         },
         "security": [
@@ -235,7 +328,7 @@
         "tags": [
           "Admin"
         ],
-        "operationId": "paginate_user_invitations",
+        "operationId": "paginate_open_user_invitations",
         "parameters": [
           {
             "name": "cursor",
@@ -262,6 +355,17 @@
               "format": "int32",
               "minimum": 0
             }
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
           }
         ],
         "responses": {
@@ -270,7 +374,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PaginationResult_String"
+                  "$ref": "#/components/schemas/PaginationResult_InviteCode"
                 }
               }
             }
@@ -408,6 +512,59 @@
       }
     },
     "/api/v1/blueprint/{id}/aux/{aux_type}": {
+      "get": {
+        "tags": [
+          "blueprint"
+        ],
+        "operationId": "download_aux_data",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The id of the blueprint",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "aux_type",
+            "in": "path",
+            "description": "The type of the auxiliary data",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AuxiliaryType"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Download of the aux data"
+          },
+          "401": {
+            "description": "Logged-in user is not allowed to perform that action"
+          },
+          "404": {
+            "description": "Unknown blueprint id or not uploaded aux"
+          },
+          "5XX": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      },
       "post": {
         "tags": [
           "blueprint"
@@ -456,7 +613,7 @@
         },
         "responses": {
           "200": {
-            "description": "Sucessfully added the auxiliary data"
+            "description": "Successfully added the auxiliary data"
           },
           "400": {
             "description": "e.g. Aux type is not needed for this blueprint"
@@ -640,6 +797,108 @@
                 }
               }
             }
+          },
+          "5XX": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/{id}/proof": {
+      "get": {
+        "tags": [
+          "Job"
+        ],
+        "operationId": "download_proof",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Download the proof"
+          },
+          "5XX": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/{id}/public_inputs": {
+      "get": {
+        "tags": [
+          "Job"
+        ],
+        "operationId": "download_public_inputs",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Download the public_inputs"
+          },
+          "5XX": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/{id}/signature": {
+      "get": {
+        "tags": [
+          "Job"
+        ],
+        "operationId": "download_signature",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Download the signature"
           },
           "5XX": {
             "description": "Internal Server Error",
@@ -922,7 +1181,7 @@
         },
         "responses": {
           "200": {
-            "description": "Created new account and redirected to the dashboard"
+            "description": "Created new account and redirected to the blueprint page"
           },
           "5XX": {
             "description": "Internal Server Error",
@@ -1012,6 +1271,25 @@
           "NoirUltrahonk"
         ]
       },
+      "CreateBatchInviteCodes": {
+        "type": "object",
+        "required": [
+          "batch_size"
+        ],
+        "properties": {
+          "batch_size": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "distribution_method": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
       "CreateBlueprintRequest": {
         "type": "object",
         "required": [
@@ -1047,17 +1325,28 @@
           }
         }
       },
+      "CreateInviteCode": {
+        "type": "object",
+        "properties": {
+          "distribution_method": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
       "CreateUserRequest": {
         "type": "object",
         "required": [
-          "username",
+          "email",
           "password"
         ],
         "properties": {
-          "password": {
+          "email": {
             "type": "string"
           },
-          "username": {
+          "password": {
             "type": "string"
           }
         }
@@ -1065,10 +1354,13 @@
       "Credentials": {
         "type": "object",
         "required": [
-          "username",
+          "email",
           "password"
         ],
         "properties": {
+          "email": {
+            "type": "string"
+          },
           "next": {
             "type": [
               "string",
@@ -1077,8 +1369,26 @@
           },
           "password": {
             "type": "string"
+          }
+        }
+      },
+      "InviteCode": {
+        "type": "object",
+        "required": [
+          "invite_code",
+          "timestamp"
+        ],
+        "properties": {
+          "distribution_method": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
-          "username": {
+          "invite_code": {
+            "type": "string"
+          },
+          "timestamp": {
             "type": "string"
           }
         }
@@ -1124,8 +1434,7 @@
             "type": "string"
           },
           "id": {
-            "type": "integer",
-            "format": "int32"
+            "$ref": "#/components/schemas/i32"
           },
           "name": {
             "type": "string"
@@ -1157,7 +1466,7 @@
           }
         }
       },
-      "PaginationResult_String": {
+      "PaginationResult_InviteCode": {
         "type": "object",
         "required": [
           "elements"
@@ -1166,7 +1475,25 @@
           "elements": {
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "object",
+              "required": [
+                "invite_code",
+                "timestamp"
+              ],
+              "properties": {
+                "distribution_method": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "invite_code": {
+                  "type": "string"
+                },
+                "timestamp": {
+                  "type": "string"
+                }
+              }
             }
           },
           "total_amount": {
@@ -1182,18 +1509,18 @@
       "RegisterRequest": {
         "type": "object",
         "required": [
-          "username",
+          "email",
           "password",
           "invite_code"
         ],
         "properties": {
+          "email": {
+            "type": "string"
+          },
           "invite_code": {
             "type": "string"
           },
           "password": {
-            "type": "string"
-          },
-          "username": {
             "type": "string"
           }
         }
@@ -1244,6 +1571,23 @@
             "format": "uuid"
           }
         }
+      },
+      "i32": {
+        "type": "integer",
+        "format": "int32"
+      }
+    },
+    "securitySchemes": {
+      "adminAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "JSESSIONID",
+        "description": "session token for admins"
+      },
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "JSESSIONID"
       }
     }
   },

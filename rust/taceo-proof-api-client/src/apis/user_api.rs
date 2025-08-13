@@ -38,13 +38,13 @@ pub enum RegisterError {
 
 pub async fn login(
     configuration: &configuration::Configuration,
+    email: &str,
     password: &str,
-    username: &str,
     next: Option<&str>,
 ) -> Result<(), Error<LoginError>> {
     // add a prefix to parameters to efficiently prevent name collisions
+    let p_email = email;
     let p_password = password;
-    let p_username = username;
     let p_next = next;
 
     let uri_str = format!("{}/login", configuration.base_path);
@@ -56,11 +56,11 @@ pub async fn login(
         req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
     }
     let mut multipart_form_params = std::collections::HashMap::new();
+    multipart_form_params.insert("email", p_email.to_string());
     if let Some(param_value) = p_next {
         multipart_form_params.insert("next", param_value.to_string());
     }
     multipart_form_params.insert("password", p_password.to_string());
-    multipart_form_params.insert("username", p_username.to_string());
     req_builder = req_builder.form(&multipart_form_params);
 
     let req = req_builder.build()?;
@@ -113,14 +113,14 @@ pub async fn logout(
 
 pub async fn register(
     configuration: &configuration::Configuration,
+    email: &str,
     invite_code: &str,
     password: &str,
-    username: &str,
 ) -> Result<(), Error<RegisterError>> {
     // add a prefix to parameters to efficiently prevent name collisions
+    let p_email = email;
     let p_invite_code = invite_code;
     let p_password = password;
-    let p_username = username;
 
     let uri_str = format!("{}/register", configuration.base_path);
     let mut req_builder = configuration
@@ -131,9 +131,9 @@ pub async fn register(
         req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
     }
     let mut multipart_form_params = std::collections::HashMap::new();
+    multipart_form_params.insert("email", p_email.to_string());
     multipart_form_params.insert("invite_code", p_invite_code.to_string());
     multipart_form_params.insert("password", p_password.to_string());
-    multipart_form_params.insert("username", p_username.to_string());
     req_builder = req_builder.form(&multipart_form_params);
 
     let req = req_builder.build()?;

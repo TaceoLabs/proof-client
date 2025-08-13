@@ -12,23 +12,26 @@ use crate::models;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
-pub struct PaginationResultString {
-    #[serde(rename = "elements")]
-    pub elements: Vec<String>,
+pub struct InviteCode {
     #[serde(
-        rename = "total_amount",
+        rename = "distribution_method",
         default,
         with = "::serde_with::rust::double_option",
         skip_serializing_if = "Option::is_none"
     )]
-    pub total_amount: Option<Option<i64>>,
+    pub distribution_method: Option<Option<String>>,
+    #[serde(rename = "invite_code")]
+    pub invite_code: String,
+    #[serde(rename = "timestamp")]
+    pub timestamp: String,
 }
 
-impl PaginationResultString {
-    pub fn new(elements: Vec<String>) -> PaginationResultString {
-        PaginationResultString {
-            elements,
-            total_amount: None,
+impl InviteCode {
+    pub fn new(invite_code: String, timestamp: String) -> InviteCode {
+        InviteCode {
+            distribution_method: None,
+            invite_code,
+            timestamp,
         }
     }
 }

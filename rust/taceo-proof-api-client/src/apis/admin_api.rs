@@ -21,6 +21,14 @@ pub enum CreateNodeInviteCodeError {
     UnknownValue(serde_json::Value),
 }
 
+/// struct for typed errors of method [`create_node_invite_code_batch`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum CreateNodeInviteCodeBatchError {
+    Status403(),
+    UnknownValue(serde_json::Value),
+}
+
 /// struct for typed errors of method [`create_user`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
@@ -37,18 +45,26 @@ pub enum CreateUserInviteCodeError {
     UnknownValue(serde_json::Value),
 }
 
-/// struct for typed errors of method [`paginate_node_invitations`]
+/// struct for typed errors of method [`create_user_invite_code_batch`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
-pub enum PaginateNodeInvitationsError {
+pub enum CreateUserInviteCodeBatchError {
     Status403(),
     UnknownValue(serde_json::Value),
 }
 
-/// struct for typed errors of method [`paginate_user_invitations`]
+/// struct for typed errors of method [`paginate_open_node_invitations`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
-pub enum PaginateUserInvitationsError {
+pub enum PaginateOpenNodeInvitationsError {
+    Status403(),
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`paginate_open_user_invitations`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum PaginateOpenUserInvitationsError {
     Status403(),
     UnknownValue(serde_json::Value),
 }
@@ -80,7 +96,11 @@ pub enum UpdateBlueprintAccessError {
 
 pub async fn create_node_invite_code(
     configuration: &configuration::Configuration,
+    distribution_method: Option<&str>,
 ) -> Result<String, Error<CreateNodeInviteCodeError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_distribution_method = distribution_method;
+
     let uri_str = format!("{}/admin/node/invitation/create", configuration.base_path);
     let mut req_builder = configuration
         .client
@@ -89,6 +109,11 @@ pub async fn create_node_invite_code(
     if let Some(ref user_agent) = configuration.user_agent {
         req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
     }
+    let mut multipart_form_params = std::collections::HashMap::new();
+    if let Some(param_value) = p_distribution_method {
+        multipart_form_params.insert("distribution_method", param_value.to_string());
+    }
+    req_builder = req_builder.form(&multipart_form_params);
 
     let req = req_builder.build()?;
     let resp = configuration.client.execute(req).await?;
@@ -119,14 +144,59 @@ pub async fn create_node_invite_code(
     }
 }
 
+pub async fn create_node_invite_code_batch(
+    configuration: &configuration::Configuration,
+    batch_size: i32,
+    distribution_method: Option<&str>,
+) -> Result<(), Error<CreateNodeInviteCodeBatchError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_batch_size = batch_size;
+    let p_distribution_method = distribution_method;
+
+    let uri_str = format!(
+        "{}/admin/node/invitation/batch_create",
+        configuration.base_path
+    );
+    let mut req_builder = configuration
+        .client
+        .request(reqwest::Method::POST, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+    let mut multipart_form_params = std::collections::HashMap::new();
+    multipart_form_params.insert("batch_size", p_batch_size.to_string());
+    if let Some(param_value) = p_distribution_method {
+        multipart_form_params.insert("distribution_method", param_value.to_string());
+    }
+    req_builder = req_builder.form(&multipart_form_params);
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+
+    if !status.is_client_error() && !status.is_server_error() {
+        Ok(())
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<CreateNodeInviteCodeBatchError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
 pub async fn create_user(
     configuration: &configuration::Configuration,
+    email: &str,
     password: &str,
-    username: &str,
 ) -> Result<(), Error<CreateUserError>> {
     // add a prefix to parameters to efficiently prevent name collisions
+    let p_email = email;
     let p_password = password;
-    let p_username = username;
 
     let uri_str = format!("{}/admin/user/create", configuration.base_path);
     let mut req_builder = configuration
@@ -137,8 +207,8 @@ pub async fn create_user(
         req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
     }
     let mut multipart_form_params = std::collections::HashMap::new();
+    multipart_form_params.insert("email", p_email.to_string());
     multipart_form_params.insert("password", p_password.to_string());
-    multipart_form_params.insert("username", p_username.to_string());
     req_builder = req_builder.form(&multipart_form_params);
 
     let req = req_builder.build()?;
@@ -161,7 +231,11 @@ pub async fn create_user(
 
 pub async fn create_user_invite_code(
     configuration: &configuration::Configuration,
+    distribution_method: Option<&str>,
 ) -> Result<String, Error<CreateUserInviteCodeError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_distribution_method = distribution_method;
+
     let uri_str = format!("{}/admin/user/invitation/create", configuration.base_path);
     let mut req_builder = configuration
         .client
@@ -170,6 +244,11 @@ pub async fn create_user_invite_code(
     if let Some(ref user_agent) = configuration.user_agent {
         req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
     }
+    let mut multipart_form_params = std::collections::HashMap::new();
+    if let Some(param_value) = p_distribution_method {
+        multipart_form_params.insert("distribution_method", param_value.to_string());
+    }
+    req_builder = req_builder.form(&multipart_form_params);
 
     let req = req_builder.build()?;
     let resp = configuration.client.execute(req).await?;
@@ -200,14 +279,61 @@ pub async fn create_user_invite_code(
     }
 }
 
-pub async fn paginate_node_invitations(
+pub async fn create_user_invite_code_batch(
+    configuration: &configuration::Configuration,
+    batch_size: i32,
+    distribution_method: Option<&str>,
+) -> Result<(), Error<CreateUserInviteCodeBatchError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_batch_size = batch_size;
+    let p_distribution_method = distribution_method;
+
+    let uri_str = format!(
+        "{}/admin/user/invitation/batch_create",
+        configuration.base_path
+    );
+    let mut req_builder = configuration
+        .client
+        .request(reqwest::Method::POST, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+    let mut multipart_form_params = std::collections::HashMap::new();
+    multipart_form_params.insert("batch_size", p_batch_size.to_string());
+    if let Some(param_value) = p_distribution_method {
+        multipart_form_params.insert("distribution_method", param_value.to_string());
+    }
+    req_builder = req_builder.form(&multipart_form_params);
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+
+    if !status.is_client_error() && !status.is_server_error() {
+        Ok(())
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<CreateUserInviteCodeBatchError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
+pub async fn paginate_open_node_invitations(
     configuration: &configuration::Configuration,
     cursor: Option<i32>,
     per_page: Option<i32>,
-) -> Result<models::PaginationResultString, Error<PaginateNodeInvitationsError>> {
+    filter: Option<&str>,
+) -> Result<models::PaginationResultInviteCode, Error<PaginateOpenNodeInvitationsError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_cursor = cursor;
     let p_per_page = per_page;
+    let p_filter = filter;
 
     let uri_str = format!("{}/admin/node/invitation/list", configuration.base_path);
     let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
@@ -218,6 +344,9 @@ pub async fn paginate_node_invitations(
     if let Some(ref param_value) = p_per_page {
         req_builder = req_builder.query(&[("per_page", &param_value.to_string())]);
     }
+    if let Some(ref param_value) = p_filter {
+        req_builder = req_builder.query(&[("filter", &param_value.to_string())]);
+    }
     if let Some(ref user_agent) = configuration.user_agent {
         req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
     }
@@ -237,12 +366,12 @@ pub async fn paginate_node_invitations(
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::PaginationResultString`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::PaginationResultString`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::PaginationResultInviteCode`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::PaginationResultInviteCode`")))),
         }
     } else {
         let content = resp.text().await?;
-        let entity: Option<PaginateNodeInvitationsError> = serde_json::from_str(&content).ok();
+        let entity: Option<PaginateOpenNodeInvitationsError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,
@@ -251,14 +380,16 @@ pub async fn paginate_node_invitations(
     }
 }
 
-pub async fn paginate_user_invitations(
+pub async fn paginate_open_user_invitations(
     configuration: &configuration::Configuration,
     cursor: Option<i32>,
     per_page: Option<i32>,
-) -> Result<models::PaginationResultString, Error<PaginateUserInvitationsError>> {
+    filter: Option<&str>,
+) -> Result<models::PaginationResultInviteCode, Error<PaginateOpenUserInvitationsError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_cursor = cursor;
     let p_per_page = per_page;
+    let p_filter = filter;
 
     let uri_str = format!("{}/admin/user/invitation/list", configuration.base_path);
     let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
@@ -269,6 +400,9 @@ pub async fn paginate_user_invitations(
     if let Some(ref param_value) = p_per_page {
         req_builder = req_builder.query(&[("per_page", &param_value.to_string())]);
     }
+    if let Some(ref param_value) = p_filter {
+        req_builder = req_builder.query(&[("filter", &param_value.to_string())]);
+    }
     if let Some(ref user_agent) = configuration.user_agent {
         req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
     }
@@ -288,12 +422,12 @@ pub async fn paginate_user_invitations(
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::PaginationResultString`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::PaginationResultString`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::PaginationResultInviteCode`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::PaginationResultInviteCode`")))),
         }
     } else {
         let content = resp.text().await?;
-        let entity: Option<PaginateUserInvitationsError> = serde_json::from_str(&content).ok();
+        let entity: Option<PaginateOpenUserInvitationsError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,

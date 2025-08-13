@@ -6,6 +6,7 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**blueprint_ready**](BlueprintApi.md#blueprint_ready) | **GET** /api/v1/blueprint/{id}/ready | checks whether a blueprint is already ready
 [**create**](BlueprintApi.md#create) | **POST** /api/v1/blueprint/create | create a new coSNARK blueprint
+[**download_aux_data**](BlueprintApi.md#download_aux_data) | **GET** /api/v1/blueprint/{id}/aux/{aux_type} | 
 [**issue_cosnark_code**](BlueprintApi.md#issue_cosnark_code) | **POST** /api/v1/blueprint/code | create a new job
 [**revoke**](BlueprintApi.md#revoke) | **POST** /api/v1/blueprint/{id}/revoke | Revokes the blueprint identified by ID if the logged in user has the correct access rights.
 [**upload_aux_data**](BlueprintApi.md#upload_aux_data) | **POST** /api/v1/blueprint/{id}/aux/{aux_type} | add proving key to blueprint
@@ -61,11 +62,40 @@ Name | Type | Description  | Required | Notes
 
 ### Authorization
 
-No authorization required
+[cookieAuth](../README.md#cookieAuth)
 
 ### HTTP request headers
 
 - **Content-Type**: application/x-www-form-urlencoded
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
+## download_aux_data
+
+> download_aux_data(id, aux_type)
+
+
+### Parameters
+
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**id** | **uuid::Uuid** | The id of the blueprint | [required] |
+**aux_type** | [**AuxiliaryType**](.md) | The type of the auxiliary data | [required] |
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+[cookieAuth](../README.md#cookieAuth)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
 - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -148,7 +178,7 @@ Name | Type | Description  | Required | Notes
 
 ### Authorization
 
-No authorization required
+[cookieAuth](../README.md#cookieAuth)
 
 ### HTTP request headers
 

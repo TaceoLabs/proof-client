@@ -30,6 +30,16 @@ pub enum CreateError {
     UnknownValue(serde_json::Value),
 }
 
+/// struct for typed errors of method [`download_aux_data`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum DownloadAuxDataError {
+    Status401(),
+    Status404(),
+    Status5XX(models::ApiError),
+    UnknownValue(serde_json::Value),
+}
+
 /// struct for typed errors of method [`issue_cosnark_code`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
@@ -153,6 +163,45 @@ pub async fn create(
     } else {
         let content = resp.text().await?;
         let entity: Option<CreateError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
+pub async fn download_aux_data(
+    configuration: &configuration::Configuration,
+    id: &str,
+    aux_type: models::AuxiliaryType,
+) -> Result<(), Error<DownloadAuxDataError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_id = id;
+    let p_aux_type = aux_type;
+
+    let uri_str = format!(
+        "{}/api/v1/blueprint/{id}/aux/{aux_type}",
+        configuration.base_path,
+        id = crate::apis::urlencode(p_id),
+        aux_type = p_aux_type.to_string()
+    );
+    let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+
+    if !status.is_client_error() && !status.is_server_error() {
+        Ok(())
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<DownloadAuxDataError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,
