@@ -41,14 +41,20 @@ Class | Method | HTTP request | Description
 *BlueprintApi* | [**download_aux_data**](docs/BlueprintApi.md#download_aux_data) | **GET** /api/v1/blueprint/{id}/aux/{aux_type} | 
 *BlueprintApi* | [**issue_cosnark_code**](docs/BlueprintApi.md#issue_cosnark_code) | **POST** /api/v1/blueprint/code | create a new job
 *BlueprintApi* | [**revoke**](docs/BlueprintApi.md#revoke) | **POST** /api/v1/blueprint/{id}/revoke | Revokes the blueprint identified by ID if the logged in user has the correct access rights.
-*BlueprintApi* | [**upload_aux_data**](docs/BlueprintApi.md#upload_aux_data) | **POST** /api/v1/blueprint/{id}/aux/{aux_type} | add proving key to blueprint
+*BlueprintApi* | [**upload_circuit**](docs/BlueprintApi.md#upload_circuit) | **POST** /api/v1/blueprint/{id}/aux/circuit | add circuit to blueprint
+*BlueprintApi* | [**upload_constraint_matrices**](docs/BlueprintApi.md#upload_constraint_matrices) | **POST** /api/v1/blueprint/{id}/aux/matrices | add constraint matrices to blueprint
+*BlueprintApi* | [**upload_pk**](docs/BlueprintApi.md#upload_pk) | **POST** /api/v1/blueprint/{id}/aux/pk | add proving key to blueprint
+*BlueprintApi* | [**upload_vk**](docs/BlueprintApi.md#upload_vk) | **POST** /api/v1/blueprint/{id}/aux/vk | add verification key to blueprint
 *HealthApi* | [**health**](docs/HealthApi.md#health) | **GET** /health | 
 *HealthApi* | [**live**](docs/HealthApi.md#live) | **GET** /health/live | 
 *HealthApi* | [**ready**](docs/HealthApi.md#ready) | **GET** /health/ready | 
+*JobApi* | [**add_inputs**](docs/JobApi.md#add_inputs) | **POST** /api/v1/jobs/add-inputs | add inputs to a existing job
 *JobApi* | [**download_proof**](docs/JobApi.md#download_proof) | **GET** /api/v1/jobs/{id}/proof | 
 *JobApi* | [**download_public_inputs**](docs/JobApi.md#download_public_inputs) | **GET** /api/v1/jobs/{id}/public_inputs | 
 *JobApi* | [**download_signature**](docs/JobApi.md#download_signature) | **GET** /api/v1/jobs/{id}/signature | 
-*JobApi* | [**schedule_job**](docs/JobApi.md#schedule_job) | **POST** /api/v1/jobs/schedule | create a new job
+*JobApi* | [**schedule_full_job**](docs/JobApi.md#schedule_full_job) | **POST** /api/v1/jobs/schedule-full-job | create a new full job
+*JobApi* | [**schedule_full_multiple_inputs_job**](docs/JobApi.md#schedule_full_multiple_inputs_job) | **POST** /api/v1/jobs/schedule-full-multiple-inputs-job | create a new full job with multiple inputs
+*JobApi* | [**schedule_prove_job**](docs/JobApi.md#schedule_prove_job) | **POST** /api/v1/jobs/schedule-prove-job | create a new prove job
 *NodeApi* | [**list**](docs/NodeApi.md#list) | **GET** /api/v1/node/list | get node providers
 *NodeApi* | [**node_provider**](docs/NodeApi.md#node_provider) | **GET** /api/v1/node/{id} | returns the node for the given id
 *NodeApi* | [**random_node_providers**](docs/NodeApi.md#random_node_providers) | **GET** /api/v1/node/random-nodes | returns 3 randomly chosen node providers
@@ -67,7 +73,7 @@ Class | Method | HTTP request | Description
  - [BlueprintType](docs/BlueprintType.md)
  - [CreateBlueprintResponse](docs/CreateBlueprintResponse.md)
  - [InviteCode](docs/InviteCode.md)
- - [JobType](docs/JobType.md)
+ - [MpcProtocol](docs/MpcProtocol.md)
  - [NodeProvider](docs/NodeProvider.md)
  - [NodeProviders](docs/NodeProviders.md)
  - [PaginationResultInviteCode](docs/PaginationResultInviteCode.md)

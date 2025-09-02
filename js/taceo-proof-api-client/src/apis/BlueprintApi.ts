@@ -65,9 +65,23 @@ export interface RevokeRequest {
     id: string;
 }
 
-export interface UploadAuxDataRequest {
+export interface UploadCircuitRequest {
     id: string;
-    auxType: AuxiliaryType;
+    file: Blob;
+}
+
+export interface UploadConstraintMatricesRequest {
+    id: string;
+    file: Blob;
+}
+
+export interface UploadPkRequest {
+    id: string;
+    file: Blob;
+}
+
+export interface UploadVkRequest {
+    id: string;
     file: Blob;
 }
 
@@ -331,27 +345,20 @@ export class BlueprintApi extends runtime.BaseAPI {
     }
 
     /**
-     * add proving key to blueprint
+     * add circuit to blueprint
      */
-    async uploadAuxDataRaw(requestParameters: UploadAuxDataRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async uploadCircuitRaw(requestParameters: UploadCircuitRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling uploadAuxData().'
-            );
-        }
-
-        if (requestParameters['auxType'] == null) {
-            throw new runtime.RequiredError(
-                'auxType',
-                'Required parameter "auxType" was null or undefined when calling uploadAuxData().'
+                'Required parameter "id" was null or undefined when calling uploadCircuit().'
             );
         }
 
         if (requestParameters['file'] == null) {
             throw new runtime.RequiredError(
                 'file',
-                'Required parameter "file" was null or undefined when calling uploadAuxData().'
+                'Required parameter "file" was null or undefined when calling uploadCircuit().'
             );
         }
 
@@ -380,7 +387,127 @@ export class BlueprintApi extends runtime.BaseAPI {
         }
 
         const response = await this.request({
-            path: `/api/v1/blueprint/{id}/aux/{aux_type}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))).replace(`{${"aux_type"}}`, encodeURIComponent(String(requestParameters['auxType']))),
+            path: `/api/v1/blueprint/{id}/aux/circuit`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: formParams,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * add circuit to blueprint
+     */
+    async uploadCircuit(requestParameters: UploadCircuitRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.uploadCircuitRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * add constraint matrices to blueprint
+     */
+    async uploadConstraintMatricesRaw(requestParameters: UploadConstraintMatricesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling uploadConstraintMatrices().'
+            );
+        }
+
+        if (requestParameters['file'] == null) {
+            throw new runtime.RequiredError(
+                'file',
+                'Required parameter "file" was null or undefined when calling uploadConstraintMatrices().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const consumes: runtime.Consume[] = [
+            { contentType: 'multipart/form-data' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['file'] != null) {
+            formParams.append('file', requestParameters['file'] as any);
+        }
+
+        const response = await this.request({
+            path: `/api/v1/blueprint/{id}/aux/matrices`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: formParams,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * add constraint matrices to blueprint
+     */
+    async uploadConstraintMatrices(requestParameters: UploadConstraintMatricesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.uploadConstraintMatricesRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * add proving key to blueprint
+     */
+    async uploadPkRaw(requestParameters: UploadPkRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling uploadPk().'
+            );
+        }
+
+        if (requestParameters['file'] == null) {
+            throw new runtime.RequiredError(
+                'file',
+                'Required parameter "file" was null or undefined when calling uploadPk().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const consumes: runtime.Consume[] = [
+            { contentType: 'multipart/form-data' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['file'] != null) {
+            formParams.append('file', requestParameters['file'] as any);
+        }
+
+        const response = await this.request({
+            path: `/api/v1/blueprint/{id}/aux/pk`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -393,8 +520,68 @@ export class BlueprintApi extends runtime.BaseAPI {
     /**
      * add proving key to blueprint
      */
-    async uploadAuxData(requestParameters: UploadAuxDataRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.uploadAuxDataRaw(requestParameters, initOverrides);
+    async uploadPk(requestParameters: UploadPkRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.uploadPkRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * add verification key to blueprint
+     */
+    async uploadVkRaw(requestParameters: UploadVkRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling uploadVk().'
+            );
+        }
+
+        if (requestParameters['file'] == null) {
+            throw new runtime.RequiredError(
+                'file',
+                'Required parameter "file" was null or undefined when calling uploadVk().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const consumes: runtime.Consume[] = [
+            { contentType: 'multipart/form-data' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['file'] != null) {
+            formParams.append('file', requestParameters['file'] as any);
+        }
+
+        const response = await this.request({
+            path: `/api/v1/blueprint/{id}/aux/vk`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: formParams,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * add verification key to blueprint
+     */
+    async uploadVk(requestParameters: UploadVkRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.uploadVkRaw(requestParameters, initOverrides);
     }
 
 }

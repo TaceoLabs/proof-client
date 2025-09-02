@@ -56,10 +56,43 @@ pub enum RevokeError {
     UnknownValue(serde_json::Value),
 }
 
-/// struct for typed errors of method [`upload_aux_data`]
+/// struct for typed errors of method [`upload_circuit`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
-pub enum UploadAuxDataError {
+pub enum UploadCircuitError {
+    Status400(),
+    Status401(),
+    Status404(),
+    Status5XX(models::ApiError),
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`upload_constraint_matrices`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum UploadConstraintMatricesError {
+    Status400(),
+    Status401(),
+    Status404(),
+    Status5XX(models::ApiError),
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`upload_pk`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum UploadPkError {
+    Status400(),
+    Status401(),
+    Status404(),
+    Status5XX(models::ApiError),
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`upload_vk`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum UploadVkError {
     Status400(),
     Status401(),
     Status404(),
@@ -299,22 +332,19 @@ pub async fn revoke(
     }
 }
 
-pub async fn upload_aux_data(
+pub async fn upload_circuit(
     configuration: &configuration::Configuration,
     id: &str,
-    aux_type: models::AuxiliaryType,
     file: impl Into<reqwest::Body>,
-) -> Result<(), Error<UploadAuxDataError>> {
+) -> Result<(), Error<UploadCircuitError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_id = id;
-    let p_aux_type = aux_type;
     let p_file = file;
 
     let uri_str = format!(
-        "{}/api/v1/blueprint/{id}/aux/{aux_type}",
+        "{}/api/v1/blueprint/{id}/aux/circuit",
         configuration.base_path,
-        id = crate::apis::urlencode(p_id),
-        aux_type = p_aux_type.to_string()
+        id = crate::apis::urlencode(p_id)
     );
     let mut req_builder = configuration
         .client
@@ -337,7 +367,139 @@ pub async fn upload_aux_data(
         Ok(())
     } else {
         let content = resp.text().await?;
-        let entity: Option<UploadAuxDataError> = serde_json::from_str(&content).ok();
+        let entity: Option<UploadCircuitError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
+pub async fn upload_constraint_matrices(
+    configuration: &configuration::Configuration,
+    id: &str,
+    file: impl Into<reqwest::Body>,
+) -> Result<(), Error<UploadConstraintMatricesError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_id = id;
+    let p_file = file;
+
+    let uri_str = format!(
+        "{}/api/v1/blueprint/{id}/aux/matrices",
+        configuration.base_path,
+        id = crate::apis::urlencode(p_id)
+    );
+    let mut req_builder = configuration
+        .client
+        .request(reqwest::Method::POST, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+    let multipart_form =
+        reqwest::multipart::Form::new().part("file", reqwest::multipart::Part::stream(p_file));
+    // TODO: support file upload for 'file' parameter
+    req_builder = req_builder.multipart(multipart_form);
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+
+    if !status.is_client_error() && !status.is_server_error() {
+        Ok(())
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<UploadConstraintMatricesError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
+pub async fn upload_pk(
+    configuration: &configuration::Configuration,
+    id: &str,
+    file: impl Into<reqwest::Body>,
+) -> Result<(), Error<UploadPkError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_id = id;
+    let p_file = file;
+
+    let uri_str = format!(
+        "{}/api/v1/blueprint/{id}/aux/pk",
+        configuration.base_path,
+        id = crate::apis::urlencode(p_id)
+    );
+    let mut req_builder = configuration
+        .client
+        .request(reqwest::Method::POST, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+    let multipart_form =
+        reqwest::multipart::Form::new().part("file", reqwest::multipart::Part::stream(p_file));
+    // TODO: support file upload for 'file' parameter
+    req_builder = req_builder.multipart(multipart_form);
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+
+    if !status.is_client_error() && !status.is_server_error() {
+        Ok(())
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<UploadPkError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
+pub async fn upload_vk(
+    configuration: &configuration::Configuration,
+    id: &str,
+    file: impl Into<reqwest::Body>,
+) -> Result<(), Error<UploadVkError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_id = id;
+    let p_file = file;
+
+    let uri_str = format!(
+        "{}/api/v1/blueprint/{id}/aux/vk",
+        configuration.base_path,
+        id = crate::apis::urlencode(p_id)
+    );
+    let mut req_builder = configuration
+        .client
+        .request(reqwest::Method::POST, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+    let multipart_form =
+        reqwest::multipart::Form::new().part("file", reqwest::multipart::Part::stream(p_file));
+    // TODO: support file upload for 'file' parameter
+    req_builder = req_builder.multipart(multipart_form);
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+
+    if !status.is_client_error() && !status.is_server_error() {
+        Ok(())
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<UploadVkError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,

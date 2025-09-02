@@ -511,6 +511,282 @@
         ]
       }
     },
+    "/api/v1/blueprint/{id}/aux/circuit": {
+      "post": {
+        "tags": [
+          "blueprint"
+        ],
+        "summary": "add circuit to blueprint",
+        "operationId": "upload_circuit",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The id of the blueprint",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully added the auxiliary data"
+          },
+          "400": {
+            "description": "e.g. Aux type is not needed for this blueprint"
+          },
+          "401": {
+            "description": "Logged-in user is not allowed to perform that action"
+          },
+          "404": {
+            "description": "Unknown blueprint id"
+          },
+          "5XX": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/blueprint/{id}/aux/matrices": {
+      "post": {
+        "tags": [
+          "blueprint"
+        ],
+        "summary": "add constraint matrices to blueprint",
+        "operationId": "upload_constraint_matrices",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The id of the blueprint",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully added the auxiliary data"
+          },
+          "400": {
+            "description": "e.g. Aux type is not needed for this blueprint"
+          },
+          "401": {
+            "description": "Logged-in user is not allowed to perform that action"
+          },
+          "404": {
+            "description": "Unknown blueprint id"
+          },
+          "5XX": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/blueprint/{id}/aux/pk": {
+      "post": {
+        "tags": [
+          "blueprint"
+        ],
+        "summary": "add proving key to blueprint",
+        "operationId": "upload_pk",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The id of the blueprint",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully added the auxiliary data"
+          },
+          "400": {
+            "description": "e.g. Aux type is not needed for this blueprint"
+          },
+          "401": {
+            "description": "Logged-in user is not allowed to perform that action"
+          },
+          "404": {
+            "description": "Unknown blueprint id"
+          },
+          "5XX": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v1/blueprint/{id}/aux/vk": {
+      "post": {
+        "tags": [
+          "blueprint"
+        ],
+        "summary": "add verification key to blueprint",
+        "operationId": "upload_vk",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The id of the blueprint",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully added the auxiliary data"
+          },
+          "400": {
+            "description": "e.g. Aux type is not needed for this blueprint"
+          },
+          "401": {
+            "description": "Logged-in user is not allowed to perform that action"
+          },
+          "404": {
+            "description": "Unknown blueprint id"
+          },
+          "5XX": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
     "/api/v1/blueprint/{id}/aux/{aux_type}": {
       "get": {
         "tags": [
@@ -547,82 +823,6 @@
           },
           "404": {
             "description": "Unknown blueprint id or not uploaded aux"
-          },
-          "5XX": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "cookieAuth": []
-          }
-        ]
-      },
-      "post": {
-        "tags": [
-          "blueprint"
-        ],
-        "summary": "add proving key to blueprint",
-        "operationId": "upload_aux_data",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "The id of the blueprint",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "aux_type",
-            "in": "path",
-            "description": "The type of the auxiliary data",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/AuxiliaryType"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "file"
-                ],
-                "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary"
-                  }
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successfully added the auxiliary data"
-          },
-          "400": {
-            "description": "e.g. Aux type is not needed for this blueprint"
-          },
-          "401": {
-            "description": "Logged-in user is not allowed to perform that action"
-          },
-          "404": {
-            "description": "Unknown blueprint id"
           },
           "5XX": {
             "description": "Internal Server Error",
@@ -721,63 +921,263 @@
         }
       }
     },
-    "/api/v1/jobs/schedule": {
+    "/api/v1/jobs/add-inputs": {
       "post": {
         "tags": [
           "Job"
         ],
-        "summary": "create a new job",
-        "operationId": "schedule_job",
+        "summary": "add inputs to a existing job",
+        "operationId": "add_inputs",
         "requestBody": {
           "content": {
             "multipart/form-data": {
               "schema": {
                 "type": "object",
                 "required": [
-                  "a_blueprint_id",
-                  "b_job_type",
-                  "c_node0",
-                  "c_node1",
-                  "c_node2",
-                  "input_party0",
-                  "input_party1",
-                  "input_party2"
+                  "job_id",
+                  "node0",
+                  "node1",
+                  "node2",
+                  "inputs0",
+                  "inputs1",
+                  "inputs2"
                 ],
                 "properties": {
-                  "a_blueprint_id": {
+                  "inputs0": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "inputs1": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "inputs2": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "job_id": {
                     "type": "string",
                     "format": "uuid"
                   },
-                  "b_job_type": {
-                    "$ref": "#/components/schemas/JobType"
-                  },
-                  "c_node0": {
+                  "node0": {
                     "type": "integer",
                     "format": "int32"
                   },
-                  "c_node1": {
+                  "node1": {
                     "type": "integer",
                     "format": "int32"
                   },
-                  "c_node2": {
+                  "node2": {
+                    "type": "integer",
+                    "format": "int32"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Add inputs to a job"
+          },
+          "5XX": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/schedule-full-job": {
+      "post": {
+        "tags": [
+          "Job"
+        ],
+        "summary": "create a new full job",
+        "operationId": "schedule_full_job",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "blueprint_id",
+                  "node0",
+                  "node1",
+                  "node2",
+                  "inputs0",
+                  "inputs1",
+                  "inputs2"
+                ],
+                "properties": {
+                  "blueprint_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "inputs0": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "inputs1": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "inputs2": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "node0": {
                     "type": "integer",
                     "format": "int32"
                   },
-                  "d_code": {
+                  "node1": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "node2": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "voucher": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Schedule a new full prove job with witness extension",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScheduleJobResponse"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/schedule-full-multiple-inputs-job": {
+      "post": {
+        "tags": [
+          "Job"
+        ],
+        "summary": "create a new full job with multiple inputs",
+        "operationId": "schedule_full_multiple_inputs_job",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/ScheduleFullMultipleInputsJobRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Schedule a new full multiple inputs prove job with witness extension",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScheduleJobResponse"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/jobs/schedule-prove-job": {
+      "post": {
+        "tags": [
+          "Job"
+        ],
+        "summary": "create a new prove job",
+        "operationId": "schedule_prove_job",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "blueprint_id",
+                  "mpc_protocol",
+                  "node0",
+                  "node1",
+                  "node2",
+                  "witness0",
+                  "witness1",
+                  "witness2"
+                ],
+                "properties": {
+                  "blueprint_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "mpc_protocol": {
+                    "$ref": "#/components/schemas/MpcProtocol"
+                  },
+                  "node0": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "node1": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "node2": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "voucher": {
                     "type": [
                       "string",
                       "null"
                     ]
                   },
-                  "input_party0": {
+                  "witness0": {
                     "type": "string",
                     "format": "binary"
                   },
-                  "input_party1": {
+                  "witness1": {
                     "type": "string",
                     "format": "binary"
                   },
-                  "input_party2": {
+                  "witness2": {
                     "type": "string",
                     "format": "binary"
                   }
@@ -789,7 +1189,7 @@
         },
         "responses": {
           "200": {
-            "description": "Schedule a new job",
+            "description": "Schedule a new prove job",
             "content": {
               "application/json": {
                 "schema": {
@@ -1413,12 +1813,11 @@
           }
         }
       },
-      "JobType": {
+      "MpcProtocol": {
         "type": "string",
         "enum": [
-          "Rep3Full",
-          "Rep3Prove",
-          "ShamirProve"
+          "Rep3",
+          "Shamir"
         ]
       },
       "NodeProvider": {
@@ -1534,6 +1933,46 @@
         "properties": {
           "code": {
             "type": "string"
+          }
+        }
+      },
+      "ScheduleFullMultipleInputsJobRequest": {
+        "type": "object",
+        "required": [
+          "blueprint_id",
+          "node0",
+          "node1",
+          "node2"
+        ],
+        "properties": {
+          "blueprint_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "deadline": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "node0": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "node1": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "node2": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "voucher": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },

@@ -792,7 +792,7 @@ dependencies = [
 [[package]]
 name = "circom-types"
 version = "0.9.0"
-source = "git+https://github.com/TaceoLabs/co-snarks?rev=5d8f254#5d8f254adc9c4866e4c90d047241d3789684f850"
+source = "git+https://github.com/TaceoLabs/co-snarks?rev=b9821e5#b9821e5202855bb9cd931ae32fe9e7d3e5b01378"
 dependencies = [
  "ark-bls12-377",
  "ark-bls12-381",
@@ -876,7 +876,7 @@ dependencies = [
 [[package]]
 name = "co-circom-types"
 version = "0.5.0"
-source = "git+https://github.com/TaceoLabs/co-snarks?rev=5d8f254#5d8f254adc9c4866e4c90d047241d3789684f850"
+source = "git+https://github.com/TaceoLabs/co-snarks?rev=b9821e5#b9821e5202855bb9cd931ae32fe9e7d3e5b01378"
 dependencies = [
  "ark-ff",
  "ark-serialize",
@@ -894,9 +894,10 @@ dependencies = [
 [[package]]
 name = "co-noir-types"
 version = "0.1.0"
-source = "git+https://github.com/TaceoLabs/co-snarks?rev=5d8f254#5d8f254adc9c4866e4c90d047241d3789684f850"
+source = "git+https://github.com/TaceoLabs/co-snarks?rev=b9821e5#b9821e5202855bb9cd931ae32fe9e7d3e5b01378"
 dependencies = [
  "ark-ff",
+ "eyre",
  "mpc-core",
  "rand 0.8.5",
  "serde",
@@ -2413,7 +2414,7 @@ dependencies = [
 [[package]]
 name = "mpc-core"
 version = "0.9.0"
-source = "git+https://github.com/TaceoLabs/co-snarks?rev=5d8f254#5d8f254adc9c4866e4c90d047241d3789684f850"
+source = "git+https://github.com/TaceoLabs/co-snarks?rev=b9821e5#b9821e5202855bb9cd931ae32fe9e7d3e5b01378"
 dependencies = [
  "ark-bn254",
  "ark-ec",
@@ -2442,7 +2443,7 @@ dependencies = [
 [[package]]
 name = "mpc-net"
 version = "0.4.0"
-source = "git+https://github.com/TaceoLabs/co-snarks?rev=5d8f254#5d8f254adc9c4866e4c90d047241d3789684f850"
+source = "git+https://github.com/TaceoLabs/co-snarks?rev=b9821e5#b9821e5202855bb9cd931ae32fe9e7d3e5b01378"
 dependencies = [
  "byteorder",
  "bytes",
@@ -2495,7 +2496,7 @@ dependencies = [
 [[package]]
 name = "noir-types"
 version = "0.1.0"
-source = "git+https://github.com/TaceoLabs/co-snarks?rev=5d8f254#5d8f254adc9c4866e4c90d047241d3789684f850"
+source = "git+https://github.com/TaceoLabs/co-snarks?rev=b9821e5#b9821e5202855bb9cd931ae32fe9e7d3e5b01378"
 dependencies = [
  "acir",
  "ark-bn254",
@@ -2504,6 +2505,7 @@ dependencies = [
  "eyre",
  "noirc_abi",
  "noirc_artifacts",
+ "num-bigint 0.4.6",
  "serde_json",
  "toml 0.8.23",
 ]
@@ -4172,10 +4174,12 @@ dependencies = [
  "ark-bls12-381",
  "ark-bn254",
  "ark-ec",
+ "ark-ff",
  "ark-groth16",
  "ark-serialize",
  "base64ct",
  "bincode",
+ "chrono",
  "circom-types",
  "clap",
  "co-circom-types",
@@ -4948,7 +4952,7 @@ version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf221c93e13a30d793f7645a0e7762c55d169dbb0a49671918a2319d289b10bb"
 dependencies = [
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
