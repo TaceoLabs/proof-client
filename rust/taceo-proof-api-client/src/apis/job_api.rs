@@ -13,6 +13,14 @@ use crate::{apis::ResponseContent, models};
 use reqwest;
 use serde::{de::Error as _, Deserialize, Serialize};
 
+/// struct for typed errors of method [`add_inputs`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum AddInputsError {
+    Status5XX(models::ApiError),
+    UnknownValue(serde_json::Value),
+}
+
 /// struct for typed errors of method [`download_proof`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
@@ -37,12 +45,83 @@ pub enum DownloadSignatureError {
     UnknownValue(serde_json::Value),
 }
 
-/// struct for typed errors of method [`schedule_job`]
+/// struct for typed errors of method [`schedule_full_job`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
-pub enum ScheduleJobError {
+pub enum ScheduleFullJobError {
     Status5XX(models::ApiError),
     UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`schedule_full_multiple_inputs_job`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum ScheduleFullMultipleInputsJobError {
+    Status5XX(models::ApiError),
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`schedule_prove_job`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum ScheduleProveJobError {
+    Status5XX(models::ApiError),
+    UnknownValue(serde_json::Value),
+}
+
+pub async fn add_inputs(
+    configuration: &configuration::Configuration,
+    inputs0: impl Into<reqwest::Body>,
+    inputs1: impl Into<reqwest::Body>,
+    inputs2: impl Into<reqwest::Body>,
+    job_id: &str,
+    node0: i32,
+    node1: i32,
+    node2: i32,
+) -> Result<(), Error<AddInputsError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_inputs0 = inputs0;
+    let p_inputs1 = inputs1;
+    let p_inputs2 = inputs2;
+    let p_job_id = job_id;
+    let p_node0 = node0;
+    let p_node1 = node1;
+    let p_node2 = node2;
+
+    let uri_str = format!("{}/api/v1/jobs/add-inputs", configuration.base_path);
+    let mut req_builder = configuration
+        .client
+        .request(reqwest::Method::POST, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+    let mut multipart_form = reqwest::multipart::Form::new();
+    multipart_form = multipart_form.part("inputs0", reqwest::multipart::Part::stream(p_inputs0));
+    multipart_form = multipart_form.part("inputs1", reqwest::multipart::Part::stream(p_inputs1));
+    multipart_form = multipart_form.part("inputs2", reqwest::multipart::Part::stream(p_inputs2));
+    multipart_form = multipart_form.text("job_id", p_job_id.to_string());
+    multipart_form = multipart_form.text("node0", p_node0.to_string());
+    multipart_form = multipart_form.text("node1", p_node1.to_string());
+    multipart_form = multipart_form.text("node2", p_node2.to_string());
+    req_builder = req_builder.multipart(multipart_form);
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+
+    if !status.is_client_error() && !status.is_server_error() {
+        Ok(())
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<AddInputsError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
 }
 
 pub async fn download_proof(
@@ -153,30 +232,28 @@ pub async fn download_signature(
     }
 }
 
-pub async fn schedule_job(
+pub async fn schedule_full_job(
     configuration: &configuration::Configuration,
-    a_blueprint_id: &str,
-    b_job_type: models::JobType,
-    c_node0: i32,
-    c_node1: i32,
-    c_node2: i32,
-    input_party0: impl Into<reqwest::Body>,
-    input_party1: impl Into<reqwest::Body>,
-    input_party2: impl Into<reqwest::Body>,
-    d_code: Option<&str>,
-) -> Result<models::ScheduleJobResponse, Error<ScheduleJobError>> {
+    blueprint_id: &str,
+    inputs0: impl Into<reqwest::Body>,
+    inputs1: impl Into<reqwest::Body>,
+    inputs2: impl Into<reqwest::Body>,
+    node0: i32,
+    node1: i32,
+    node2: i32,
+    voucher: Option<&str>,
+) -> Result<models::ScheduleJobResponse, Error<ScheduleFullJobError>> {
     // add a prefix to parameters to efficiently prevent name collisions
-    let p_a_blueprint_id = a_blueprint_id;
-    let p_b_job_type = b_job_type;
-    let p_c_node0 = c_node0;
-    let p_c_node1 = c_node1;
-    let p_c_node2 = c_node2;
-    let p_input_party0 = input_party0;
-    let p_input_party1 = input_party1;
-    let p_input_party2 = input_party2;
-    let p_d_code = d_code;
+    let p_blueprint_id = blueprint_id;
+    let p_inputs0 = inputs0;
+    let p_inputs1 = inputs1;
+    let p_inputs2 = inputs2;
+    let p_node0 = node0;
+    let p_node1 = node1;
+    let p_node2 = node2;
+    let p_voucher = voucher;
 
-    let uri_str = format!("{}/api/v1/jobs/schedule", configuration.base_path);
+    let uri_str = format!("{}/api/v1/jobs/schedule-full-job", configuration.base_path);
     let mut req_builder = configuration
         .client
         .request(reqwest::Method::POST, &uri_str);
@@ -185,26 +262,16 @@ pub async fn schedule_job(
         req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
     }
     let mut multipart_form = reqwest::multipart::Form::new();
-    multipart_form = multipart_form.text("a_blueprint_id", p_a_blueprint_id.to_string());
-    multipart_form = multipart_form.text("b_job_type", p_b_job_type.to_string());
-    multipart_form = multipart_form.text("c_node0", p_c_node0.to_string());
-    multipart_form = multipart_form.text("c_node1", p_c_node1.to_string());
-    multipart_form = multipart_form.text("c_node2", p_c_node2.to_string());
-    if let Some(param_value) = p_d_code {
-        multipart_form = multipart_form.text("d_code", param_value.to_string());
+    multipart_form = multipart_form.text("blueprint_id", p_blueprint_id.to_string());
+    multipart_form = multipart_form.part("inputs0", reqwest::multipart::Part::stream(p_inputs0));
+    multipart_form = multipart_form.part("inputs1", reqwest::multipart::Part::stream(p_inputs1));
+    multipart_form = multipart_form.part("inputs2", reqwest::multipart::Part::stream(p_inputs2));
+    multipart_form = multipart_form.text("node0", p_node0.to_string());
+    multipart_form = multipart_form.text("node1", p_node1.to_string());
+    multipart_form = multipart_form.text("node2", p_node2.to_string());
+    if let Some(param_value) = p_voucher {
+        multipart_form = multipart_form.text("voucher", param_value.to_string());
     }
-    multipart_form = multipart_form.part(
-        "input_party0",
-        reqwest::multipart::Part::stream(p_input_party0),
-    );
-    multipart_form = multipart_form.part(
-        "input_party1",
-        reqwest::multipart::Part::stream(p_input_party1),
-    );
-    multipart_form = multipart_form.part(
-        "input_party2",
-        reqwest::multipart::Part::stream(p_input_party2),
-    );
     req_builder = req_builder.multipart(multipart_form);
 
     let req = req_builder.build()?;
@@ -227,7 +294,152 @@ pub async fn schedule_job(
         }
     } else {
         let content = resp.text().await?;
-        let entity: Option<ScheduleJobError> = serde_json::from_str(&content).ok();
+        let entity: Option<ScheduleFullJobError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
+pub async fn schedule_full_multiple_inputs_job(
+    configuration: &configuration::Configuration,
+    blueprint_id: &str,
+    node0: i32,
+    node1: i32,
+    node2: i32,
+    deadline: Option<String>,
+    voucher: Option<&str>,
+) -> Result<models::ScheduleJobResponse, Error<ScheduleFullMultipleInputsJobError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_blueprint_id = blueprint_id;
+    let p_node0 = node0;
+    let p_node1 = node1;
+    let p_node2 = node2;
+    let p_deadline = deadline;
+    let p_voucher = voucher;
+
+    let uri_str = format!(
+        "{}/api/v1/jobs/schedule-full-multiple-inputs-job",
+        configuration.base_path
+    );
+    let mut req_builder = configuration
+        .client
+        .request(reqwest::Method::POST, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+    let mut multipart_form_params = std::collections::HashMap::new();
+    multipart_form_params.insert("blueprint_id", p_blueprint_id.to_string());
+    if let Some(param_value) = p_deadline {
+        multipart_form_params.insert("deadline", param_value.to_string());
+    }
+    multipart_form_params.insert("node0", p_node0.to_string());
+    multipart_form_params.insert("node1", p_node1.to_string());
+    multipart_form_params.insert("node2", p_node2.to_string());
+    if let Some(param_value) = p_voucher {
+        multipart_form_params.insert("voucher", param_value.to_string());
+    }
+    req_builder = req_builder.form(&multipart_form_params);
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::ScheduleJobResponse`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::ScheduleJobResponse`")))),
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<ScheduleFullMultipleInputsJobError> =
+            serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent {
+            status,
+            content,
+            entity,
+        }))
+    }
+}
+
+pub async fn schedule_prove_job(
+    configuration: &configuration::Configuration,
+    blueprint_id: &str,
+    mpc_protocol: models::MpcProtocol,
+    node0: i32,
+    node1: i32,
+    node2: i32,
+    witness0: impl Into<reqwest::Body>,
+    witness1: impl Into<reqwest::Body>,
+    witness2: impl Into<reqwest::Body>,
+    voucher: Option<&str>,
+) -> Result<models::ScheduleJobResponse, Error<ScheduleProveJobError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_blueprint_id = blueprint_id;
+    let p_mpc_protocol = mpc_protocol;
+    let p_node0 = node0;
+    let p_node1 = node1;
+    let p_node2 = node2;
+    let p_witness0 = witness0;
+    let p_witness1 = witness1;
+    let p_witness2 = witness2;
+    let p_voucher = voucher;
+
+    let uri_str = format!("{}/api/v1/jobs/schedule-prove-job", configuration.base_path);
+    let mut req_builder = configuration
+        .client
+        .request(reqwest::Method::POST, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+    let mut multipart_form = reqwest::multipart::Form::new();
+    multipart_form = multipart_form.text("blueprint_id", p_blueprint_id.to_string());
+    multipart_form = multipart_form.text("mpc_protocol", p_mpc_protocol.to_string());
+    multipart_form = multipart_form.text("node0", p_node0.to_string());
+    multipart_form = multipart_form.text("node1", p_node1.to_string());
+    multipart_form = multipart_form.text("node2", p_node2.to_string());
+    if let Some(param_value) = p_voucher {
+        multipart_form = multipart_form.text("voucher", param_value.to_string());
+    }
+    multipart_form = multipart_form.part("witness0", reqwest::multipart::Part::stream(p_witness0));
+    multipart_form = multipart_form.part("witness1", reqwest::multipart::Part::stream(p_witness1));
+    multipart_form = multipart_form.part("witness2", reqwest::multipart::Part::stream(p_witness2));
+    req_builder = req_builder.multipart(multipart_form);
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::ScheduleJobResponse`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::ScheduleJobResponse`")))),
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<ScheduleProveJobError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent {
             status,
             content,

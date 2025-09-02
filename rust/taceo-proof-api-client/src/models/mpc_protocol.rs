@@ -13,27 +13,24 @@ use serde::{Deserialize, Serialize};
 
 ///
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
-pub enum JobType {
-    #[serde(rename = "Rep3Full")]
-    Rep3Full,
-    #[serde(rename = "Rep3Prove")]
-    Rep3Prove,
-    #[serde(rename = "ShamirProve")]
-    ShamirProve,
+pub enum MpcProtocol {
+    #[serde(rename = "Rep3")]
+    Rep3,
+    #[serde(rename = "Shamir")]
+    Shamir,
 }
 
-impl std::fmt::Display for JobType {
+impl std::fmt::Display for MpcProtocol {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Self::Rep3Full => write!(f, "Rep3Full"),
-            Self::Rep3Prove => write!(f, "Rep3Prove"),
-            Self::ShamirProve => write!(f, "ShamirProve"),
+            Self::Rep3 => write!(f, "Rep3"),
+            Self::Shamir => write!(f, "Shamir"),
         }
     }
 }
 
-impl Default for JobType {
-    fn default() -> JobType {
-        Self::Rep3Full
+impl Default for MpcProtocol {
+    fn default() -> MpcProtocol {
+        Self::Rep3
     }
 }

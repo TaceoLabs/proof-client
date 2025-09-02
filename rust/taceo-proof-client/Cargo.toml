@@ -12,12 +12,14 @@ readme = "./README.md"
 
 [dependencies]
 ark-ec = "0.5.0"
+ark-ff = "0.5.0"
 bincode = "1.3.3"
 crypto_box = { version = "0.9.1", features = ["std", "seal"] }
-co-circom-types = { git = "https://github.com/TaceoLabs/co-snarks", rev = "5d8f254" }
-circom-types = { git = "https://github.com/TaceoLabs/co-snarks", rev = "5d8f254", features = ["ark-bls12-377", "ark-bls12-381"] }
-co-noir-types = { git = "https://github.com/TaceoLabs/co-snarks", rev = "5d8f254" }
-noir-types = { git = "https://github.com/TaceoLabs/co-snarks", rev = "5d8f254" }
+chrono = "0.4.41"
+co-circom-types = { git = "https://github.com/TaceoLabs/co-snarks", rev = "b9821e5" }
+circom-types = { git = "https://github.com/TaceoLabs/co-snarks", rev = "b9821e5", features = ["ark-bls12-377", "ark-bls12-381"] }
+co-noir-types = { git = "https://github.com/TaceoLabs/co-snarks", rev = "b9821e5" }
+noir-types = { git = "https://github.com/TaceoLabs/co-snarks", rev = "b9821e5" }
 taceo-proof-api-client = { path = "../taceo-proof-api-client" }
 base64ct = { version = "1.7.3", features = ["alloc"] }
 rand = "0.8.5"

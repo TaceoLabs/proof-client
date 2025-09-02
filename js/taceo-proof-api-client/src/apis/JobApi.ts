@@ -16,17 +16,27 @@
 import * as runtime from '../runtime';
 import type {
   ApiError,
-  JobType,
+  MpcProtocol,
   ScheduleJobResponse,
 } from '../models/index';
 import {
     ApiErrorFromJSON,
     ApiErrorToJSON,
-    JobTypeFromJSON,
-    JobTypeToJSON,
+    MpcProtocolFromJSON,
+    MpcProtocolToJSON,
     ScheduleJobResponseFromJSON,
     ScheduleJobResponseToJSON,
 } from '../models/index';
+
+export interface AddInputsRequest {
+    inputs0: Blob;
+    inputs1: Blob;
+    inputs2: Blob;
+    jobId: string;
+    node0: number;
+    node1: number;
+    node2: number;
+}
 
 export interface DownloadProofRequest {
     id: string;
@@ -40,22 +50,165 @@ export interface DownloadSignatureRequest {
     id: string;
 }
 
-export interface ScheduleJobRequest {
-    aBlueprintId: string;
-    bJobType: JobType;
-    cNode0: number;
-    cNode1: number;
-    cNode2: number;
-    inputParty0: Blob;
-    inputParty1: Blob;
-    inputParty2: Blob;
-    dCode?: string | null;
+export interface ScheduleFullJobRequest {
+    blueprintId: string;
+    inputs0: Blob;
+    inputs1: Blob;
+    inputs2: Blob;
+    node0: number;
+    node1: number;
+    node2: number;
+    voucher?: string | null;
+}
+
+export interface ScheduleFullMultipleInputsJobRequest {
+    blueprintId: string;
+    node0: number;
+    node1: number;
+    node2: number;
+    deadline?: Date | null;
+    voucher?: string | null;
+}
+
+export interface ScheduleProveJobRequest {
+    blueprintId: string;
+    mpcProtocol: MpcProtocol;
+    node0: number;
+    node1: number;
+    node2: number;
+    witness0: Blob;
+    witness1: Blob;
+    witness2: Blob;
+    voucher?: string | null;
 }
 
 /**
  * 
  */
 export class JobApi extends runtime.BaseAPI {
+
+    /**
+     * add inputs to a existing job
+     */
+    async addInputsRaw(requestParameters: AddInputsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['inputs0'] == null) {
+            throw new runtime.RequiredError(
+                'inputs0',
+                'Required parameter "inputs0" was null or undefined when calling addInputs().'
+            );
+        }
+
+        if (requestParameters['inputs1'] == null) {
+            throw new runtime.RequiredError(
+                'inputs1',
+                'Required parameter "inputs1" was null or undefined when calling addInputs().'
+            );
+        }
+
+        if (requestParameters['inputs2'] == null) {
+            throw new runtime.RequiredError(
+                'inputs2',
+                'Required parameter "inputs2" was null or undefined when calling addInputs().'
+            );
+        }
+
+        if (requestParameters['jobId'] == null) {
+            throw new runtime.RequiredError(
+                'jobId',
+                'Required parameter "jobId" was null or undefined when calling addInputs().'
+            );
+        }
+
+        if (requestParameters['node0'] == null) {
+            throw new runtime.RequiredError(
+                'node0',
+                'Required parameter "node0" was null or undefined when calling addInputs().'
+            );
+        }
+
+        if (requestParameters['node1'] == null) {
+            throw new runtime.RequiredError(
+                'node1',
+                'Required parameter "node1" was null or undefined when calling addInputs().'
+            );
+        }
+
+        if (requestParameters['node2'] == null) {
+            throw new runtime.RequiredError(
+                'node2',
+                'Required parameter "node2" was null or undefined when calling addInputs().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const consumes: runtime.Consume[] = [
+            { contentType: 'multipart/form-data' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['inputs0'] != null) {
+            formParams.append('inputs0', requestParameters['inputs0'] as any);
+        }
+
+        if (requestParameters['inputs1'] != null) {
+            formParams.append('inputs1', requestParameters['inputs1'] as any);
+        }
+
+        if (requestParameters['inputs2'] != null) {
+            formParams.append('inputs2', requestParameters['inputs2'] as any);
+        }
+
+        if (requestParameters['jobId'] != null) {
+            formParams.append('job_id', requestParameters['jobId'] as any);
+        }
+
+        if (requestParameters['node0'] != null) {
+            formParams.append('node0', requestParameters['node0'] as any);
+        }
+
+        if (requestParameters['node1'] != null) {
+            formParams.append('node1', requestParameters['node1'] as any);
+        }
+
+        if (requestParameters['node2'] != null) {
+            formParams.append('node2', requestParameters['node2'] as any);
+        }
+
+        const response = await this.request({
+            path: `/api/v1/jobs/add-inputs`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: formParams,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * add inputs to a existing job
+     */
+    async addInputs(requestParameters: AddInputsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.addInputsRaw(requestParameters, initOverrides);
+    }
 
     /**
      */
@@ -148,62 +301,55 @@ export class JobApi extends runtime.BaseAPI {
     }
 
     /**
-     * create a new job
+     * create a new full job
      */
-    async scheduleJobRaw(requestParameters: ScheduleJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ScheduleJobResponse>> {
-        if (requestParameters['aBlueprintId'] == null) {
+    async scheduleFullJobRaw(requestParameters: ScheduleFullJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ScheduleJobResponse>> {
+        if (requestParameters['blueprintId'] == null) {
             throw new runtime.RequiredError(
-                'aBlueprintId',
-                'Required parameter "aBlueprintId" was null or undefined when calling scheduleJob().'
+                'blueprintId',
+                'Required parameter "blueprintId" was null or undefined when calling scheduleFullJob().'
             );
         }
 
-        if (requestParameters['bJobType'] == null) {
+        if (requestParameters['inputs0'] == null) {
             throw new runtime.RequiredError(
-                'bJobType',
-                'Required parameter "bJobType" was null or undefined when calling scheduleJob().'
+                'inputs0',
+                'Required parameter "inputs0" was null or undefined when calling scheduleFullJob().'
             );
         }
 
-        if (requestParameters['cNode0'] == null) {
+        if (requestParameters['inputs1'] == null) {
             throw new runtime.RequiredError(
-                'cNode0',
-                'Required parameter "cNode0" was null or undefined when calling scheduleJob().'
+                'inputs1',
+                'Required parameter "inputs1" was null or undefined when calling scheduleFullJob().'
             );
         }
 
-        if (requestParameters['cNode1'] == null) {
+        if (requestParameters['inputs2'] == null) {
             throw new runtime.RequiredError(
-                'cNode1',
-                'Required parameter "cNode1" was null or undefined when calling scheduleJob().'
+                'inputs2',
+                'Required parameter "inputs2" was null or undefined when calling scheduleFullJob().'
             );
         }
 
-        if (requestParameters['cNode2'] == null) {
+        if (requestParameters['node0'] == null) {
             throw new runtime.RequiredError(
-                'cNode2',
-                'Required parameter "cNode2" was null or undefined when calling scheduleJob().'
+                'node0',
+                'Required parameter "node0" was null or undefined when calling scheduleFullJob().'
             );
         }
 
-        if (requestParameters['inputParty0'] == null) {
+        if (requestParameters['node1'] == null) {
             throw new runtime.RequiredError(
-                'inputParty0',
-                'Required parameter "inputParty0" was null or undefined when calling scheduleJob().'
+                'node1',
+                'Required parameter "node1" was null or undefined when calling scheduleFullJob().'
             );
         }
 
-        if (requestParameters['inputParty1'] == null) {
+        if (requestParameters['node2'] == null) {
             throw new runtime.RequiredError(
-                'inputParty1',
-                'Required parameter "inputParty1" was null or undefined when calling scheduleJob().'
-            );
-        }
-
-        if (requestParameters['inputParty2'] == null) {
-            throw new runtime.RequiredError(
-                'inputParty2',
-                'Required parameter "inputParty2" was null or undefined when calling scheduleJob().'
+                'node2',
+                'Required parameter "node2" was null or undefined when calling scheduleFullJob().'
             );
         }
 
@@ -231,44 +377,40 @@ export class JobApi extends runtime.BaseAPI {
             formParams = new URLSearchParams();
         }
 
-        if (requestParameters['aBlueprintId'] != null) {
-            formParams.append('a_blueprint_id', requestParameters['aBlueprintId'] as any);
+        if (requestParameters['blueprintId'] != null) {
+            formParams.append('blueprint_id', requestParameters['blueprintId'] as any);
         }
 
-        if (requestParameters['bJobType'] != null) {
-            formParams.append('b_job_type', requestParameters['bJobType'] as any);
+        if (requestParameters['inputs0'] != null) {
+            formParams.append('inputs0', requestParameters['inputs0'] as any);
         }
 
-        if (requestParameters['cNode0'] != null) {
-            formParams.append('c_node0', requestParameters['cNode0'] as any);
+        if (requestParameters['inputs1'] != null) {
+            formParams.append('inputs1', requestParameters['inputs1'] as any);
         }
 
-        if (requestParameters['cNode1'] != null) {
-            formParams.append('c_node1', requestParameters['cNode1'] as any);
+        if (requestParameters['inputs2'] != null) {
+            formParams.append('inputs2', requestParameters['inputs2'] as any);
         }
 
-        if (requestParameters['cNode2'] != null) {
-            formParams.append('c_node2', requestParameters['cNode2'] as any);
+        if (requestParameters['node0'] != null) {
+            formParams.append('node0', requestParameters['node0'] as any);
         }
 
-        if (requestParameters['dCode'] != null) {
-            formParams.append('d_code', requestParameters['dCode'] as any);
+        if (requestParameters['node1'] != null) {
+            formParams.append('node1', requestParameters['node1'] as any);
         }
 
-        if (requestParameters['inputParty0'] != null) {
-            formParams.append('input_party0', requestParameters['inputParty0'] as any);
+        if (requestParameters['node2'] != null) {
+            formParams.append('node2', requestParameters['node2'] as any);
         }
 
-        if (requestParameters['inputParty1'] != null) {
-            formParams.append('input_party1', requestParameters['inputParty1'] as any);
-        }
-
-        if (requestParameters['inputParty2'] != null) {
-            formParams.append('input_party2', requestParameters['inputParty2'] as any);
+        if (requestParameters['voucher'] != null) {
+            formParams.append('voucher', requestParameters['voucher'] as any);
         }
 
         const response = await this.request({
-            path: `/api/v1/jobs/schedule`,
+            path: `/api/v1/jobs/schedule-full-job`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -279,10 +421,242 @@ export class JobApi extends runtime.BaseAPI {
     }
 
     /**
-     * create a new job
+     * create a new full job
      */
-    async scheduleJob(requestParameters: ScheduleJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ScheduleJobResponse> {
-        const response = await this.scheduleJobRaw(requestParameters, initOverrides);
+    async scheduleFullJob(requestParameters: ScheduleFullJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ScheduleJobResponse> {
+        const response = await this.scheduleFullJobRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * create a new full job with multiple inputs
+     */
+    async scheduleFullMultipleInputsJobRaw(requestParameters: ScheduleFullMultipleInputsJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ScheduleJobResponse>> {
+        if (requestParameters['blueprintId'] == null) {
+            throw new runtime.RequiredError(
+                'blueprintId',
+                'Required parameter "blueprintId" was null or undefined when calling scheduleFullMultipleInputsJob().'
+            );
+        }
+
+        if (requestParameters['node0'] == null) {
+            throw new runtime.RequiredError(
+                'node0',
+                'Required parameter "node0" was null or undefined when calling scheduleFullMultipleInputsJob().'
+            );
+        }
+
+        if (requestParameters['node1'] == null) {
+            throw new runtime.RequiredError(
+                'node1',
+                'Required parameter "node1" was null or undefined when calling scheduleFullMultipleInputsJob().'
+            );
+        }
+
+        if (requestParameters['node2'] == null) {
+            throw new runtime.RequiredError(
+                'node2',
+                'Required parameter "node2" was null or undefined when calling scheduleFullMultipleInputsJob().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const consumes: runtime.Consume[] = [
+            { contentType: 'application/x-www-form-urlencoded' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['blueprintId'] != null) {
+            formParams.append('blueprint_id', requestParameters['blueprintId'] as any);
+        }
+
+        if (requestParameters['deadline'] != null) {
+            formParams.append('deadline', (requestParameters['deadline'] as any).toISOString());
+        }
+
+        if (requestParameters['node0'] != null) {
+            formParams.append('node0', requestParameters['node0'] as any);
+        }
+
+        if (requestParameters['node1'] != null) {
+            formParams.append('node1', requestParameters['node1'] as any);
+        }
+
+        if (requestParameters['node2'] != null) {
+            formParams.append('node2', requestParameters['node2'] as any);
+        }
+
+        if (requestParameters['voucher'] != null) {
+            formParams.append('voucher', requestParameters['voucher'] as any);
+        }
+
+        const response = await this.request({
+            path: `/api/v1/jobs/schedule-full-multiple-inputs-job`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: formParams,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ScheduleJobResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * create a new full job with multiple inputs
+     */
+    async scheduleFullMultipleInputsJob(requestParameters: ScheduleFullMultipleInputsJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ScheduleJobResponse> {
+        const response = await this.scheduleFullMultipleInputsJobRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * create a new prove job
+     */
+    async scheduleProveJobRaw(requestParameters: ScheduleProveJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ScheduleJobResponse>> {
+        if (requestParameters['blueprintId'] == null) {
+            throw new runtime.RequiredError(
+                'blueprintId',
+                'Required parameter "blueprintId" was null or undefined when calling scheduleProveJob().'
+            );
+        }
+
+        if (requestParameters['mpcProtocol'] == null) {
+            throw new runtime.RequiredError(
+                'mpcProtocol',
+                'Required parameter "mpcProtocol" was null or undefined when calling scheduleProveJob().'
+            );
+        }
+
+        if (requestParameters['node0'] == null) {
+            throw new runtime.RequiredError(
+                'node0',
+                'Required parameter "node0" was null or undefined when calling scheduleProveJob().'
+            );
+        }
+
+        if (requestParameters['node1'] == null) {
+            throw new runtime.RequiredError(
+                'node1',
+                'Required parameter "node1" was null or undefined when calling scheduleProveJob().'
+            );
+        }
+
+        if (requestParameters['node2'] == null) {
+            throw new runtime.RequiredError(
+                'node2',
+                'Required parameter "node2" was null or undefined when calling scheduleProveJob().'
+            );
+        }
+
+        if (requestParameters['witness0'] == null) {
+            throw new runtime.RequiredError(
+                'witness0',
+                'Required parameter "witness0" was null or undefined when calling scheduleProveJob().'
+            );
+        }
+
+        if (requestParameters['witness1'] == null) {
+            throw new runtime.RequiredError(
+                'witness1',
+                'Required parameter "witness1" was null or undefined when calling scheduleProveJob().'
+            );
+        }
+
+        if (requestParameters['witness2'] == null) {
+            throw new runtime.RequiredError(
+                'witness2',
+                'Required parameter "witness2" was null or undefined when calling scheduleProveJob().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const consumes: runtime.Consume[] = [
+            { contentType: 'multipart/form-data' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['blueprintId'] != null) {
+            formParams.append('blueprint_id', requestParameters['blueprintId'] as any);
+        }
+
+        if (requestParameters['mpcProtocol'] != null) {
+            formParams.append('mpc_protocol', requestParameters['mpcProtocol'] as any);
+        }
+
+        if (requestParameters['node0'] != null) {
+            formParams.append('node0', requestParameters['node0'] as any);
+        }
+
+        if (requestParameters['node1'] != null) {
+            formParams.append('node1', requestParameters['node1'] as any);
+        }
+
+        if (requestParameters['node2'] != null) {
+            formParams.append('node2', requestParameters['node2'] as any);
+        }
+
+        if (requestParameters['voucher'] != null) {
+            formParams.append('voucher', requestParameters['voucher'] as any);
+        }
+
+        if (requestParameters['witness0'] != null) {
+            formParams.append('witness0', requestParameters['witness0'] as any);
+        }
+
+        if (requestParameters['witness1'] != null) {
+            formParams.append('witness1', requestParameters['witness1'] as any);
+        }
+
+        if (requestParameters['witness2'] != null) {
+            formParams.append('witness2', requestParameters['witness2'] as any);
+        }
+
+        const response = await this.request({
+            path: `/api/v1/jobs/schedule-prove-job`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: formParams,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ScheduleJobResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * create a new prove job
+     */
+    async scheduleProveJob(requestParameters: ScheduleProveJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ScheduleJobResponse> {
+        const response = await this.scheduleProveJobRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

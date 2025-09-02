@@ -8,7 +8,7 @@ export * from './BlueprintReadyProbe';
 export * from './BlueprintType';
 export * from './CreateBlueprintResponse';
 export * from './InviteCode';
-export * from './JobType';
+export * from './MpcProtocol';
 export * from './NodeProvider';
 export * from './NodeProviders';
 export * from './PaginationResultInviteCode';

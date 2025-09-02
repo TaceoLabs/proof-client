@@ -9,7 +9,10 @@ Method | HTTP request | Description
 [**download_aux_data**](BlueprintApi.md#download_aux_data) | **GET** /api/v1/blueprint/{id}/aux/{aux_type} | 
 [**issue_cosnark_code**](BlueprintApi.md#issue_cosnark_code) | **POST** /api/v1/blueprint/code | create a new job
 [**revoke**](BlueprintApi.md#revoke) | **POST** /api/v1/blueprint/{id}/revoke | Revokes the blueprint identified by ID if the logged in user has the correct access rights.
-[**upload_aux_data**](BlueprintApi.md#upload_aux_data) | **POST** /api/v1/blueprint/{id}/aux/{aux_type} | add proving key to blueprint
+[**upload_circuit**](BlueprintApi.md#upload_circuit) | **POST** /api/v1/blueprint/{id}/aux/circuit | add circuit to blueprint
+[**upload_constraint_matrices**](BlueprintApi.md#upload_constraint_matrices) | **POST** /api/v1/blueprint/{id}/aux/matrices | add constraint matrices to blueprint
+[**upload_pk**](BlueprintApi.md#upload_pk) | **POST** /api/v1/blueprint/{id}/aux/pk | add proving key to blueprint
+[**upload_vk**](BlueprintApi.md#upload_vk) | **POST** /api/v1/blueprint/{id}/aux/vk | add verification key to blueprint
 
 
 
@@ -158,9 +161,67 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 
-## upload_aux_data
+## upload_circuit
 
-> upload_aux_data(id, aux_type, file)
+> upload_circuit(id, file)
+add circuit to blueprint
+
+### Parameters
+
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**id** | **uuid::Uuid** | The id of the blueprint | [required] |
+**file** | **std::path::PathBuf** |  | [required] |
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+[cookieAuth](../README.md#cookieAuth)
+
+### HTTP request headers
+
+- **Content-Type**: multipart/form-data
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
+## upload_constraint_matrices
+
+> upload_constraint_matrices(id, file)
+add constraint matrices to blueprint
+
+### Parameters
+
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**id** | **uuid::Uuid** | The id of the blueprint | [required] |
+**file** | **std::path::PathBuf** |  | [required] |
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+[cookieAuth](../README.md#cookieAuth)
+
+### HTTP request headers
+
+- **Content-Type**: multipart/form-data
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
+## upload_pk
+
+> upload_pk(id, file)
 add proving key to blueprint
 
 ### Parameters
@@ -169,7 +230,35 @@ add proving key to blueprint
 Name | Type | Description  | Required | Notes
 ------------- | ------------- | ------------- | ------------- | -------------
 **id** | **uuid::Uuid** | The id of the blueprint | [required] |
-**aux_type** | [**AuxiliaryType**](.md) | The type of the auxiliary data | [required] |
+**file** | **std::path::PathBuf** |  | [required] |
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+[cookieAuth](../README.md#cookieAuth)
+
+### HTTP request headers
+
+- **Content-Type**: multipart/form-data
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
+## upload_vk
+
+> upload_vk(id, file)
+add verification key to blueprint
+
+### Parameters
+
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**id** | **uuid::Uuid** | The id of the blueprint | [required] |
 **file** | **std::path::PathBuf** |  | [required] |
 
 ### Return type

@@ -1,38 +1,36 @@
 {
   "name": "@taceo/proof-client-bundler",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/TaceoLabs/proof-client"
   },
-  "main": "index.js",
-  "types": "index.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:node": "wasm-pack build --target nodejs && sed -i '2s/proof-client-bundler/proof-client-node/' package.json && tsc",
-    "build:bundler": "wasm-pack build --target bundler && sed -i '2s/proof-client-node/proof-client-bundler/' package.json && tsc"
-
+    "build:node": "wasm-pack build --target nodejs --no-pack taceo-proof-wasm && rm taceo-proof-wasm/pkg/.gitignore && sed -i '2s/proof-client-bundler/proof-client-node/' package.json && tsc",
+    "build:bundler": "wasm-pack build --target bundler --no-pack taceo-proof-wasm && rm taceo-proof-wasm/pkg/.gitignore && sed -i '2s/proof-client-node/proof-client-bundler/' package.json && tsc"
   },
   "files": [
-    "index.ts",
-    "index.js",
-    "index.d.ts",
-    "./pkg/taceo_proof_wasm.js",
-    "./pkg/taceo_proof_wasm_bg.wasm",
-    "./pkg/taceo_proof_wasm.d.ts",
-    "./pkg/taceo_proof_wasm_bg.js",
-    "./pkg/taceo_proof_wasm_bg.js",
-    "./pkg/taceo_proof_wasm_bg.wasm.d.ts"
+    "dist/**",
+    "taceo-proof-wasm/pkg/taceo_proof_wasm.js",
+    "taceo-proof-wasm/pkg/taceo_proof_wasm_bg.wasm",
+    "taceo-proof-wasm/pkg/taceo_proof_wasm.d.ts",
+    "taceo-proof-wasm/pkg/taceo_proof_wasm_bg.js",
+    "taceo-proof-wasm/pkg/taceo_proof_wasm_bg.js",
+    "taceo-proof-wasm/pkg/taceo_proof_wasm_bg.wasm.d.ts"
   ],
   "keywords": [],
   "author": "",
   "license": "MIT",
   "description": "",
   "devDependencies": {
-    "@types/node": "^22.9.0",
     "typescript": "^5.6.3"
   },
   "dependencies": {
-    "@taceo/proof-api-client": "^1.0.0"
+    "@taceo/proof-api-client": "^2.0.0",
+    "@types/snarkjs": "^0.7.9",
+    "js-base64": "^3.7.8"
   }
 }
